@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "855612301458",
+    "firebase_url": "https://where-we-f57be.firebaseio.com",
+    "project_id": "where-we-f57be",
+    "storage_bucket": "where-we-f57be.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855612301458:android:9f7b279b1063087e",
+        "android_client_info": {
+          "package_name": "ru.nwts.wherewe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "855612301458-dlrf1u69r704dui3gg1d1ugif8pnft56.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxbmknN8wzsaW282kOraqz3la2Giw1C6g"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
