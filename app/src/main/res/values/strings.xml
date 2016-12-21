@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">Where We</string>
+
+    <string name="wifi_title">Wi-Fi</string>
+    <string name="wifi_summary">Вкл. или выкл. сеть WiFi</string>
+    <string name="hints_title">Подсказки</string>
+    <string name="hints_summary">Показывать подсказки</string>
+    <string name="googleplay_url">https://play.google.com/store/apps/details?id=ru.nwts.appsyoutube</string>
+
+    <string name="about">О приложении</string>
+
+    <string-array name="channel_names">
+        <item>New Video</item>
+        <item>Java for beginners</item>
+        <item>Android Studio</item>
+        <item>Android Design</item>
+        <item>Developer Tools</item>
+        <item>Game Dev</item>
+        <item>Eclipse</item>
+    </string-array>
+
 </resources>

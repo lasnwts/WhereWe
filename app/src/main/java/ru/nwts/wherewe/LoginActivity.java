@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import ru.nwts.wherewe.util.PreferenceHelper;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     //defining views
@@ -25,8 +27,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText editTextPassword;
     private TextView textViewSignup;
 
+    private String email;
+    private String password;
+
     //firebase auth object
     private FirebaseAuth firebaseAuth;
+    PreferenceHelper preferenceHelper;
 
     //progress dialog
     private ProgressDialog progressDialog;
@@ -54,6 +60,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         buttonSignIn = (Button) findViewById(R.id.buttonSignin);
         textViewSignup = (TextView) findViewById(R.id.textViewSignUp);
 
+        //initializing preference
+        PreferenceHelper.getInstance().init(getApplicationContext());
+        preferenceHelper = PreferenceHelper.getInstance();
+
+        if(!preferenceHelper.getString("login").isEmpty() && !preferenceHelper.getString("password").isEmpty()){
+            editTextEmail.setText(preferenceHelper.getString("login"));
+            editTextPassword.setText(preferenceHelper.getString("password"));
+        }
+
         progressDialog = new ProgressDialog(this);
 
         //attaching click listener
@@ -64,8 +79,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     //method for user login
     private void userLogin() {
-        String email = editTextEmail.getText().toString().trim();
-        String password = editTextPassword.getText().toString().trim();
+         email = editTextEmail.getText().toString().trim();
+         password = editTextPassword.getText().toString().trim();
 
 
         //checking if email and passwords are empty
@@ -94,6 +109,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         //if the task is successfull
                         if (task.isSuccessful()) {
                             //start the profile activity
+                            preferenceHelper.putString("login",email);
+                            preferenceHelper.putString("password",password);
                             finish();
                             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         }else{

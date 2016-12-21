@@ -1,7 +1,32 @@
 <resources>
 
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="colorPrimary">@color/primary_color</item>
+        <item name="colorPrimaryDark">@color/dark_primary_color</item>
+        <item name="colorAccent">@color/accent_color</item>
+
+        <item name="material_drawer_background">@color/drawer_background_color</item>
+        <item name="material_drawer_primary_icon">@color/text_and_icon_color</item>
+        <item name="material_drawer_primary_text">@color/text_and_icon_color</item>
+        <item name="material_drawer_secondary_text">@color/text_and_icon_color</item>
+        <item name="material_drawer_hint_text">@color/accent_color</item>
+        <item name="material_drawer_divider">@color/drawer_divider_color</item>
+        <item name="material_drawer_selected">@color/drawer_item_selected_color</item>
+        <item name="material_drawer_selected_text">@color/accent_color</item>
+        <item name="material_drawer_header_selection_text">@color/text_and_icon_color</item>
+
+
+    </style>
+
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme2" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
