@@ -1,14 +1,24 @@
 package ru.nwts.wherewe;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -19,7 +29,15 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.List;
+
+import ru.nwts.wherewe.database.DBHelper;
+import ru.nwts.wherewe.model.Model;
+import ru.nwts.wherewe.model.SmallModel;
+
+import static ru.nwts.wherewe.TODOApplication.*;
+
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
     //firebase auth object
     private FirebaseAuth firebaseAuth;
@@ -37,11 +55,25 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private int selectedDrawerItem = 0;
 
+    //
+    private GoogleMap Map;
+    public DBHelper dbHelper;
+    //Db
+    List<SmallModel> smallModels;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+
 
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -108,10 +140,23 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
         //displaying logged in user name
-        textViewUserEmail.setText("Welcome " + user.getEmail());
+        textViewUserEmail.setText("Welcome " + user.getEmail()+" "+TODOApplication.getInstance().TEST_STRING);
 
         //adding listener to button
         buttonLogout.setOnClickListener(this);
+
+        //Works Databases
+        //dbHelper = new DBHelper(this);
+        dbHelper = TODOApplication.getInstance().dbHelper;
+        if (dbHelper !=null){
+            dbHelper.dbDeleteUsers();
+            dbHelper.dbInsertUser("Test name_5", 1,1,1,1,1,198299922,33.35324905,65.84073992,null, null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
+            dbHelper.dbInsertUser("Test name_1", 1,1,1,1,1,198299922,28.55324905,68.14073992,null, null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
+            dbHelper.dbInsertUser("Test name_3", 1,1,1,1,1,198299922,30.35324905,64.84073992,null, null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
+            dbHelper.dbReadInLog();
+            smallModels = dbHelper.getListSmallModel();
+        }
+
     }
 
     @Override
@@ -132,5 +177,34 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //return super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_option, menu);
         return true;
+    }
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Map = googleMap;
+
+        if(Map == null){
+            Toast.makeText(getApplicationContext(),
+                    "Error creating map",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (smallModels == null){
+            Toast.makeText(getApplicationContext(),
+                    "Error SmallModel empty Error!",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for(int j=0;j < smallModels.size();j++){
+            SmallModel model = smallModels.get(j);
+            Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude())).title(model.getName()));
+            Map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(model.getLattitude(), model.getLongtitude())));
+        }
+
+        // Add a marker in Sydney and move the camera
+        //LatLng sydney = new LatLng(-34, 151);
+        //Map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //Map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 }
