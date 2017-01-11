@@ -3,6 +3,8 @@ package ru.nwts.wherewe;
 import android.app.Application;
 import android.content.Context;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import ru.nwts.wherewe.database.DBHelper;
 
 /**
@@ -17,8 +19,15 @@ public class TODOApplication extends Application {
 
     public DBHelper dbHelper;
 
+    //firebase auth object
+    private FirebaseAuth firebaseAuth;
+
     public static TODOApplication getInstance() {
         return instance;
+    }
+
+    public static FirebaseAuth getFireBaseAuth(){
+         return FirebaseAuth.getInstance();
     }
 
 

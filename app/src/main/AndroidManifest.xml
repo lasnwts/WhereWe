@@ -46,7 +46,12 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version">
         </meta-data>
-
+        <service
+            android:name=".services.LocationService"
+            android:exported="false"></service>
+        <service
+            android:name=".services.DeviceLocationService"
+            android:exported="false"></service>
 
     </application>
 

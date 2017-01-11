@@ -203,7 +203,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     private void initFireBaseLogin() {
 
         //initializing firebase auth object
-        firebaseAuth = FirebaseAuth.getInstance();
+        //firebaseAuth = FirebaseAuth.getInstance(); -- old variant
+        firebaseAuth = TODOApplication.getFireBaseAuth();
 
         boolean is_login = !preferenceHelper.getString("login").isEmpty();
         boolean is_password = !preferenceHelper.getString("password").isEmpty();

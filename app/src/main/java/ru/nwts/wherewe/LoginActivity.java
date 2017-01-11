@@ -43,7 +43,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
 
         //getting firebase auth object
-        firebaseAuth = FirebaseAuth.getInstance();
+     //  firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth = TODOApplication.getFireBaseAuth();
+                //FirebaseAuth.getInstance();
 
         //if the objects getcurrentuser method is not null
         //means user is already logged in

@@ -179,7 +179,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
     //Delete all record to Users
     public int dbDeleteUsers(){
         int deleteCount = getWritableDatabase().delete(TABLE_USERS,null,null);
-        Log.d(TAG,"Dlete count ="+ " delete:"+deleteCount);
+        Log.d(TAG,"Delete count ="+ " delete:"+deleteCount);
         return  deleteCount;
     }
 

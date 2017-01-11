@@ -34,10 +34,18 @@ import java.util.List;
 import ru.nwts.wherewe.database.DBHelper;
 import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.SmallModel;
+import ru.nwts.wherewe.services.DeviceLocationService;
+import ru.nwts.wherewe.services.LocationService;
+import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static ru.nwts.wherewe.TODOApplication.*;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
+
+    //LOG
+    public static final String TAG = "MyLogs";
+
+    PreferenceHelper preferenceHelper;
 
     //firebase auth object
     private FirebaseAuth firebaseAuth;
@@ -61,7 +69,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     //Db
     List<SmallModel> smallModels;
 
+    //
+    Intent locationService;
 
+    private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
+    private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
 
 
     @Override
@@ -76,7 +88,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
         //initializing firebase authentication object
-        firebaseAuth = FirebaseAuth.getInstance();
+        //firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth = TODOApplication.getFireBaseAuth();
 
         //if the user is not logged in
         //that means current user will return null
@@ -157,6 +170,41 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             smallModels = dbHelper.getListSmallModel();
         }
 
+
+        locationService = new Intent(ProfileActivity.this, DeviceLocationService.class);
+        //Preference
+        initPreferences();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Write to SharedPref what ProfActivity Started
+        preferenceHelper.putBoolean(KEY_ACTIVITY_READY,true);
+        //Tested Run LocationService Or Not
+        if (!preferenceHelper.getBoolean(KEY_LOCATION_SERVICE_STARTED)){
+            //Тест координат
+            Log.d(TAG,"Start service! from ProfileActivity!");
+//
+//        locationService = new Intent(ProfileActivity.this, LocationService.class);
+//        locationService.putExtra("task", "GetMyLocation");
+//        startService(locationService);
+        }
+        startService(locationService);
+    }
+
+    @Override
+    protected void onPause() {
+        //Write to SharedPref what ProfActivity Started
+        Log.d(TAG,"ProfileActivity onPaiused..");
+        preferenceHelper.putBoolean(KEY_ACTIVITY_READY,false);
+        super.onPause();
+    }
+
+    private void initPreferences() {
+        //initializing preference
+        PreferenceHelper.getInstance().init(getApplicationContext());
+        preferenceHelper = PreferenceHelper.getInstance();
     }
 
     @Override
