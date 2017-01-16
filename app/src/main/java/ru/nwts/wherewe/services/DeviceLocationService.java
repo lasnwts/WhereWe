@@ -2,7 +2,9 @@ package ru.nwts.wherewe.services;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -20,6 +22,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.text.SimpleDateFormat;
+
+import ru.nwts.wherewe.util.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 /**
@@ -34,6 +39,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
 
     PreferenceHelper preferenceHelper;
+    private final String BATTERY_CHARGED = "BATTERY_CHARGED";
     private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
     private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
 
@@ -51,7 +57,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     private long myTime;
     private long timeWork;
 
-
+    private BroadcastReceiver receiver;
+    BoardReceiverBattery br;
+    SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 
     @Nullable
@@ -82,18 +90,18 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         myLongitude = location.getLongitude();
         myTime = location.getTime();
         mySpeed = (long) location.getSpeed();
-        Log.d(TAG,"KEY_ACTIVITY_READY"+preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
+        Log.d(TAG,"KEY_ACTIVITY_READY : "+preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
         //if ProfActivity not Start, may disabled service location
         if (!preferenceHelper.getBoolean(KEY_ACTIVITY_READY)){
             if (myAccuracy == location.getAccuracy()){
                 Log.d(TAG," Destroy on myAccuracy == location.getAccuracy().");
                 this.stopSelf();
-                onDestroy();
+                //onDestroy();
             }
             if (System.currentTimeMillis() - timeWork > 60 * 1000) {
                 Log.d(TAG," Destroy on timeWork > 4 min.");
                 this.stopSelf();
-                onDestroy();
+                //onDestroy();
             }
         }
 
@@ -103,9 +111,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG, "Latitude : " + String.valueOf(myLatitude));
         Log.d(TAG, "Longitude : " + String.valueOf(myLongitude));
         Log.d(TAG, "myAccuracy : " + String.valueOf(myAccuracy));
-        Log.d(TAG, "myTime : " + String.valueOf(myTime));
+        Log.d(TAG, "myTime : " + String.valueOf(myTime) +" normal time write:"+dateformat.format(myTime));
         Log.d(TAG, "mySpeed : " + String.valueOf(mySpeed));
-
     }
 
     private void requestLocationUpdates() {
@@ -160,9 +167,36 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG,"Location Service onStartCommand");
+        Log.d(TAG,"Location Service onStartCommand " + this.hashCode());
         initService();
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void changelocationRequestOnBattery(){
+        Log.d(TAG, "changelocationRequestOnBattery()");
+        if (locationRequest == null){
+            locationRequest = new LocationRequest();
+            if (preferenceHelper.getInt(BATTERY_CHARGED) >35){
+                Log.d(TAG, "(BATTERY_CHARGED) >35");
+                locationRequest.setInterval(10 * 1000);
+                locationRequest.setFastestInterval(5 * 1000);
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            }else {
+                if(preferenceHelper.getInt(BATTERY_CHARGED) > 18){
+                    Log.d(TAG, "(BATTERY_CHARGED) >18");
+                    locationRequest.setInterval(20 * 1000);
+                    locationRequest.setFastestInterval(5 * 1000);
+                    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                    //locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                }else if(preferenceHelper.getInt(BATTERY_CHARGED)<19){
+                    Log.d(TAG, "(BATTERY_CHARGED) <19");
+                    locationRequest.setInterval(30 * 1000);
+                    locationRequest.setFastestInterval(5 * 1000);
+                    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                    //locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                }
+            }
+        }
     }
 
     private void initService(){
@@ -178,10 +212,14 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             //  createLocationRequest();
             buildGoogleApiClient();
             if (locationRequest == null){
+                //Изменение параметров прогслушивания
+                changelocationRequestOnBattery();
+/*
                 locationRequest = new LocationRequest();
                 locationRequest.setInterval(10 * 1000);
                 locationRequest.setFastestInterval(5 * 1000);
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+*/
             }
             Log.d(TAG, "Google API Yастройки законченны");
             if (googleApiClient.isConnected()) {
@@ -199,7 +237,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG,"LOcatio Service Started");
         myAccuracy = 0;
         timeWork = System.currentTimeMillis();
-        initService();
+      //  initService();1388714548
+        //Ставим broadcast на батарею
+        br = new BoardReceiverBattery();
+        receiver = br.InitReceiver();
+        registerReceiver(receiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
 
@@ -210,7 +252,13 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         if (googleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
             googleApiClient.disconnect();
-            Log.d(TAG, "onDestroy googleAPi disabled");
+            locationRequest = null;
+            Log.d(TAG, "onDestroy googleAPi disabled "+ this.hashCode());
+            if (receiver != null) {
+                unregisterReceiver(receiver);
+                receiver = null;
+            }
+            Log.d(TAG, ":DeviceServiceLocation:onDestroy() :"+br.GetBatteryInfo());
         }
         Log.d(TAG, "onDestroy end");
         super.onDestroy();
