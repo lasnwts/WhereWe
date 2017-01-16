@@ -53,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     //view objects
     private TextView textViewUserEmail;
     private Button buttonLogout;
+    private Button buttonService;
 
     private Drawer drawer = null;
     private Toolbar toolbar;
@@ -110,6 +111,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
+        buttonService = (Button) findViewById(R.id.buttonService);
 
         channelNames = getResources().getStringArray(R.array.channel_names);
         PrimaryDrawerItem[] primaryDrawerItems = new PrimaryDrawerItem[channelNames.length];
@@ -157,6 +159,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         //adding listener to button
         buttonLogout.setOnClickListener(this);
+        buttonService.setOnClickListener(this);
 
         //Works Databases
         //dbHelper = new DBHelper(this);
@@ -217,6 +220,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             finish();
             //starting login activity
             startActivity(new Intent(this, LoginActivity.class));
+        }
+        if (view == buttonService){
+            startService(locationService);
         }
     }
 
