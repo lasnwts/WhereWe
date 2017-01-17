@@ -40,6 +40,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     PreferenceHelper preferenceHelper;
     private final String BATTERY_CHARGED = "BATTERY_CHARGED";
+    private final String LOCATION_MODE = "LOCATION_MODE"; //0 - Base > 35%; 1 - > 18; 2 - < 18%
     private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
     private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
 
@@ -178,18 +179,33 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             locationRequest = new LocationRequest();
             if (preferenceHelper.getInt(BATTERY_CHARGED) >35){
                 Log.d(TAG, "(BATTERY_CHARGED) >35");
+                if (preferenceHelper.getInt(LOCATION_MODE)==0){
+                    Log.d(TAG, "Mode = 0");
+                    return;
+                }
+                preferenceHelper.putInt(LOCATION_MODE,0); //Mode location = 0
                 locationRequest.setInterval(10 * 1000);
                 locationRequest.setFastestInterval(5 * 1000);
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             }else {
                 if(preferenceHelper.getInt(BATTERY_CHARGED) > 18){
                     Log.d(TAG, "(BATTERY_CHARGED) >18");
+                    if (preferenceHelper.getInt(LOCATION_MODE)==1){
+                        Log.d(TAG, "Mode = 1");
+                        return;
+                    }
+                    preferenceHelper.putInt(LOCATION_MODE,1); //Mode location = 1
                     locationRequest.setInterval(20 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                     //locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
                 }else if(preferenceHelper.getInt(BATTERY_CHARGED)<19){
                     Log.d(TAG, "(BATTERY_CHARGED) <19");
+                    if (preferenceHelper.getInt(LOCATION_MODE)==2){
+                        Log.d(TAG, "Mode = 2");
+                        return;
+                    }
+                    preferenceHelper.putInt(LOCATION_MODE,2); //Mode location = 2
                     locationRequest.setInterval(30 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
