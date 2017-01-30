@@ -40,7 +40,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     PreferenceHelper preferenceHelper;
     private final String BATTERY_CHARGED = "BATTERY_CHARGED";
-    private final String LOCATION_MODE = "LOCATION_MODE"; //0 - Base > 35%; 1 - > 18; 2 - < 18%
+    private final String LOCATION_MODE = "LOCATION_MODE"; //1 - Base > 35%;  2- > 18; 3 - < 18%; 0 - not working..
     private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
     private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
 
@@ -114,6 +114,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG, "myAccuracy : " + String.valueOf(myAccuracy));
         Log.d(TAG, "myTime : " + String.valueOf(myTime) +" normal time write:"+dateformat.format(myTime));
         Log.d(TAG, "mySpeed : " + String.valueOf(mySpeed));
+        Log.d(TAG," "+BATTERY_CHARGED+preferenceHelper.getInt(BATTERY_CHARGED)+" "+LOCATION_MODE+":"+preferenceHelper.getInt(LOCATION_MODE));
     }
 
     private void requestLocationUpdates() {
@@ -157,6 +158,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     protected void stopLocationUpdates() {
         Log.d(TAG,"stopLocationUpdates()");
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        locationRequest = null;
     }
 
 
@@ -175,37 +177,38 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     private void changelocationRequestOnBattery(){
         Log.d(TAG, "changelocationRequestOnBattery()");
+        Log.d(TAG, "(LOCATION_MODE) = "+preferenceHelper.getInt(LOCATION_MODE));
         if (locationRequest == null){
             locationRequest = new LocationRequest();
             if (preferenceHelper.getInt(BATTERY_CHARGED) >35){
                 Log.d(TAG, "(BATTERY_CHARGED) >35");
-                if (preferenceHelper.getInt(LOCATION_MODE)==0){
-                    Log.d(TAG, "Mode = 0");
-                    return;
-                }
-                preferenceHelper.putInt(LOCATION_MODE,0); //Mode location = 0
+//                if (preferenceHelper.getInt(LOCATION_MODE)==1){
+//                    Log.d(TAG, "Mode = 1");
+//                    return;
+//                }
+                preferenceHelper.putInt(LOCATION_MODE,1); //Mode location = 1
                 locationRequest.setInterval(10 * 1000);
                 locationRequest.setFastestInterval(5 * 1000);
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             }else {
                 if(preferenceHelper.getInt(BATTERY_CHARGED) > 18){
                     Log.d(TAG, "(BATTERY_CHARGED) >18");
-                    if (preferenceHelper.getInt(LOCATION_MODE)==1){
-                        Log.d(TAG, "Mode = 1");
-                        return;
-                    }
-                    preferenceHelper.putInt(LOCATION_MODE,1); //Mode location = 1
+//                    if (preferenceHelper.getInt(LOCATION_MODE)==2){
+//                        Log.d(TAG, "Mode = 2");
+//                        return;
+//                    }
+                    preferenceHelper.putInt(LOCATION_MODE,2); //Mode location = 2
                     locationRequest.setInterval(20 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                     //locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
                 }else if(preferenceHelper.getInt(BATTERY_CHARGED)<19){
                     Log.d(TAG, "(BATTERY_CHARGED) <19");
-                    if (preferenceHelper.getInt(LOCATION_MODE)==2){
-                        Log.d(TAG, "Mode = 2");
-                        return;
-                    }
-                    preferenceHelper.putInt(LOCATION_MODE,2); //Mode location = 2
+//                    if (preferenceHelper.getInt(LOCATION_MODE)==3){
+//                        Log.d(TAG, "Mode = 3");
+//                        return;
+//                    }
+                    preferenceHelper.putInt(LOCATION_MODE,3); //Mode location = 3
                     locationRequest.setInterval(30 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -253,6 +256,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG,"LOcatio Service Started");
         myAccuracy = 0;
         timeWork = System.currentTimeMillis();
+        //
+        if (preferenceHelper == null){
+            initPreferences();
+        }
+        preferenceHelper.putInt(LOCATION_MODE,0);
       //  initService();1388714548
         //Ставим broadcast на батарею
         br = new BoardReceiverBattery();
@@ -269,6 +277,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
             googleApiClient.disconnect();
             locationRequest = null;
+            preferenceHelper.putInt(LOCATION_MODE,0);
             Log.d(TAG, "onDestroy googleAPi disabled "+ this.hashCode());
             if (receiver != null) {
                 unregisterReceiver(receiver);
