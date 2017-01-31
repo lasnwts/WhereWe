@@ -21,11 +21,26 @@ import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
+import ru.nwts.wherewe.TODOApplication;
+import ru.nwts.wherewe.model.TestModel;
 import ru.nwts.wherewe.util.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
+
+import static android.R.attr.data;
+import static android.R.attr.value;
 
 /**
  * Created by Надя on 10.01.2017.
@@ -37,6 +52,14 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     //LOG
     public static final String TAG = "MyLogs";
 
+    //firebase auth object
+    private FirebaseAuth firebaseAuth;
+    //FireBase User
+    FirebaseUser user;
+    //firebase for write and read
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReferenceId;
 
     PreferenceHelper preferenceHelper;
     private final String BATTERY_CHARGED = "BATTERY_CHARGED";
@@ -261,6 +284,106 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             initPreferences();
         }
         preferenceHelper.putInt(LOCATION_MODE,0);
+
+        //initializing firebase authentication object
+        //firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth = TODOApplication.getFireBaseAuth();
+
+        //if the user is not logged in
+        //that means current user will return null
+        if (firebaseAuth.getCurrentUser() == null) {
+            //closing this activity
+            Log.d(TAG,"Attention FireBase User not Authorizied! DeviceLocationService...Destroy()");
+            onDestroy();
+        }
+        //getting current user
+         user = firebaseAuth.getCurrentUser();
+        //getting the database reference
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReferenceId = databaseReference.getRef();
+        Log.d(TAG,"DeviceLocartionService FireBase: "+databaseReference.toString());
+        Log.d(TAG,"DeviceLocartionService FireBase: "+databaseReference.child(user.getUid()).toString());
+        databaseReference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String value = dataSnapshot.child("test").toString();
+                   Log.d(TAG,"FBase value = "+value.toString());
+                if (dataSnapshot.exists()){
+                    String valueJson = dataSnapshot.getValue().toString();
+                    Log.d(TAG,"FBase value Json ="+valueJson);
+    //               TestModel testModel = dataSnapshot.child("-KboI4Ia6DSToPRURKmG").getValue(TestModel.class);
+    //               Log.d(TAG,"FBase TestModel class ="+testModel.getTest());
+//                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()){
+//                        TestModel testModel2 = dataSnapshot.child("-KboI4IdtZiiNh921-RB").getValue(TestModel.class);
+//                        Log.d(TAG,"FBase TestModel2 class ="+testModel2.getTest());
+//                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG,"FBase value = read Failed.");
+            }
+        });
+
+        //FireBase addValue Child Listner
+        databaseReference.child(user.getUid()).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.d(TAG,"FBase addChildEventListener onChildAdded value = s."+s);
+                Log.d(TAG,"FBase addChildEventListener onChildAdded dataSnapshot key = "+dataSnapshot.getKey());
+                if (!dataSnapshot.getKey().isEmpty()){
+                    TestModel testModel4 =  dataSnapshot.getValue(TestModel.class);
+                    Log.d(TAG,"FBase TestModel3 class ="+testModel4.getTest());
+                    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.d(TAG,"FBase addChildEventListener onChildChanged value = s."+s);
+                Log.d(TAG,"FBase addChildEventListener onChildChanged dataSnapshot key = "+dataSnapshot.getKey());
+                if (!dataSnapshot.getKey().isEmpty()){
+                    TestModel testModel3 =  dataSnapshot.getValue(TestModel.class);
+                    Log.d(TAG,"FBase TestModel3 class ="+testModel3.getTest());
+                    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.d(TAG,"FBase addChildEventListener onChildRemoved value" );
+                Log.d(TAG,"FBase addChildEventListener onChildRemoved dataSnapshot key = "+dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.d(TAG,"FBase addChildEventListener onChildMoved value = s."+s);
+                Log.d(TAG,"FBase addChildEventListener onChildMoved dataSnapshot key = "+dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG,"FBase addChildEventListener onChildAdded value = s."+databaseError.toString());
+            }
+        });
+
+        /*
+        Тестироввание Создадим объект в FireBase`
+         */
+        databaseReference.child(user.getUid()).push().setValue(new TestModel("test101"));
+       databaseReference.child(user.getUid()).push().setValue(new TestModel("test202"));
+
+        databaseReference.child("M0erubbTS6hbInqmOmnZOPelZfE2").push().setValue(new TestModel("test202"));
+       // Map<String, TestModel> testModels = new HashMap<String, TestModel>();
+       // testModels.put("testoviy Rklient", new TestModel("New Test User1"));
+       // databaseReference.child(user.getUid()).setValue(testModels); // все стирает в ключе! Остается одна запись!
+
+
+
+        /*
+        Коненц тестирования
+         */
       //  initService();1388714548
         //Ставим broadcast на батарею
         br = new BoardReceiverBattery();
