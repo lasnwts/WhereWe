@@ -335,7 +335,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 if (!dataSnapshot.getKey().isEmpty()){
                     TestModel testModel4 =  dataSnapshot.getValue(TestModel.class);
                     Log.d(TAG,"FBase TestModel3 class ="+testModel4.getTest());
-                    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                //    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                 }
             }
 
@@ -346,7 +346,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 if (!dataSnapshot.getKey().isEmpty()){
                     TestModel testModel3 =  dataSnapshot.getValue(TestModel.class);
                     Log.d(TAG,"FBase TestModel3 class ="+testModel3.getTest());
-                    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                 //   databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                 }
             }
 
@@ -371,10 +371,12 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         /*
         Тестироввание Создадим объект в FireBase`
          */
-        databaseReference.child(user.getUid()).push().setValue(new TestModel("test101"));
-       databaseReference.child(user.getUid()).push().setValue(new TestModel("test202"));
+        databaseReference.child(user.getUid()).push().setValue(new TestModel("test101","email@mail.ru",129l));
+       databaseReference.child(user.getUid()).push().setValue(new TestModel("test202","email@mail.ru",129l));
 
-        databaseReference.child("M0erubbTS6hbInqmOmnZOPelZfE2").push().setValue(new TestModel("test202"));
+        databaseReference.child("M0erubbTS6hbInqmOmnZOPelZfE2").push().setValue(new TestModel("test202","email@mail.ru",129l));
+
+        databaseReference.child(user.getUid()).child("test83737MAILRU").setValue(new TestModel("For more information see","email@mail.ru",129l));
        // Map<String, TestModel> testModels = new HashMap<String, TestModel>();
        // testModels.put("testoviy Rklient", new TestModel("New Test User1"));
        // databaseReference.child(user.getUid()).setValue(testModels); // все стирает в ключе! Остается одна запись!

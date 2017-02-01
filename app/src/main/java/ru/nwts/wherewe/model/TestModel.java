@@ -7,7 +7,23 @@ import java.io.Serializable;
  */
 
 public class TestModel implements Serializable {
+    public String getEmail() {
+        return email;
+    }
+
+    public long getAttitude() {
+        return attitude;
+    }
+
+    public TestModel(String test, String email, long attitude) {
+        this.test = test;
+        this.email = email;
+        this.attitude = attitude;
+    }
+
     private String test;
+    private String email;
+    private long attitude;
 
     public TestModel() {
     }

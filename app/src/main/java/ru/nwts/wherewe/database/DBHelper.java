@@ -11,6 +11,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.nwts.wherewe.model.FbaseModel;
 import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.SmallModel;
 
@@ -50,6 +51,8 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         db.execSQL(SQL_CREATE_ENTRIES_GROUPS);
         db.execSQL(SQL_CREATE_ENTRIES_LINKS);
         db.execSQL(SQL_CREATE_ENTRIES_TRACKS);
+        db.execSQL("insert into "+TABLE_USERS+"("+KEY_NAME+")"+"VALUES('You First Name')");
+       // dbInsertUser("You First Name", 1,1,1,1,1,198299922,33.35324905,65.84073992,null, null, 0, 999,"i123456789", "o123456789", "test@mail.ru", "09");
     }
 
     @Override
@@ -170,6 +173,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     //Delete record to Users
     public int dbDeleteUser(long rowID){
+        if (rowID ==1){
+            return 0;
+        }
         String where = KEY_ID + "=" + rowID;
         int deleteCount = getWritableDatabase().delete(TABLE_USERS,where,null);
         Log.d(TAG,"rowID ="+rowID + " delete:"+deleteCount);
@@ -178,7 +184,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     //Delete all record to Users
     public int dbDeleteUsers(){
-        int deleteCount = getWritableDatabase().delete(TABLE_USERS,null,null);
+        int deleteCount = getWritableDatabase().delete(TABLE_USERS, KEY_ID +" !=1", null);
         Log.d(TAG,"Delete count ="+ " delete:"+deleteCount);
         return  deleteCount;
     }
@@ -271,4 +277,29 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return SmallModels;
     }
 
+
+    //read 1 model FireBase, _id = 1
+    public FbaseModel getFbaseModel(){
+        Cursor c = getReadableDatabase().query(TABLE_USERS, null, "KEY_ID = ?", new String[] {Integer.toString(1)}, null, null, null);
+
+        // определяем номера столбцов по имени в выборке
+        int idColIndex = c.getColumnIndex(KEY_ID);
+        int nameColIndex = c.getColumnIndex(KEY_NAME);
+        int stateColIndex = c.getColumnIndex(KEY_STATE);
+        int modeColIndex = c.getColumnIndex(KEY_MODE);
+        int rightsColIndex = c.getColumnIndex(KEY_RIGHTS);
+        int speedColIndex = c.getColumnIndex(KEY_SPEED);
+        int movedColIndex = c.getColumnIndex(KEY_MOVED);
+        int dateColIndex = c.getColumnIndex(KEY_DATE);
+        int longtitudeColIndex = c.getColumnIndex(KEY_LONGTITUDE);
+        int lattitudeColIndex = c.getColumnIndex(KEY_LATTITUDE);
+        int contactColIndex = c.getColumnIndex(KEY_CONTACT_ID);
+        int emailColIndex = c.getColumnIndex(KEY_EMAIL);
+
+        if (c !=null && c.getCount()>0){
+            Log.d(TAG,"getFbaseModel");
+
+        }
+        return null;
+    }
 }
