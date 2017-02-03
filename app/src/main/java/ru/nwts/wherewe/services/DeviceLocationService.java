@@ -32,9 +32,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ru.nwts.wherewe.TODOApplication;
+import ru.nwts.wherewe.database.DBHelper;
+import ru.nwts.wherewe.model.ListFireBasePath;
+import ru.nwts.wherewe.model.ModelCheck;
 import ru.nwts.wherewe.model.TestModel;
 import ru.nwts.wherewe.util.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
@@ -49,8 +53,24 @@ import static android.R.attr.value;
 public class DeviceLocationService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    //VARIABBLES MONITORING
+    private long timeAccpetWait = 15 * 60 * 1000; //Время (15 мин) через которое необходимо обязательно записать в FB информацию
+    private double acceptDistance = 200;
+    private String accprtDistanceString = "meter";
+    /*
+    "M" -   Miles
+    "K" -   Kilometers
+    "N" -   Nautical Miles
+    "meter" -   meters
+     */
+
+
     //LOG
     public static final String TAG = "MyLogs";
+    //SQLite
+    public DBHelper dbHelper;
+    ModelCheck modelCheck;
+    List<ListFireBasePath> listFireBasePaths;
 
     //firebase auth object
     private FirebaseAuth firebaseAuth;
@@ -64,8 +84,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     PreferenceHelper preferenceHelper;
     private final String BATTERY_CHARGED = "BATTERY_CHARGED";
     private final String LOCATION_MODE = "LOCATION_MODE"; //1 - Base > 35%;  2- > 18; 3 - < 18%; 0 - not working..
-    private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
-    private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
+    private final String KEY_ACTIVITY_READY = "PROF_ACTIVITY";
+    private final String KEY_LOCATION_SERVICE_STARTED = "LOCATION_SERVICE";
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
@@ -114,16 +134,23 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         myLongitude = location.getLongitude();
         myTime = location.getTime();
         mySpeed = (long) location.getSpeed();
-        Log.d(TAG,"KEY_ACTIVITY_READY : "+preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
+        //Call function check Write OR not in FireBase
+        if (getCheckWriteOrNotInFirerBase(myLatitude, myLongitude, myTime)) {
+            //Write to FireBase
+            putWriteMyDataToFireBase(myLatitude, myLongitude, myTime, mySpeed);
+        }
+
+
+        Log.d(TAG, "KEY_ACTIVITY_READY : " + preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
         //if ProfActivity not Start, may disabled service location
-        if (!preferenceHelper.getBoolean(KEY_ACTIVITY_READY)){
-            if (myAccuracy == location.getAccuracy()){
-                Log.d(TAG," Destroy on myAccuracy == location.getAccuracy().");
+        if (!preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
+            if (myAccuracy == location.getAccuracy()) {
+                Log.d(TAG, " Destroy on myAccuracy == location.getAccuracy().");
                 this.stopSelf();
                 //onDestroy();
             }
             if (System.currentTimeMillis() - timeWork > 60 * 1000) {
-                Log.d(TAG," Destroy on timeWork > 4 min.");
+                Log.d(TAG, " Destroy on timeWork > 4 min.");
                 this.stopSelf();
                 //onDestroy();
             }
@@ -135,13 +162,74 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG, "Latitude : " + String.valueOf(myLatitude));
         Log.d(TAG, "Longitude : " + String.valueOf(myLongitude));
         Log.d(TAG, "myAccuracy : " + String.valueOf(myAccuracy));
-        Log.d(TAG, "myTime : " + String.valueOf(myTime) +" normal time write:"+dateformat.format(myTime));
+        Log.d(TAG, "myTime : " + String.valueOf(myTime) + " normal time write:" + dateformat.format(myTime));
         Log.d(TAG, "mySpeed : " + String.valueOf(mySpeed));
-        Log.d(TAG," "+BATTERY_CHARGED+preferenceHelper.getInt(BATTERY_CHARGED)+" "+LOCATION_MODE+":"+preferenceHelper.getInt(LOCATION_MODE));
+        Log.d(TAG, " " + BATTERY_CHARGED + preferenceHelper.getInt(BATTERY_CHARGED) + " " + LOCATION_MODE + ":" + preferenceHelper.getInt(LOCATION_MODE));
     }
 
+    private void putWriteMyDataToFireBase(Double myLatitude, Double myLongitude, long myTime, double mySpeed){
+        //get all path from FireBase
+        listFireBasePaths = dbHelper.getListFireBasePath();
+        if(listFireBasePaths == null || listFireBasePaths.isEmpty()){
+            return;
+        }
+        if (listFireBasePaths.size() == 1){
+            ListFireBasePath listFireBaePath = listFireBasePaths.get(0);
+            if (listFireBaePath.getId() == 0){
+                return;
+            }
+        }
+        //Пишем в FB
+        for(int j=0;j < listFireBasePaths.size();j++){
+            //Запись в FireBase 03/02/2017
+        }
+        //Пишем в SQLite о себе
+        dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
+    }
+
+    private boolean getCheckWriteOrNotInFirerBase(Double myLatitude, Double myLongitude, long myTime) {
+        //Здесь необходимо из SharedPreferency получить Разрешенную дистанцию
+        //Также время записи в FB
+        modelCheck = dbHelper.getLatLongTimeFromMe();
+        double calcDistance = distance(myLatitude,myLongitude,modelCheck.getLatitude(),modelCheck.getLongtitude(),"meter");
+        long calcTimeDistance = System.currentTimeMillis() - myTime;
+        if (acceptDistance < calcDistance || timeAccpetWait < calcTimeDistance ){
+            //Wirte to FireBasde
+            return  true;
+        } else {
+            return  false;
+        }
+    }
+
+
+    private double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        if (unit == "K") {
+            dist = dist * 1.609344;
+        } else if (unit == "N") {
+            dist = dist * 0.8684;
+        } else if (unit == "meter") {
+            dist = dist * 1609.344;
+        }
+        Log.d(TAG,"distance : "+dist);
+        return dist;
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
+    }
+
+
     private void requestLocationUpdates() {
-        Log.d(TAG,"requestLocationUpdates()..");
+        Log.d(TAG, "requestLocationUpdates()..");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -152,9 +240,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        Log.d(TAG,"test connected requestLocationUpdates()..");
-        if(googleApiClient.isConnected()){
-            Log.d(TAG," LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this)");
+        Log.d(TAG, "test connected requestLocationUpdates()..");
+        if (googleApiClient.isConnected()) {
+            Log.d(TAG, " LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this)");
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
     }
@@ -179,59 +267,58 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     protected void stopLocationUpdates() {
-        Log.d(TAG,"stopLocationUpdates()");
+        Log.d(TAG, "stopLocationUpdates()");
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         locationRequest = null;
     }
 
 
     private void initPreferences() {
-        //initializing preference
         PreferenceHelper.getInstance().init(getApplicationContext());
         preferenceHelper = PreferenceHelper.getInstance();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG,"Location Service onStartCommand " + this.hashCode());
+        Log.d(TAG, "Location Service onStartCommand " + this.hashCode());
         initService();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void changelocationRequestOnBattery(){
+    private void changelocationRequestOnBattery() {
         Log.d(TAG, "changelocationRequestOnBattery()");
-        Log.d(TAG, "(LOCATION_MODE) = "+preferenceHelper.getInt(LOCATION_MODE));
-        if (locationRequest == null){
+        Log.d(TAG, "(LOCATION_MODE) = " + preferenceHelper.getInt(LOCATION_MODE));
+        if (locationRequest == null) {
             locationRequest = new LocationRequest();
-            if (preferenceHelper.getInt(BATTERY_CHARGED) >35){
+            if (preferenceHelper.getInt(BATTERY_CHARGED) > 35) {
                 Log.d(TAG, "(BATTERY_CHARGED) >35");
 //                if (preferenceHelper.getInt(LOCATION_MODE)==1){
 //                    Log.d(TAG, "Mode = 1");
 //                    return;
 //                }
-                preferenceHelper.putInt(LOCATION_MODE,1); //Mode location = 1
+                preferenceHelper.putInt(LOCATION_MODE, 1); //Mode location = 1
                 locationRequest.setInterval(10 * 1000);
                 locationRequest.setFastestInterval(5 * 1000);
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            }else {
-                if(preferenceHelper.getInt(BATTERY_CHARGED) > 18){
+            } else {
+                if (preferenceHelper.getInt(BATTERY_CHARGED) > 18) {
                     Log.d(TAG, "(BATTERY_CHARGED) >18");
 //                    if (preferenceHelper.getInt(LOCATION_MODE)==2){
 //                        Log.d(TAG, "Mode = 2");
 //                        return;
 //                    }
-                    preferenceHelper.putInt(LOCATION_MODE,2); //Mode location = 2
+                    preferenceHelper.putInt(LOCATION_MODE, 2); //Mode location = 2
                     locationRequest.setInterval(20 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                     //locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                }else if(preferenceHelper.getInt(BATTERY_CHARGED)<19){
+                } else if (preferenceHelper.getInt(BATTERY_CHARGED) < 19) {
                     Log.d(TAG, "(BATTERY_CHARGED) <19");
 //                    if (preferenceHelper.getInt(LOCATION_MODE)==3){
 //                        Log.d(TAG, "Mode = 3");
 //                        return;
 //                    }
-                    preferenceHelper.putInt(LOCATION_MODE,3); //Mode location = 3
+                    preferenceHelper.putInt(LOCATION_MODE, 3); //Mode location = 3
                     locationRequest.setInterval(30 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -241,19 +328,19 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         }
     }
 
-    private void initService(){
+    private void initService() {
         //
-        if (preferenceHelper == null){
+        if (preferenceHelper == null) {
             initPreferences();
         }
-        preferenceHelper.putBoolean(KEY_LOCATION_SERVICE_STARTED,true);
+        preferenceHelper.putBoolean(KEY_LOCATION_SERVICE_STARTED, true);
         Log.d(TAG, "Start service location!");
         if (checkPlayServices()) {
             Log.d(TAG, "buildGoogleApiClient");
 
             //  createLocationRequest();
             buildGoogleApiClient();
-            if (locationRequest == null){
+            if (locationRequest == null) {
                 //Изменение параметров прогслушивания
                 changelocationRequestOnBattery();
 /*
@@ -276,14 +363,20 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG,"LOcatio Service Started");
+        Log.d(TAG, "LOcatio Service Started");
         myAccuracy = 0;
         timeWork = System.currentTimeMillis();
         //
-        if (preferenceHelper == null){
+        if (preferenceHelper == null) {
             initPreferences();
         }
-        preferenceHelper.putInt(LOCATION_MODE,0);
+        preferenceHelper.putInt(LOCATION_MODE, 0);
+        //init SQlite
+        dbHelper = TODOApplication.getInstance().dbHelper;
+        if (dbHelper == null) {
+            Log.e(TAG, "SQLite error! Service Application destroyed.");
+            onDestroy();
+        }
 
         //initializing firebase authentication object
         //firebaseAuth = FirebaseAuth.getInstance();
@@ -293,26 +386,27 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         //that means current user will return null
         if (firebaseAuth.getCurrentUser() == null) {
             //closing this activity
-            Log.d(TAG,"Attention FireBase User not Authorizied! DeviceLocationService...Destroy()");
+            Log.d(TAG, "Attention FireBase User not Authorizied! DeviceLocationService...Destroy()");
             onDestroy();
         }
         //getting current user
-         user = firebaseAuth.getCurrentUser();
+        user = firebaseAuth.getCurrentUser();
         //getting the database reference
         databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReferenceId = databaseReference.getRef();
-        Log.d(TAG,"DeviceLocartionService FireBase: "+databaseReference.toString());
-        Log.d(TAG,"DeviceLocartionService FireBase: "+databaseReference.child(user.getUid()).toString());
+        Log.d(TAG, "DeviceLocartionService FireBase: " + databaseReference.toString());
+        Log.d(TAG, "DeviceLocartionService FireBase Key: " + databaseReference.child(user.getUid()).getKey().toString());
+        Log.d(TAG, "DeviceLocartionService FireBase: " + databaseReference.child(user.getUid()).toString());
         databaseReference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.child("test").toString();
-                   Log.d(TAG,"FBase value = "+value.toString());
-                if (dataSnapshot.exists()){
+                Log.d(TAG, "FBase value = " + value.toString());
+                if (dataSnapshot.exists()) {
                     String valueJson = dataSnapshot.getValue().toString();
-                    Log.d(TAG,"FBase value Json ="+valueJson);
-    //               TestModel testModel = dataSnapshot.child("-KboI4Ia6DSToPRURKmG").getValue(TestModel.class);
-    //               Log.d(TAG,"FBase TestModel class ="+testModel.getTest());
+                    Log.d(TAG, "FBase value Json =" + valueJson);
+                    //               TestModel testModel = dataSnapshot.child("-KboI4Ia6DSToPRURKmG").getValue(TestModel.class);
+                    //               Log.d(TAG,"FBase TestModel class ="+testModel.getTest());
 //                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()){
 //                        TestModel testModel2 = dataSnapshot.child("-KboI4IdtZiiNh921-RB").getValue(TestModel.class);
 //                        Log.d(TAG,"FBase TestModel2 class ="+testModel2.getTest());
@@ -322,7 +416,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG,"FBase value = read Failed.");
+                Log.d(TAG, "FBase value = read Failed.");
             }
         });
 
@@ -330,63 +424,63 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         databaseReference.child(user.getUid()).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG,"FBase addChildEventListener onChildAdded value = s."+s);
-                Log.d(TAG,"FBase addChildEventListener onChildAdded dataSnapshot key = "+dataSnapshot.getKey());
-                if (!dataSnapshot.getKey().isEmpty()){
-                    TestModel testModel4 =  dataSnapshot.getValue(TestModel.class);
-                    Log.d(TAG,"FBase TestModel3 class ="+testModel4.getTest());
-                //    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                Log.d(TAG, "FBase addChildEventListener onChildAdded value = s." + s);
+                Log.d(TAG, "FBase addChildEventListener onChildAdded dataSnapshot key = " + dataSnapshot.getKey());
+                if (!dataSnapshot.getKey().isEmpty()) {
+                    TestModel testModel4 = dataSnapshot.getValue(TestModel.class);
+                    Log.d(TAG, "FBase TestModel3 class =" + testModel4.getTest());
+                    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG,"FBase addChildEventListener onChildChanged value = s."+s);
-                Log.d(TAG,"FBase addChildEventListener onChildChanged dataSnapshot key = "+dataSnapshot.getKey());
-                if (!dataSnapshot.getKey().isEmpty()){
-                    TestModel testModel3 =  dataSnapshot.getValue(TestModel.class);
-                    Log.d(TAG,"FBase TestModel3 class ="+testModel3.getTest());
-                 //   databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                Log.d(TAG, "FBase addChildEventListener onChildChanged value = s." + s);
+                Log.d(TAG, "FBase addChildEventListener onChildChanged dataSnapshot key = " + dataSnapshot.getKey());
+                if (!dataSnapshot.getKey().isEmpty()) {
+                    TestModel testModel3 = dataSnapshot.getValue(TestModel.class);
+                    Log.d(TAG, "FBase TestModel3 class =" + testModel3.getTest());
+                    //   databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                 }
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.d(TAG,"FBase addChildEventListener onChildRemoved value" );
-                Log.d(TAG,"FBase addChildEventListener onChildRemoved dataSnapshot key = "+dataSnapshot.getKey());
+                Log.d(TAG, "FBase addChildEventListener onChildRemoved value");
+                Log.d(TAG, "FBase addChildEventListener onChildRemoved dataSnapshot key = " + dataSnapshot.getKey());
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG,"FBase addChildEventListener onChildMoved value = s."+s);
-                Log.d(TAG,"FBase addChildEventListener onChildMoved dataSnapshot key = "+dataSnapshot.getKey());
+                Log.d(TAG, "FBase addChildEventListener onChildMoved value = s." + s);
+                Log.d(TAG, "FBase addChildEventListener onChildMoved dataSnapshot key = " + dataSnapshot.getKey());
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG,"FBase addChildEventListener onChildAdded value = s."+databaseError.toString());
+                Log.d(TAG, "FBase addChildEventListener onChildAdded value = s." + databaseError.toString());
             }
         });
 
         /*
         Тестироввание Создадим объект в FireBase`
          */
-        databaseReference.child(user.getUid()).push().setValue(new TestModel("test101","email@mail.ru",129l));
-       databaseReference.child(user.getUid()).push().setValue(new TestModel("test202","email@mail.ru",129l));
+        databaseReference.child(user.getUid()).push().setValue(new TestModel("test101", "email@mail.ru", 129l));
+        databaseReference.child(user.getUid()).push().setValue(new TestModel("test202", "email@mail.ru", 129l));
 
-        databaseReference.child("M0erubbTS6hbInqmOmnZOPelZfE2").push().setValue(new TestModel("test202","email@mail.ru",129l));
+        databaseReference.child("M0erubbTS6hbInqmOmnZOPelZfE2").push().setValue(new TestModel("test202", "email@mail.ru", 129l));
 
-        databaseReference.child(user.getUid()).child("test83737MAILRU").setValue(new TestModel("For more information see","email@mail.ru",129l));
-       // Map<String, TestModel> testModels = new HashMap<String, TestModel>();
-       // testModels.put("testoviy Rklient", new TestModel("New Test User1"));
-       // databaseReference.child(user.getUid()).setValue(testModels); // все стирает в ключе! Остается одна запись!
+        databaseReference.child(user.getUid()).child("test83737MAILRU").setValue(new TestModel("For more information see", "email@mail.ru", 129l));
+        // Map<String, TestModel> testModels = new HashMap<String, TestModel>();
+        // testModels.put("testoviy Rklient", new TestModel("New Test User1"));
+        // databaseReference.child(user.getUid()).setValue(testModels); // все стирает в ключе! Остается одна запись!
 
 
 
         /*
         Коненц тестирования
          */
-      //  initService();1388714548
+        //  initService();1388714548
         //Ставим broadcast на батарею
         br = new BoardReceiverBattery();
         receiver = br.InitReceiver();
@@ -396,19 +490,19 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     @Override
     public void onDestroy() {
-        preferenceHelper.putBoolean(KEY_LOCATION_SERVICE_STARTED,false);
+        preferenceHelper.putBoolean(KEY_LOCATION_SERVICE_STARTED, false);
         Log.d(TAG, "onDestroy begining");
         if (googleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
             googleApiClient.disconnect();
             locationRequest = null;
-            preferenceHelper.putInt(LOCATION_MODE,0);
-            Log.d(TAG, "onDestroy googleAPi disabled "+ this.hashCode());
+            preferenceHelper.putInt(LOCATION_MODE, 0);
+            Log.d(TAG, "onDestroy googleAPi disabled " + this.hashCode());
             if (receiver != null) {
                 unregisterReceiver(receiver);
                 receiver = null;
             }
-            Log.d(TAG, ":DeviceServiceLocation:onDestroy() :"+br.GetBatteryInfo());
+            Log.d(TAG, ":DeviceServiceLocation:onDestroy() :" + br.GetBatteryInfo());
         }
         Log.d(TAG, "onDestroy end");
         super.onDestroy();
