@@ -11,17 +11,31 @@ public class ListFireBasePath implements Serializable {
     private String partEmail;
     private String pathFireBase;
     private int id;
+    private int badCount;
+
+    public int getBadCount() {
+        return badCount;
+    }
 
     public int getId() {
         return id;
     }
 
-    public ListFireBasePath(String email, String partEmail, String pathFireBase, int id) {
+    public ListFireBasePath(String email, String partEmail, String pathFireBase, int id, int badCount) {
+        if (email == null){
+            email ="";
+        }
         this.email = email;
+        if (partEmail == null){
+            partEmail = "";
+        }
         this.partEmail = partEmail;
+        if (pathFireBase == null){
+            pathFireBase = "";
+        }
         this.pathFireBase = pathFireBase;
         this.id = id;
-
+        this.badCount = badCount;
     }
 
     public String getEmail() {

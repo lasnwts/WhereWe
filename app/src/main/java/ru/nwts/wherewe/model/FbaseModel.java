@@ -8,23 +8,25 @@ import java.io.Serializable;
 
 public class FbaseModel implements Serializable {
 
-    private long lattitude;
-    private long longtitude;
-    private long speed;
+    private double lattitude;
+    private double longtitude;
+    private double speed;
     private double moved;
     private double state;
     private double mode;
     private int rights;
     private String fbase_path;
-    private String fbase_old;
+    private long dateTime;
     private String email;
     private String part_email;
+
 
     public FbaseModel() {
     }
 
-    public FbaseModel(long flattitude, long flongtitude, long speed, double moved, double state,
-                      double mode, int rights, String fbase_path, String email, String part_email) {
+    public FbaseModel(double flattitude, double flongtitude, double speed, double moved, double state,
+                      double mode, int rights, String fbase_path, String email, String part_email, long dateTime) {
+
         this.lattitude = flattitude;
         this.longtitude = flongtitude;
         this.speed = speed;
@@ -32,20 +34,30 @@ public class FbaseModel implements Serializable {
         this.state = state;
         this.mode = mode;
         this.rights = rights;
+        if (fbase_path == null) {
+            fbase_path = "";
+        }
         this.fbase_path = fbase_path;
+        if (email == null){
+            email ="";
+        }
         this.email = email;
+        if (part_email == null){
+            part_email = "";
+        }
         this.part_email = part_email;
+        this.dateTime = dateTime;
     }
 
-    public long getLattitude() {
+    public double getLattitude() {
         return lattitude;
     }
 
-    public long getLongtitude() {
+    public double getLongtitude() {
         return longtitude;
     }
 
-    public long getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 

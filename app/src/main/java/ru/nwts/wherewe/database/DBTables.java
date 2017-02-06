@@ -27,7 +27,8 @@ public interface DBTables extends DBConstant {
                     KEY_ENCRYPTION_OLD          + " TEXT," +
                     KEY_CONTACT_ID              + " INTEGER," +
                     KEY_EMAIL	                + " TEXT," +
-                    KEY_PART_EMAIL               + " TEXT" +
+                    KEY_PART_EMAIL              + " TEXT," +
+                    KEY_BADCOUNT                + " INTEGER" +
                     ")";
 
     //Таблица groups

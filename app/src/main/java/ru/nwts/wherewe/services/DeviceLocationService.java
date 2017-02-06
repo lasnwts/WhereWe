@@ -37,6 +37,7 @@ import java.util.Map;
 
 import ru.nwts.wherewe.TODOApplication;
 import ru.nwts.wherewe.database.DBHelper;
+import ru.nwts.wherewe.model.FbaseModel;
 import ru.nwts.wherewe.model.ListFireBasePath;
 import ru.nwts.wherewe.model.ModelCheck;
 import ru.nwts.wherewe.model.TestModel;
@@ -44,6 +45,7 @@ import ru.nwts.wherewe.util.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static android.R.attr.data;
+import static android.R.attr.mode;
 import static android.R.attr.value;
 
 /**
@@ -64,6 +66,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     "meter" -   meters
      */
 
+    private int jCount; //Counters
 
     //LOG
     public static final String TAG = "MyLogs";
@@ -168,6 +171,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private void putWriteMyDataToFireBase(Double myLatitude, Double myLongitude, long myTime, double mySpeed){
+        //get new object
+        FbaseModel fbaseModel = new FbaseModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
+                databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(),myTime);
         //get all path from FireBase
         listFireBasePaths = dbHelper.getListFireBasePath();
         if(listFireBasePaths == null || listFireBasePaths.isEmpty()){
@@ -180,10 +186,36 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             }
         }
         //Пишем в FB
-        for(int j=0;j < listFireBasePaths.size();j++){
+        for(jCount=0;jCount < listFireBasePaths.size();jCount++){
             //Запись в FireBase 03/02/2017
+            Log.d(TAG, "listFireBasePaths:"+listFireBasePaths.get(jCount).getId() +" "
+                    + listFireBasePaths.get(jCount).getEmail() + ": " + listFireBasePaths.get(jCount).getPartEmail() + "; "
+                    + listFireBasePaths.get(jCount).getPathFireBase()
+                    + "; " + getNormalizeString(listFireBasePaths.get(jCount).getEmail() + listFireBasePaths.get(jCount).getPartEmail())
+                    + " listFireBasePaths.get(j).getPathFireBase() :" + listFireBasePaths.get(jCount).getPathFireBase()
+                    + " listFireBasePaths.get(j).getBadCount() :" + listFireBasePaths.get(jCount).getBadCount());
+              if (!listFireBasePaths.get(jCount).getPathFireBase().isEmpty()){
+                DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(listFireBasePaths.get(jCount).getEmail() + listFireBasePaths.get(jCount).getPartEmail()));
+                databaseReferenceOnce.setValue(fbaseModel, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        if (databaseError != null){
+                            dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
+                            Log.d(TAG, "listFireBasePaths:onComplete:(databaseError != null)");
+                        }else {
+                            Log.d(TAG, "listFireBasePaths:onComplete:successfully!");
+                            if (listFireBasePaths.get(jCount).getBadCount() > 0){
+                                dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()-1);
+                            }
+                        }
+                    }
+                });
+            } else{
+                //BadCount
+                dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
+            }
         }
-        //Пишем в SQLite о себе
+        //Пишем в SQLite о себеreplaceALL
         dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
     }
 
@@ -199,6 +231,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         } else {
             return  false;
         }
+    }
+
+    private String getNormalizeString(String s){
+       //        return  (s.replaceAll("[^A-Za-z0-9+]","_")).replaceAll("[@]+","_");
+        return  s.replaceAll("[^A-Za-z0-9]+","_");
     }
 
 

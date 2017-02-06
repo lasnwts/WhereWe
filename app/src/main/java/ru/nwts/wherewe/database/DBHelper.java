@@ -318,7 +318,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     public ModelCheck getLatLongTimeFromMe() {
         ModelCheck modelCheck;
-        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_LATTITUDE, KEY_LONGTITUDE, KEY_DATE, KEY_ID, KEY_NAME},
+        Cursor c = getReadableDatabase().query(TABLE_USERS, null,
                 KEY_ID + "=?", new String[]{Integer.toString(1)}, null, null, null);
 
 
@@ -328,6 +328,13 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         int dateColIndex = c.getColumnIndex(KEY_DATE);
         int idColIndex = c.getColumnIndex(KEY_ID);
         int nameColIndex = c.getColumnIndex(KEY_NAME);
+        int stateColIndex = c.getColumnIndex(KEY_STATE);
+        int modeColIndex = c.getColumnIndex(KEY_MODE);
+        int rightsColIndex = c.getColumnIndex(KEY_RIGHTS);
+        int speedColIndex = c.getColumnIndex(KEY_SPEED);
+        int movedColIndex = c.getColumnIndex(KEY_MOVED);
+        int emailColIndex = c.getColumnIndex(KEY_EMAIL);
+        int part_emailColIndex = c.getColumnIndex(KEY_PART_EMAIL);
 
         if (c != null && c.getCount() > 0 && c.moveToFirst()) {
             Log.d(TAG, "getLatLongTimeFromMe Latitude;" + c.getString(lattitudeColIndex));
@@ -335,9 +342,12 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
             Log.d(TAG, "getLatLongTimeFromMe KEY_ID = "+c.getString(idColIndex));
             Log.d(TAG, "getLatLongTimeFromMe LongTitude;" + c.getString(longtitudeColIndex));
             Log.d(TAG, "getLatLongTimeFromMe DateTime;" + c.getString(dateColIndex));
-            modelCheck = new ModelCheck(c.getDouble(lattitudeColIndex), c.getDouble(longtitudeColIndex), c.getLong(dateColIndex));
+          //  modelCheck = new ModelCheck(c.getDouble(lattitudeColIndex), c.getDouble(longtitudeColIndex), c.getLong(dateColIndex));
+            modelCheck = new ModelCheck(c.getDouble(lattitudeColIndex), c.getDouble(longtitudeColIndex), c.getLong(dateColIndex)
+            , c.getInt(stateColIndex), c.getInt(modeColIndex), c.getInt(rightsColIndex), c.getLong(speedColIndex)
+            , c.getInt(modeColIndex), c.getString(emailColIndex), c.getString(part_emailColIndex));
         } else {
-            modelCheck = new ModelCheck(0, 0, 0);
+            modelCheck = new ModelCheck(0, 0, 0, 0, 0, 0, 0, 0, "none@none.ne", "0000");
         }
         c.close();
         return modelCheck;
@@ -345,7 +355,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     public List<ListFireBasePath> getListFireBasePath(){
         List<ListFireBasePath> listFireBasePaths = new ArrayList<>();
-        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL, KEY_PART_EMAIL, KEY_FBASE_PATH, KEY_ID},
+        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL, KEY_PART_EMAIL, KEY_FBASE_PATH, KEY_ID, KEY_BADCOUNT},
                 KEY_ID + "!=1", null, null, null, null);
 
 
@@ -356,6 +366,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
                 int part_emailColIndex = c.getColumnIndex(KEY_PART_EMAIL);
                 int fbasePathColIndex = c.getColumnIndex(KEY_FBASE_PATH);
                 int idColIndex = c.getColumnIndex(KEY_ID);
+                int badCountColIndex = c.getColumnIndex(KEY_BADCOUNT);
                 int i = 0;
 
                 do {
@@ -365,18 +376,18 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
                                     ", part_email = " + c.getString(part_emailColIndex) +
                                     ", firebase_pth = " + c.getString(fbasePathColIndex));
                     listFireBasePaths.add ( i, new ListFireBasePath(c.getString(emailColIndex),
-                            c.getString(part_emailColIndex),c.getString(fbasePathColIndex),c.getInt(idColIndex)));
+                            c.getString(part_emailColIndex),c.getString(fbasePathColIndex),c.getInt(idColIndex),c.getInt(badCountColIndex)));
                     i++;
 
                 } while (c.moveToNext());
 
             } else {
                 Log.d(TAG, "0 rows");
-                listFireBasePaths.add(0, new ListFireBasePath("","","",0));
+                listFireBasePaths.add(0, new ListFireBasePath("","","",0,0));
             }
         } else {
             Log.d(TAG, "0 rows");
-            listFireBasePaths.add(0, new ListFireBasePath("","","",0));
+            listFireBasePaths.add(0, new ListFireBasePath("","","",0,0));
         }
         c.close();
         return listFireBasePaths;
@@ -407,4 +418,14 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
         return updateResult;
     }
+
+    public int dbUpdateBadCount(long rowID, int badCount){
+        cv = new ContentValues();
+        cv.put(KEY_BADCOUNT, badCount);
+        String where = KEY_ID + "=" + rowID;
+        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
+        return updateResult;
+    }
 }
+

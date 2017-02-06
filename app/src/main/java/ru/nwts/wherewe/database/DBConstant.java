@@ -46,6 +46,7 @@ public interface DBConstant {
     public static final String KEY_ENCRYPTION_OLD = "key_old";
     public static final String KEY_EMAIL = "email";
     public static final String KEY_PART_EMAIL = "part_email";
+    public static final String KEY_BADCOUNT = "badcount";
 
 
     //Mode
