@@ -186,32 +186,39 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             }
         }
         //Пишем в FB
-        for(jCount=0;jCount < listFireBasePaths.size();jCount++){
+        for(jCount=0;jCount < (listFireBasePaths.size());jCount++){
             //Запись в FireBase 03/02/2017
+            Log.d(TAG, "listFireBasePaths:Jcount:FF"+jCount + " size:"+listFireBasePaths.size());
             Log.d(TAG, "listFireBasePaths:"+listFireBasePaths.get(jCount).getId() +" "
                     + listFireBasePaths.get(jCount).getEmail() + ": " + listFireBasePaths.get(jCount).getPartEmail() + "; "
                     + listFireBasePaths.get(jCount).getPathFireBase()
                     + "; " + getNormalizeString(listFireBasePaths.get(jCount).getEmail() + listFireBasePaths.get(jCount).getPartEmail())
                     + " listFireBasePaths.get(j).getPathFireBase() :" + listFireBasePaths.get(jCount).getPathFireBase()
                     + " listFireBasePaths.get(j).getBadCount() :" + listFireBasePaths.get(jCount).getBadCount());
-              if (!listFireBasePaths.get(jCount).getPathFireBase().isEmpty()){
-                DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(listFireBasePaths.get(jCount).getEmail() + listFireBasePaths.get(jCount).getPartEmail()));
+              if (!listFireBasePaths.get(jCount).getPathFireBase().isEmpty()) {
+                  Log.d(TAG, "listFireBasePaths:Jcount:0"+jCount + " size:"+listFireBasePaths.size());
+//                DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(listFireBasePaths.get(jCount).getEmail() + listFireBasePaths.get(jCount).getPartEmail()));
+                  DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(modelCheck.getEmail() + modelCheck.getPart_email()));
                 databaseReferenceOnce.setValue(fbaseModel, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         if (databaseError != null){
-                            dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
-                            Log.d(TAG, "listFireBasePaths:onComplete:(databaseError != null)");
+                            Log.d(TAG, "listFireBasePaths:"+databaseReference.getRef().toString());
+                         //   dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
+                            Log.d(TAG, "listFireBasePaths:onComplete:(databaseError != null)"+databaseError.getMessage());
                         }else {
                             Log.d(TAG, "listFireBasePaths:onComplete:successfully!");
-                            if (listFireBasePaths.get(jCount).getBadCount() > 0){
-                                dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()-1);
-                            }
+                            Log.d(TAG, "listFireBasePaths:"+databaseReference.getRef().toString());
+//                            if (listFireBasePaths.get(jCount).getBadCount() > 0){
+//                                Log.d(TAG, "listFireBasePaths:Jcount:PP"+jCount + " size:"+listFireBasePaths.size());
+//                                dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()-1);
+//                            }
                         }
                     }
                 });
             } else{
                 //BadCount
+                  Log.d(TAG, "listFireBasePaths:Jcount:0"+jCount + " size:"+listFireBasePaths.size());
                 dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
             }
         }
@@ -431,6 +438,14 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         //getting the database reference
         databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReferenceId = databaseReference.getRef();
+
+        //Проверка правильности SQLite email
+        if (dbHelper.getEmail() !=null){
+            if(!dbHelper.getEmail().equals(user.getEmail())){
+                dbHelper.dbUpdateEmail(1,user.getEmail());
+            }
+        }
+
         Log.d(TAG, "DeviceLocartionService FireBase: " + databaseReference.toString());
         Log.d(TAG, "DeviceLocartionService FireBase Key: " + databaseReference.child(user.getUid()).getKey().toString());
         Log.d(TAG, "DeviceLocartionService FireBase: " + databaseReference.child(user.getUid()).toString());

@@ -55,7 +55,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         db.execSQL(SQL_CREATE_ENTRIES_TRACKS);
         db.execSQL("insert into " + TABLE_USERS + "(" + KEY_NAME + "," + KEY_EMAIL + "," + KEY_PART_EMAIL +
                 "," + KEY_DATE + "," + KEY_FBASE_PATH + "," + KEY_LATTITUDE + "," + KEY_LONGTITUDE  + ")" +
-                "VALUES('You First Name', 'install@install.com','part_email@install.com',0,'fbasepathInstall',0,0)");
+                "VALUES('You First Name', 'install@install.com',"+this.hashCode()+",0,'fbasepathInstall',0,0)");
      }
 
     @Override
@@ -206,6 +206,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
             int idColIndex = c.getColumnIndex(KEY_ID);
             int nameColIndex = c.getColumnIndex(KEY_NAME);
             int emailColIndex = c.getColumnIndex(KEY_EMAIL);
+            int partemailColIndex = c.getColumnIndex(KEY_PART_EMAIL);
             int latColIndex = c.getColumnIndex(KEY_LATTITUDE);
             int longColIndex = c.getColumnIndex(KEY_LONGTITUDE);
             int speedColIndex = c.getColumnIndex(KEY_SPEED);
@@ -218,6 +219,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
                         "ID = " + c.getInt(idColIndex) +
                                 ", name = " + c.getString(nameColIndex) +
                                 ", email = " + c.getString(emailColIndex) +
+                                ", part_email = " + c.getString(partemailColIndex) +
                                 ", latitude = " + c.getString(latColIndex) +
                                 ", longtitude = " + c.getString(longColIndex) +
                                 ", speed = " + c.getString(speedColIndex) +
@@ -311,7 +313,6 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
         if (c != null && c.getCount() > 0) {
             Log.d(TAG, "getFbaseModel");
-
         }
         return null;
     }
@@ -426,6 +427,29 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
         Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
         return updateResult;
+    }
+
+    public int dbUpdateEmail(long rowID, String email){
+        cv = new ContentValues();
+        cv.put(KEY_EMAIL, email);
+        String where = KEY_ID + "=" + rowID;
+        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
+        return updateResult;
+    }
+
+    //read Email _id = 1
+    public String getEmail() {
+        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL}, KEY_ID +"= 1", null, null, null, null);
+
+        // определяем номера столбцов по имени в выборке
+        int emailColIndex = c.getColumnIndex(KEY_EMAIL);
+
+        if (c != null && c.getCount() > 0 && c.moveToFirst())  {
+            Log.d(TAG, "getEmail()");
+            return c.getString(emailColIndex);
+        }
+        return null;
     }
 }
 

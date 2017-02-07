@@ -166,8 +166,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         dbHelper = TODOApplication.getInstance().dbHelper;
         if (dbHelper !=null){
             dbHelper.dbDeleteUsers();
-            dbHelper.dbInsertUser("Test name_115", 1,1,1,1,1,198299922,33.35324905,65.84073992,null, null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
-            dbHelper.dbInsertUser("Test name_1", 1,1,1,1,1,198299922,28.55324905,68.14073992,null, null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
+            dbHelper.dbInsertUser("Test name_115", 1,1,1,1,1,198299922,33.35324905,65.84073992,"M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
+            dbHelper.dbInsertUser("Test name_1", 1,1,1,1,1,198299922,28.55324905,68.14073992,"Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
             dbHelper.dbInsertUser("Test name_3", 1,1,1,1,1,198299922,30.35324905,64.84073992,null, null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
             dbHelper.dbReadInLog();
             smallModels = dbHelper.getListSmallModel();

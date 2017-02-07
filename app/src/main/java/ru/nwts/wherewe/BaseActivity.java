@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import ru.nwts.wherewe.database.DBHelper;
 import ru.nwts.wherewe.util.DialogFragmentGooglePlayService;
 import ru.nwts.wherewe.util.PreferenceActivities;
 import ru.nwts.wherewe.util.PreferenceHelper;
@@ -107,8 +108,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     private void registerUser() {
 
         //getting email and password from edit texts
-        String email = editTextEmail.getText().toString().trim();
-        String password = editTextPassword.getText().toString().trim();
+        email = editTextEmail.getText().toString().trim();
+        password = editTextPassword.getText().toString().trim();
 
         //checking if email and passwords are empty
         if (TextUtils.isEmpty(email)) {
