@@ -11,9 +11,9 @@ public class FbaseModel implements Serializable {
     private double lattitude;
     private double longtitude;
     private double speed;
-    private double moved;
-    private double state;
-    private double mode;
+    private int moved;
+    private int state;
+    private int mode;
     private int rights;
     private String fbase_path;
     private long dateTime;
@@ -24,8 +24,12 @@ public class FbaseModel implements Serializable {
     public FbaseModel() {
     }
 
-    public FbaseModel(double flattitude, double flongtitude, double speed, double moved, double state,
-                      double mode, int rights, String fbase_path, String email, String part_email, long dateTime) {
+    public long getDateTime() {
+        return dateTime;
+    }
+
+    public FbaseModel(double flattitude, double flongtitude, double speed, int moved, int state,
+                      int mode, int rights, String fbase_path, String email, String part_email, long dateTime) {
 
         this.lattitude = flattitude;
         this.longtitude = flongtitude;
@@ -61,15 +65,15 @@ public class FbaseModel implements Serializable {
         return speed;
     }
 
-    public double getMoved() {
+    public int getMoved() {
         return moved;
     }
 
-    public double getState() {
+    public int getState() {
         return state;
     }
 
-    public double getMode() {
+    public int getMode() {
         return mode;
     }
 

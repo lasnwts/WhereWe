@@ -51,6 +51,16 @@ public class PreferenceHelper {
         editor.apply();
     }
 
+    public void putEmail (String key, String value){
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key,getNormalizeString(value));
+        editor.apply();
+    }
+
+    private String getNormalizeString(String s){
+        return  s.replaceAll("[^A-Za-z0-9,@,.,\\,]+","");
+    }
+
     public String getString(String key){ return preferences.getString(key,"");}
 
     public void putLong (String key, long value){

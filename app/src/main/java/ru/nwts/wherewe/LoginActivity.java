@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +34,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     //firebase auth object
     private FirebaseAuth firebaseAuth;
     PreferenceHelper preferenceHelper;
+
+    //CONSTANT Shared Preference
+    private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
+    private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
+    private final String KEY_EMAIL_SHARED_PREF = "EMAIL_SHARED_PREF";
 
     //progress dialog
     private ProgressDialog progressDialog;
@@ -111,7 +117,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         //if the task is successfull
                         if (task.isSuccessful()) {
                             //start the profile activity
-                            preferenceHelper.putString("login",email);
+                            preferenceHelper.putEmail("login",email);
                             preferenceHelper.putString("password",password);
                             finish();
                             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));

@@ -73,6 +73,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     //SQLite
     public DBHelper dbHelper;
     ModelCheck modelCheck;
+    FbaseModel fbaseModel;
     List<ListFireBasePath> listFireBasePaths;
 
     //firebase auth object
@@ -89,6 +90,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     private final String LOCATION_MODE = "LOCATION_MODE"; //1 - Base > 35%;  2- > 18; 3 - < 18%; 0 - not working..
     private final String KEY_ACTIVITY_READY = "PROF_ACTIVITY";
     private final String KEY_LOCATION_SERVICE_STARTED = "LOCATION_SERVICE";
+    private final String KEY_EMAIL_SHARED_PREF = "EMAIL_SHARED_PREF";
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
@@ -170,45 +172,48 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG, " " + BATTERY_CHARGED + preferenceHelper.getInt(BATTERY_CHARGED) + " " + LOCATION_MODE + ":" + preferenceHelper.getInt(LOCATION_MODE));
     }
 
-    private void putWriteMyDataToFireBase(Double myLatitude, Double myLongitude, long myTime, double mySpeed){
+    private void putWriteMyDataToFireBase(Double myLatitude, Double myLongitude, long myTime, double mySpeed) {
         //get new object
-        FbaseModel fbaseModel = new FbaseModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
-                databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(),myTime);
+        fbaseModel = new FbaseModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
+                databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(), myTime);
+        //Пишем в SQLite о себеreplaceALL
+        dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
+
         //get all path from FireBase
         listFireBasePaths = dbHelper.getListFireBasePath();
-        if(listFireBasePaths == null || listFireBasePaths.isEmpty()){
+        if (listFireBasePaths == null || listFireBasePaths.isEmpty()) {
             return;
         }
-        if (listFireBasePaths.size() == 1){
+        if (listFireBasePaths.size() == 1) {
             ListFireBasePath listFireBaePath = listFireBasePaths.get(0);
-            if (listFireBaePath.getId() == 0){
+            if (listFireBaePath.getId() == 0) {
                 return;
             }
         }
         //Пишем в FB
-        for(jCount=0;jCount < (listFireBasePaths.size());jCount++){
+        for (jCount = 0; jCount < (listFireBasePaths.size()); jCount++) {
             //Запись в FireBase 03/02/2017
-            Log.d(TAG, "listFireBasePaths:Jcount:FF"+jCount + " size:"+listFireBasePaths.size());
-            Log.d(TAG, "listFireBasePaths:"+listFireBasePaths.get(jCount).getId() +" "
+            Log.d(TAG, "listFireBasePaths:Jcount:FF" + jCount + " size:" + listFireBasePaths.size());
+            Log.d(TAG, "listFireBasePaths:" + listFireBasePaths.get(jCount).getId() + " "
                     + listFireBasePaths.get(jCount).getEmail() + ": " + listFireBasePaths.get(jCount).getPartEmail() + "; "
                     + listFireBasePaths.get(jCount).getPathFireBase()
                     + "; " + getNormalizeString(listFireBasePaths.get(jCount).getEmail() + listFireBasePaths.get(jCount).getPartEmail())
                     + " listFireBasePaths.get(j).getPathFireBase() :" + listFireBasePaths.get(jCount).getPathFireBase()
                     + " listFireBasePaths.get(j).getBadCount() :" + listFireBasePaths.get(jCount).getBadCount());
-              if (!listFireBasePaths.get(jCount).getPathFireBase().isEmpty()) {
-                  Log.d(TAG, "listFireBasePaths:Jcount:0"+jCount + " size:"+listFireBasePaths.size());
+            if (!listFireBasePaths.get(jCount).getPathFireBase().isEmpty()) {
+                Log.d(TAG, "listFireBasePaths:Jcount:0" + jCount + " size:" + listFireBasePaths.size());
 //                DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(listFireBasePaths.get(jCount).getEmail() + listFireBasePaths.get(jCount).getPartEmail()));
-                  DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(modelCheck.getEmail() + modelCheck.getPart_email()));
+                DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(modelCheck.getEmail() + modelCheck.getPart_email()));
                 databaseReferenceOnce.setValue(fbaseModel, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        if (databaseError != null){
-                            Log.d(TAG, "listFireBasePaths:"+databaseReference.getRef().toString());
-                         //   dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
-                            Log.d(TAG, "listFireBasePaths:onComplete:(databaseError != null)"+databaseError.getMessage());
-                        }else {
+                        if (databaseError != null) {
+                            Log.d(TAG, "listFireBasePaths:" + databaseReference.getRef().toString());
+                            //   dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
+                            Log.d(TAG, "listFireBasePaths:onComplete:(databaseError != null)" + databaseError.getMessage());
+                        } else {
                             Log.d(TAG, "listFireBasePaths:onComplete:successfully!");
-                            Log.d(TAG, "listFireBasePaths:"+databaseReference.getRef().toString());
+                            Log.d(TAG, "listFireBasePaths:" + databaseReference.getRef().toString());
 //                            if (listFireBasePaths.get(jCount).getBadCount() > 0){
 //                                Log.d(TAG, "listFireBasePaths:Jcount:PP"+jCount + " size:"+listFireBasePaths.size());
 //                                dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()-1);
@@ -216,33 +221,31 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                         }
                     }
                 });
-            } else{
+            } else {
                 //BadCount
-                  Log.d(TAG, "listFireBasePaths:Jcount:0"+jCount + " size:"+listFireBasePaths.size());
-                dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
+                Log.d(TAG, "listFireBasePaths:Jcount:0" + jCount + " size:" + listFireBasePaths.size());
+                dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(), listFireBasePaths.get(jCount).getBadCount() + 1);
             }
         }
-        //Пишем в SQLite о себеreplaceALL
-        dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
     }
 
     private boolean getCheckWriteOrNotInFirerBase(Double myLatitude, Double myLongitude, long myTime) {
         //Здесь необходимо из SharedPreferency получить Разрешенную дистанцию
         //Также время записи в FB
         modelCheck = dbHelper.getLatLongTimeFromMe();
-        double calcDistance = distance(myLatitude,myLongitude,modelCheck.getLatitude(),modelCheck.getLongtitude(),"meter");
+        double calcDistance = distance(myLatitude, myLongitude, modelCheck.getLatitude(), modelCheck.getLongtitude(), "meter");
         long calcTimeDistance = System.currentTimeMillis() - myTime;
-        if (acceptDistance < calcDistance || timeAccpetWait < calcTimeDistance ){
+        if (acceptDistance < calcDistance || timeAccpetWait < calcTimeDistance) {
             //Wirte to FireBasde
-            return  true;
+            return true;
         } else {
-            return  false;
+            return false;
         }
     }
 
-    private String getNormalizeString(String s){
-       //        return  (s.replaceAll("[^A-Za-z0-9+]","_")).replaceAll("[@]+","_");
-        return  s.replaceAll("[^A-Za-z0-9]+","_");
+    private String getNormalizeString(String s) {
+        //        return  (s.replaceAll("[^A-Za-z0-9+]","_")).replaceAll("[@]+","_");
+        return s.replaceAll("[^A-Za-z0-9]+", "_");
     }
 
 
@@ -259,7 +262,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         } else if (unit == "meter") {
             dist = dist * 1609.344;
         }
-        Log.d(TAG,"distance : "+dist);
+        Log.d(TAG, "distance : " + dist);
         return dist;
     }
 
@@ -440,37 +443,52 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         databaseReferenceId = databaseReference.getRef();
 
         //Проверка правильности SQLite email
-        if (dbHelper.getEmail() !=null){
-            if(!dbHelper.getEmail().equals(user.getEmail())){
-                dbHelper.dbUpdateEmail(1,user.getEmail());
+        if (dbHelper.getEmail() != null) {
+            if (!dbHelper.getEmail().equals(user.getEmail())) {
+                dbHelper.dbUpdateEmail(1, user.getEmail());
             }
         }
 
         Log.d(TAG, "DeviceLocartionService FireBase: " + databaseReference.toString());
         Log.d(TAG, "DeviceLocartionService FireBase Key: " + databaseReference.child(user.getUid()).getKey().toString());
         Log.d(TAG, "DeviceLocartionService FireBase: " + databaseReference.child(user.getUid()).toString());
-        databaseReference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String value = dataSnapshot.child("test").toString();
-                Log.d(TAG, "FBase value = " + value.toString());
-                if (dataSnapshot.exists()) {
-                    String valueJson = dataSnapshot.getValue().toString();
-                    Log.d(TAG, "FBase value Json =" + valueJson);
-                    //               TestModel testModel = dataSnapshot.child("-KboI4Ia6DSToPRURKmG").getValue(TestModel.class);
-                    //               Log.d(TAG,"FBase TestModel class ="+testModel.getTest());
-//                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()){
-//                        TestModel testModel2 = dataSnapshot.child("-KboI4IdtZiiNh921-RB").getValue(TestModel.class);
-//                        Log.d(TAG,"FBase TestModel2 class ="+testModel2.getTest());
-//                    }
-                }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "FBase value = read Failed.");
-            }
-        });
+//        databaseReference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                String value = dataSnapshot.child("test").toString();
+//                Log.d(TAG, "FBase value = " + value.toString());
+//                if (dataSnapshot.exists()) {
+//                    String valueJson = dataSnapshot.getValue().toString();
+//                    Log.d(TAG, "FBase value Json =" + valueJson);
+//                    //               TestModel testModel = dataSnapshot.child("-KboI4Ia6DSToPRURKmG").getValue(TestModel.class);
+//                    //               Log.d(TAG,"FBase TestModel class ="+testModel.getTest());
+////                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()){
+////                        TestModel testModel2 = dataSnapshot.child("-KboI4IdtZiiNh921-RB").getValue(TestModel.class);
+////                        Log.d(TAG,"FBase TestModel2 class ="+testModel2.getTest());
+////                    }
+//                }
+//            }
+//
+//            //Ce2N4qWXF5UahlEHiHuLJSBzBzk1
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.d(TAG, "FBase value = read Failed.");
+//            }
+//        });
+//
+//        databaseReference.child("Fkq0Hze0sXgatHf0dsnkD0gTGiO2").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Log.d(TAG, "addValueEventListener : Fkq0Hze0sXgatHf0dsnkD0gTGiO2 :successfully! ");
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.d(TAG, "addValueEventListener : Fkq0Hze0sXgatHf0dsnkD0gTGiO2 :error! ");
+//            }
+//        });
 
         //FireBase addValue Child Listner
         databaseReference.child(user.getUid()).addChildEventListener(new ChildEventListener() {
@@ -481,7 +499,17 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 if (!dataSnapshot.getKey().isEmpty()) {
                     TestModel testModel4 = dataSnapshot.getValue(TestModel.class);
                     Log.d(TAG, "FBase TestModel3 class =" + testModel4.getTest());
-                    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                    fbaseModel = dataSnapshot.getValue(FbaseModel.class);
+             //       databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                    if (fbaseModel != null) {
+                        dbHelper.updateFbaseModel(fbaseModel.getState(),
+                                fbaseModel.getMode(), fbaseModel.getRights(),
+                                fbaseModel.getSpeed(), fbaseModel.getMoved(),
+                                fbaseModel.getDateTime(), fbaseModel.getLongtitude(),
+                                fbaseModel.getLattitude(), fbaseModel.getFbase_path(),
+                                fbaseModel.getEmail(), fbaseModel.getPart_email());
+                        dbHelper.dbReadInLog();
+                    }
                 }
             }
 
@@ -492,7 +520,17 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 if (!dataSnapshot.getKey().isEmpty()) {
                     TestModel testModel3 = dataSnapshot.getValue(TestModel.class);
                     Log.d(TAG, "FBase TestModel3 class =" + testModel3.getTest());
-                    //   databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                    fbaseModel = dataSnapshot.getValue(FbaseModel.class);
+                //    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                    if (fbaseModel != null) {
+                        dbHelper.updateFbaseModel(fbaseModel.getState(),
+                                fbaseModel.getMode(), fbaseModel.getRights(),
+                                fbaseModel.getSpeed(), fbaseModel.getMoved(),
+                                fbaseModel.getDateTime(), fbaseModel.getLongtitude(),
+                                fbaseModel.getLattitude(), fbaseModel.getFbase_path(),
+                                fbaseModel.getEmail(), fbaseModel.getPart_email());
+                        dbHelper.dbReadInLog();
+                    }
                 }
             }
 

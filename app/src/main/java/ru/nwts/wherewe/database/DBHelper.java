@@ -16,6 +16,7 @@ import ru.nwts.wherewe.model.ListFireBasePath;
 import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.ModelCheck;
 import ru.nwts.wherewe.model.SmallModel;
+import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static android.R.attr.id;
 import static android.R.attr.languageTag;
@@ -36,7 +37,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     // создаем объект для данных
     ContentValues cv;
-
+    PreferenceHelper preferenceHelper;
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -49,14 +50,15 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        initPreferences();
         db.execSQL(SQL_CREATE_ENTRIES_USERS);
         db.execSQL(SQL_CREATE_ENTRIES_GROUPS);
         db.execSQL(SQL_CREATE_ENTRIES_LINKS);
         db.execSQL(SQL_CREATE_ENTRIES_TRACKS);
         db.execSQL("insert into " + TABLE_USERS + "(" + KEY_NAME + "," + KEY_EMAIL + "," + KEY_PART_EMAIL +
-                "," + KEY_DATE + "," + KEY_FBASE_PATH + "," + KEY_LATTITUDE + "," + KEY_LONGTITUDE  + ")" +
-                "VALUES('You First Name', 'install@install.com',"+this.hashCode()+",0,'fbasepathInstall',0,0)");
-     }
+                "," + KEY_DATE + "," + KEY_FBASE_PATH + "," + KEY_LATTITUDE + "," + KEY_LONGTITUDE + ")" +
+                "VALUES('Input You Name','" + preferenceHelper.getString("login") + "'," + this.hashCode() + ",0,'fbasepathInstall',0,0)");
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -192,6 +194,10 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return deleteCount;
     }
 
+    private void initPreferences() {
+        //initializing preference
+        preferenceHelper = PreferenceHelper.getInstance();
+    }
 
     public int dbReadInLog() {
         Log.d(TAG, "--- Rows in mytable: ---");
@@ -295,7 +301,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     //read 1 model FireBase, _id = 1
     public FbaseModel getFbaseModel() {
-        Cursor c = getReadableDatabase().query(TABLE_USERS, null, "KEY_ID = ?", new String[]{Integer.toString(1)}, null, null, null);
+        Cursor c = getReadableDatabase().query(TABLE_USERS, null, KEY_ID + " = ?", new String[]{Integer.toString(1)}, null, null, null);
 
         // определяем номера столбцов по имени в выборке
         int idColIndex = c.getColumnIndex(KEY_ID);
@@ -340,13 +346,13 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         if (c != null && c.getCount() > 0 && c.moveToFirst()) {
             Log.d(TAG, "getLatLongTimeFromMe Latitude;" + c.getString(lattitudeColIndex));
             Log.d(TAG, "getLatLongTimeFromMe Name;" + c.getString(nameColIndex));
-            Log.d(TAG, "getLatLongTimeFromMe KEY_ID = "+c.getString(idColIndex));
+            Log.d(TAG, "getLatLongTimeFromMe KEY_ID = " + c.getString(idColIndex));
             Log.d(TAG, "getLatLongTimeFromMe LongTitude;" + c.getString(longtitudeColIndex));
             Log.d(TAG, "getLatLongTimeFromMe DateTime;" + c.getString(dateColIndex));
-          //  modelCheck = new ModelCheck(c.getDouble(lattitudeColIndex), c.getDouble(longtitudeColIndex), c.getLong(dateColIndex));
+            //  modelCheck = new ModelCheck(c.getDouble(lattitudeColIndex), c.getDouble(longtitudeColIndex), c.getLong(dateColIndex));
             modelCheck = new ModelCheck(c.getDouble(lattitudeColIndex), c.getDouble(longtitudeColIndex), c.getLong(dateColIndex)
-            , c.getInt(stateColIndex), c.getInt(modeColIndex), c.getInt(rightsColIndex), c.getLong(speedColIndex)
-            , c.getInt(modeColIndex), c.getString(emailColIndex), c.getString(part_emailColIndex));
+                    , c.getInt(stateColIndex), c.getInt(modeColIndex), c.getInt(rightsColIndex), c.getLong(speedColIndex)
+                    , c.getInt(modeColIndex), c.getString(emailColIndex), c.getString(part_emailColIndex));
         } else {
             modelCheck = new ModelCheck(0, 0, 0, 0, 0, 0, 0, 0, "none@none.ne", "0000");
         }
@@ -354,7 +360,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return modelCheck;
     }
 
-    public List<ListFireBasePath> getListFireBasePath(){
+    public List<ListFireBasePath> getListFireBasePath() {
         List<ListFireBasePath> listFireBasePaths = new ArrayList<>();
         Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL, KEY_PART_EMAIL, KEY_FBASE_PATH, KEY_ID, KEY_BADCOUNT},
                 KEY_ID + "!=1", null, null, null, null);
@@ -376,19 +382,19 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
                             "email = " + c.getString(emailColIndex) +
                                     ", part_email = " + c.getString(part_emailColIndex) +
                                     ", firebase_pth = " + c.getString(fbasePathColIndex));
-                    listFireBasePaths.add ( i, new ListFireBasePath(c.getString(emailColIndex),
-                            c.getString(part_emailColIndex),c.getString(fbasePathColIndex),c.getInt(idColIndex),c.getInt(badCountColIndex)));
+                    listFireBasePaths.add(i, new ListFireBasePath(c.getString(emailColIndex),
+                            c.getString(part_emailColIndex), c.getString(fbasePathColIndex), c.getInt(idColIndex), c.getInt(badCountColIndex)));
                     i++;
 
                 } while (c.moveToNext());
 
             } else {
                 Log.d(TAG, "0 rows");
-                listFireBasePaths.add(0, new ListFireBasePath("","","",0,0));
+                listFireBasePaths.add(0, new ListFireBasePath("", "", "", 0, 0));
             }
         } else {
             Log.d(TAG, "0 rows");
-            listFireBasePaths.add(0, new ListFireBasePath("","","",0,0));
+            listFireBasePaths.add(0, new ListFireBasePath("", "", "", 0, 0));
         }
         c.close();
         return listFireBasePaths;
@@ -405,7 +411,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv.put(KEY_RIGHTS, rights);
         cv.put(KEY_SPEED, speed);
         cv.put(KEY_MOVED, moved);
-        if (track_date != 0){       //if 0 значит время обнорвления FB не ставим
+        if (track_date != 0) {       //if 0 значит время обнорвления FB не ставим
             cv.put(KEY_DATE, track_date);
         }
         cv.put(KEY_LONGTITUDE, longtitude);
@@ -420,7 +426,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return updateResult;
     }
 
-    public int dbUpdateBadCount(long rowID, int badCount){
+    public int dbUpdateBadCount(long rowID, int badCount) {
         cv = new ContentValues();
         cv.put(KEY_BADCOUNT, badCount);
         String where = KEY_ID + "=" + rowID;
@@ -429,7 +435,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return updateResult;
     }
 
-    public int dbUpdateEmail(long rowID, String email){
+    public int dbUpdateEmail(long rowID, String email) {
         cv = new ContentValues();
         cv.put(KEY_EMAIL, email);
         String where = KEY_ID + "=" + rowID;
@@ -440,16 +446,47 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     //read Email _id = 1
     public String getEmail() {
-        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL}, KEY_ID +"= 1", null, null, null, null);
+        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL}, KEY_ID + "= 1", null, null, null, null);
 
         // определяем номера столбцов по имени в выборке
         int emailColIndex = c.getColumnIndex(KEY_EMAIL);
 
-        if (c != null && c.getCount() > 0 && c.moveToFirst())  {
+        if (c != null && c.getCount() > 0 && c.moveToFirst()) {
             Log.d(TAG, "getEmail()");
             return c.getString(emailColIndex);
         }
         return null;
+    }
+
+    //update information from FireBase for clients
+    public int updateFbaseModel(int state, int mode, int rights,
+                                double speed, int moved, long track_date, double longtitude, double lattitude,
+                                String fbase_path, String email, String part_email) {
+        cv = new ContentValues();
+
+        if (email == null || part_email == null){
+            return 0;
+        }
+        if (email.isEmpty() || part_email.isEmpty()){
+            return 0;
+        }
+
+        cv.put(KEY_STATE, state);
+        cv.put(KEY_MODE, mode);
+        cv.put(KEY_RIGHTS, rights);
+        cv.put(KEY_SPEED, speed);
+        cv.put(KEY_MOVED, moved);
+        if (track_date != 0) {       //if 0 значит время обнорвления FB не ставим
+            cv.put(KEY_DATE, track_date);
+        }
+        cv.put(KEY_LONGTITUDE, longtitude);
+        cv.put(KEY_LATTITUDE, lattitude);
+        cv.put(KEY_FBASE_PATH, fbase_path);
+        String where = KEY_EMAIL + "='" + email + "' and " + KEY_PART_EMAIL + "='" + part_email + "'";
+        Log.d(TAG, "DBHelper:updateFbaseModel: " + cv.toString()+" where :"+where);
+        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        Log.d(TAG, "DBHelper:updateFbaseModel: updated where =" + where + " updated:" + updateResult);
+        return updateResult;
     }
 }
 

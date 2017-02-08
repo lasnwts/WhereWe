@@ -52,6 +52,10 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "WhW";
 
+    //CONSTANT Shared Preference
+    private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
+    private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
+    private final String KEY_EMAIL_SHARED_PREF = "EMAIL_SHARED_PREF";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +143,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                         if (task.isSuccessful()) {
                             //display some message here
                             Toast.makeText(BaseActivity.this, "Successfully registered", Toast.LENGTH_LONG).show();
+                            preferenceHelper.putEmail("login",email);
+                            preferenceHelper.putString("password",password);
                             finish();
                             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         } else {

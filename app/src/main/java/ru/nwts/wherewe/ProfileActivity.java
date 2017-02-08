@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.SmallModel;
 import ru.nwts.wherewe.services.DeviceLocationService;
 import ru.nwts.wherewe.services.LocationService;
+import ru.nwts.wherewe.util.PreferenceActivities;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static ru.nwts.wherewe.TODOApplication.*;
@@ -70,11 +72,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     //Db
     List<SmallModel> smallModels;
 
+
+
     //
     Intent locationService;
 
+    //CONSTANT Shared Preference
     private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
     private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
+    private final String KEY_EMAIL_SHARED_PREF = "EMAIL_SHARED_PREF";
 
 
     @Override
@@ -166,9 +172,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         dbHelper = TODOApplication.getInstance().dbHelper;
         if (dbHelper !=null){
             dbHelper.dbDeleteUsers();
-            dbHelper.dbInsertUser("Test name_115", 1,1,1,1,1,198299922,33.35324905,65.84073992,"M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
-            dbHelper.dbInsertUser("Test name_1", 1,1,1,1,1,198299922,28.55324905,68.14073992,"Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
-            dbHelper.dbInsertUser("Test name_3", 1,1,1,1,1,198299922,30.35324905,64.84073992,null, null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "09");
+            dbHelper.dbInsertUser("Test name_115", 1,1,1,1,1,198299922,33.35324905,65.84073992,"M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "076077669");
+            dbHelper.dbInsertUser("Test name_1", 1,1,1,1,1,198299922,28.55324905,68.14073992,"Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999,"067", "o123456789", "alexl1967@mail.ru", "067");
+            dbHelper.dbInsertUser("Test name_3", 1,1,1,1,1,198299922,30.35324905,64.84073992,"c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999,"i123456789", "o123456789", "atest@mail.ru", "0979799");
             dbHelper.dbReadInLog();
             smallModels = dbHelper.getListSmallModel();
         }
@@ -233,6 +239,17 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.menuPref:
+                showSettings();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -260,5 +277,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //LatLng sydney = new LatLng(-34, 151);
         //Map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         //Map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    public void showSettings() {
+        Intent intent = new Intent(ProfileActivity.this, PreferenceActivities.class);
+        startActivityForResult(intent, 0);
     }
 }

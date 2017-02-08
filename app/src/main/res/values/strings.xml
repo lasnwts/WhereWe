@@ -8,6 +8,7 @@
     <string name="googleplay_url">https://play.google.com/store/apps/details?id=ru.nwts.appsyoutube</string>
 
     <string name="about">О приложении</string>
+    <string name="prefer">Setting</string>
 
     <string-array name="channel_names">
         <item>New Video</item>
