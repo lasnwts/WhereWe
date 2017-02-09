@@ -500,7 +500,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                     TestModel testModel4 = dataSnapshot.getValue(TestModel.class);
                     Log.d(TAG, "FBase TestModel3 class =" + testModel4.getTest());
                     fbaseModel = dataSnapshot.getValue(FbaseModel.class);
-             //       databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                     if (fbaseModel != null) {
                         dbHelper.updateFbaseModel(fbaseModel.getState(),
                                 fbaseModel.getMode(), fbaseModel.getRights(),
@@ -521,7 +521,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                     TestModel testModel3 = dataSnapshot.getValue(TestModel.class);
                     Log.d(TAG, "FBase TestModel3 class =" + testModel3.getTest());
                     fbaseModel = dataSnapshot.getValue(FbaseModel.class);
-                //    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
+                    databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                     if (fbaseModel != null) {
                         dbHelper.updateFbaseModel(fbaseModel.getState(),
                                 fbaseModel.getMode(), fbaseModel.getRights(),
