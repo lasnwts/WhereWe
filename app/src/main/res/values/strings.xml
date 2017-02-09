@@ -20,4 +20,9 @@
         <item>Eclipse</item>
     </string-array>
 
+    <string name="allowedReceivedLocation">Allow broad cast location?</string>
+    <string name="hintAllowedReceivedLocation">Allow or not send information from your location</string>
+    <string name="youname">Input your name</string>
+    <string name="hint_yourname">Your name</string>
+    <string name="summary_yourname">if you want to enter, it is not necessary</string>
 </resources>

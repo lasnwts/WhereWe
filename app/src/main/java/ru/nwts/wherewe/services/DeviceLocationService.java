@@ -1,6 +1,8 @@
 package ru.nwts.wherewe.services;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +34,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +70,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     "meter" -   meters
      */
 
+    //AlarmManager for Periodical starts
+    AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
+
+    //For FireBaee Object
     private int jCount; //Counters
 
     //LOG
@@ -178,6 +187,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(), myTime);
         //Пишем в SQLite о себеreplaceALL
         dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
+
+        //check Allow OR no send you location Global
+        if (!preferenceHelper.getBoolean("allowedSendLocation")){
+            return;
+        }
 
         //get all path from FireBase
         listFireBasePaths = dbHelper.getListFireBasePath();
@@ -565,8 +579,6 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         // testModels.put("testoviy Rklient", new TestModel("New Test User1"));
         // databaseReference.child(user.getUid()).setValue(testModels); // все стирает в ключе! Остается одна запись!
 
-
-
         /*
         Коненц тестирования
          */
@@ -594,7 +606,19 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             }
             Log.d(TAG, ":DeviceServiceLocation:onDestroy() :" + br.GetBatteryInfo());
         }
+        onWakeUpInstallation();
         Log.d(TAG, "onDestroy end");
         super.onDestroy();
+    }
+
+    private void onWakeUpInstallation(){
+        Intent intent = new Intent(this, DeviceLocationService.class);
+        pendingIntent = PendingIntent.getService(this,0,intent,0);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.MINUTE, 1);
+        alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
+        Log.d(TAG,"alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);");
     }
 }

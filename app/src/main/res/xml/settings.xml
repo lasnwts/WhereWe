@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:title="@string/youname"
+        android:hint="@string/hint_yourname"
+        android:key="YouName"
+        android:summary="@string/summary_yourname"
+        android:dialogTitle="@string/summary_yourname"
+        />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="wifi"
@@ -10,6 +17,11 @@
         android:key="hints"
         android:summary="@string/hints_summary"
         android:title="@string/hints_title"/>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="allowedSendLocation"
+        android:summary="@string/hintAllowedReceivedLocation"
+        android:title="@string/allowedReceivedLocation"/>
     <ListPreference
         android:key="behaviour"
         android:title="Type work sensor"
