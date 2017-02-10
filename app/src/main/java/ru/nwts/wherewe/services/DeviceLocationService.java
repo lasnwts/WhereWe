@@ -147,6 +147,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         myLatitude = location.getLatitude();
         myLongitude = location.getLongitude();
         myTime = location.getTime();
+        preferenceHelper.putLong("Latitude",Double.doubleToRawLongBits(myLatitude));
+        preferenceHelper.putLong("Longtitude",Double.doubleToRawLongBits(myLongitude));
+        preferenceHelper.putLong("Time",myTime);
         mySpeed = (long) location.getSpeed();
         //Call function check Write OR not in FireBase
         if (getCheckWriteOrNotInFirerBase(myLatitude, myLongitude, myTime)) {

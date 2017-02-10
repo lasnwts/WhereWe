@@ -78,4 +78,14 @@ public class PreferenceHelper {
     }
 
     public int getInt(String key){ return preferences.getInt(key,0);}
+
+    public void putFloat(String key, float value){
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putFloat(key,value);
+        editor.apply();
+    }
+
+    public float getFloat(String key){
+        return preferences.getFloat(key,0);
+    }
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.List;
 
+import ru.nwts.wherewe.aux_ui.About;
 import ru.nwts.wherewe.database.DBHelper;
 import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.SmallModel;
@@ -73,13 +75,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     List<SmallModel> smallModels;
 
 
-
     //
     Intent locationService;
 
     //CONSTANT Shared Preference
-    private final String KEY_ACTIVITY_READY="PROF_ACTIVITY";
-    private final String KEY_LOCATION_SERVICE_STARTED="LOCATION_SERVICE";
+    private final String KEY_ACTIVITY_READY = "PROF_ACTIVITY";
+    private final String KEY_LOCATION_SERVICE_STARTED = "LOCATION_SERVICE";
     private final String KEY_EMAIL_SHARED_PREF = "EMAIL_SHARED_PREF";
 
 
@@ -91,7 +92,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
 
 
         //initializing firebase authentication object
@@ -161,7 +161,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
         //displaying logged in user name
-        textViewUserEmail.setText("Welcome " + user.getEmail()+" "+TODOApplication.getInstance().TEST_STRING);
+        textViewUserEmail.setText("Welcome " + user.getEmail() + " " + TODOApplication.getInstance().TEST_STRING);
 
         //adding listener to button
         buttonLogout.setOnClickListener(this);
@@ -170,11 +170,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //Works Databases
         //dbHelper = new DBHelper(this);
         dbHelper = TODOApplication.getInstance().dbHelper;
-        if (dbHelper !=null){
+        if (dbHelper != null) {
             dbHelper.dbDeleteUsers();
-            dbHelper.dbInsertUser("Test name_115", 1,1,1,1,1,198299922,33.35324905,65.84073992,"M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999,"i123456789", "o123456789", "test1@mail.ru", "076077669");
-            dbHelper.dbInsertUser("Test name_1", 1,1,1,1,1,198299922,28.55324905,68.14073992,"Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999,"067", "o123456789", "alexl1967@mail.ru", "067");
-            dbHelper.dbInsertUser("Test name_3", 1,1,1,1,1,198299922,30.35324905,64.84073992,"c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999,"i123456789", "o123456789", "atest@mail.ru", "0979799");
+            dbHelper.dbInsertUser("Test name_115", 1, 1, 1, 1, 1, 198299922, 33.35324905, 65.84073992, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
+            dbHelper.dbInsertUser("Test name_1", 1, 1, 1, 1, 1, 198299922, 28.55324905, 68.14073992, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
+            dbHelper.dbInsertUser("Test name_3", 1, 1, 1, 1, 1, 198299922, 30.35324905, 64.84073992, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
             dbHelper.dbReadInLog();
             smallModels = dbHelper.getListSmallModel();
         }
@@ -189,11 +189,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     protected void onResume() {
         super.onResume();
         //Write to SharedPref what ProfActivity Started
-        preferenceHelper.putBoolean(KEY_ACTIVITY_READY,true);
+        preferenceHelper.putBoolean(KEY_ACTIVITY_READY, true);
         //Tested Run LocationService Or Not
-        if (!preferenceHelper.getBoolean(KEY_LOCATION_SERVICE_STARTED)){
+        if (!preferenceHelper.getBoolean(KEY_LOCATION_SERVICE_STARTED)) {
             //Тест координат
-            Log.d(TAG,"Start service! from ProfileActivity!");
+            Log.d(TAG, "Start service! from ProfileActivity!");
 //
 //        locationService = new Intent(ProfileActivity.this, LocationService.class);
 //        locationService.putExtra("task", "GetMyLocation");
@@ -205,8 +205,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onPause() {
         //Write to SharedPref what ProfActivity Started
-        Log.d(TAG,"ProfileActivity onPaiused..");
-        preferenceHelper.putBoolean(KEY_ACTIVITY_READY,false);
+        Log.d(TAG, "ProfileActivity onPaiused..");
+        preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
         super.onPause();
     }
 
@@ -227,7 +227,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             //starting login activity
             startActivity(new Intent(this, LoginActivity.class));
         }
-        if (view == buttonService){
+        if (view == buttonService) {
             startService(locationService);
         }
     }
@@ -242,9 +242,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menuPref:
                 showSettings();
+                return true;
+            case R.id.menuAbout:
+                showAbout();
                 return true;
         }
 
@@ -255,19 +258,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     public void onMapReady(GoogleMap googleMap) {
         Map = googleMap;
 
-        if(Map == null){
+        if (Map == null) {
             Toast.makeText(getApplicationContext(),
-                    "Error creating map",Toast.LENGTH_SHORT).show();
+                    "Error creating map", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (smallModels == null){
+        if (smallModels == null) {
             Toast.makeText(getApplicationContext(),
-                    "Error SmallModel empty Error!",Toast.LENGTH_SHORT).show();
+                    "Error SmallModel empty Error!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        for(int j=0;j < smallModels.size();j++){
+        for (int j = 0; j < smallModels.size(); j++) {
             SmallModel model = smallModels.get(j);
             Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude())).title(model.getName()));
             Map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(model.getLattitude(), model.getLongtitude())));
@@ -283,4 +286,40 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent = new Intent(ProfileActivity.this, PreferenceActivities.class);
         startActivityForResult(intent, 0);
     }
+
+
+    public void showAbout() {
+        String email;
+        String part_email;
+        String fbase_part;
+        /*
+        This test code begin
+         */
+        Log.d(TAG, "showAbout:" + dbHelper.getEmailPartFBasePartFromMe());
+        String s = dbHelper.getEmailPartFBasePartFromMe();
+        byte[] bs = s.getBytes();
+        String strEncoded = Base64.encodeToString(bs, Base64.DEFAULT);
+        Log.d(TAG, "showAbout:base64 encoded:" + strEncoded);
+        s = new String(Base64.decode(strEncoded.getBytes(), Base64.DEFAULT));
+        Log.d(TAG, "showAbout:base64 decoded:" + s);
+        email = s.substring(0, s.indexOf(";"));
+        Log.d(TAG, "showAbout:email:" + email);
+        s = s.substring(s.indexOf(";") + 1, s.length());
+        Log.d(TAG, "showAbout:s:" + s);
+        part_email = s.substring(0, s.indexOf(";"));
+        Log.d(TAG, "showAbout:part_email:" + part_email);
+        fbase_part = s.substring(s.indexOf(";") + 1, s.length());
+        Log.d(TAG, "showAbout:Fbase_part:" + fbase_part);
+        if (!dbHelper.checkExistClient(email, part_email, fbase_part)) {
+            dbHelper.dbInsertUser("", 0, 0, 0, 0, 0,  preferenceHelper.getLong("Time"), Double.longBitsToDouble(preferenceHelper.getLong("Longtitude")),
+                    Double.longBitsToDouble(preferenceHelper.getLong("Latitude")),fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email);
+        }
+        /*
+        thies end of test code
+         */
+        Intent intent = new Intent(ProfileActivity.this, About.class);
+        startActivity(intent);
+    }
+
+
 }

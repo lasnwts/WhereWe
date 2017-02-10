@@ -298,31 +298,6 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return SmallModels;
     }
 
-
-    //read 1 model FireBase, _id = 1
-    public FbaseModel getFbaseModel() {
-        Cursor c = getReadableDatabase().query(TABLE_USERS, null, KEY_ID + " = ?", new String[]{Integer.toString(1)}, null, null, null);
-
-        // определяем номера столбцов по имени в выборке
-        int idColIndex = c.getColumnIndex(KEY_ID);
-        int nameColIndex = c.getColumnIndex(KEY_NAME);
-        int stateColIndex = c.getColumnIndex(KEY_STATE);
-        int modeColIndex = c.getColumnIndex(KEY_MODE);
-        int rightsColIndex = c.getColumnIndex(KEY_RIGHTS);
-        int speedColIndex = c.getColumnIndex(KEY_SPEED);
-        int movedColIndex = c.getColumnIndex(KEY_MOVED);
-        int dateColIndex = c.getColumnIndex(KEY_DATE);
-        int longtitudeColIndex = c.getColumnIndex(KEY_LONGTITUDE);
-        int lattitudeColIndex = c.getColumnIndex(KEY_LATTITUDE);
-        int contactColIndex = c.getColumnIndex(KEY_CONTACT_ID);
-        int emailColIndex = c.getColumnIndex(KEY_EMAIL);
-
-        if (c != null && c.getCount() > 0) {
-            Log.d(TAG, "getFbaseModel");
-        }
-        return null;
-    }
-
     public ModelCheck getLatLongTimeFromMe() {
         ModelCheck modelCheck;
         Cursor c = getReadableDatabase().query(TABLE_USERS, null,
@@ -452,9 +427,10 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         int emailColIndex = c.getColumnIndex(KEY_EMAIL);
 
         if (c != null && c.getCount() > 0 && c.moveToFirst()) {
-            Log.d(TAG, "getEmail()");
-            return c.getString(emailColIndex);
+                Log.d(TAG, "getEmail()");
+                return c.getString(emailColIndex);
         }
+        c.close();
         return null;
     }
 
@@ -487,6 +463,41 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
         Log.d(TAG, "DBHelper:updateFbaseModel: updated where =" + where + " updated:" + updateResult);
         return updateResult;
+    }
+
+    public String getEmailPartFBasePartFromMe(){
+        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL, KEY_PART_EMAIL, KEY_FBASE_PATH, KEY_ID},KEY_ID + "=1", null, null, null, null);
+
+        if (c != null && c.getCount() > 0 && c.moveToFirst()) {
+            Log.d(TAG, "showAbout(YES)");
+            // определяем номера столбцов по имени в выборке
+            int emailColIndex = c.getColumnIndex(KEY_EMAIL);
+            int part_emailColIndex = c.getColumnIndex(KEY_PART_EMAIL);
+            int fbaseColIndex = c.getColumnIndex(KEY_FBASE_PATH);
+            String s = c.getString(emailColIndex)+";"+c.getString(part_emailColIndex)+";"+c.getString(fbaseColIndex);
+            c.close();
+            return s;
+        } else {
+            Log.d(TAG, "showAbout(NO)");
+            c.close();
+            return "";
+        }
+    }
+
+    public boolean checkExistClient(String email, String part_email, String fbase_path){
+        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL, KEY_PART_EMAIL, KEY_FBASE_PATH, KEY_ID},
+                KEY_EMAIL + "=? and "+KEY_PART_EMAIL + "=? and " + KEY_FBASE_PATH +"=?", new String[]{email,part_email,fbase_path},
+                null, null, null);
+
+        if (c != null && c.getCount() > 0 && c.moveToFirst()) {
+            Log.d(TAG, "showAbout:checkExistClient(YES)");
+            c.close();
+            return true;
+        } else {
+            Log.d(TAG, "showAbout:checkExistClient(NO)");
+            c.close();
+            return false;
+        }
     }
 }
 
