@@ -15,9 +15,9 @@
         <item>Java for beginners</item>
         <item>Android Studio</item>
         <item>Android Design</item>
-        <item>Developer Tools</item>
-        <item>Game Dev</item>
-        <item>Eclipse</item>
+        <item>Input string data</item>
+        <item>Send my data</item>
+        <item>Logout</item>
     </string-array>
 
     <string name="allowedReceivedLocation">Allow broad cast location?</string>
@@ -25,4 +25,29 @@
     <string name="youname">Input your name</string>
     <string name="hint_yourname">Your name</string>
     <string name="summary_yourname">if you want to enter, it is not necessary</string>
+
+    <string name="pref_app_title">О приложении</string>
+    <string name="pref_app_summary">Видеоуроки по разработке мобильных приложений</string>
+    <string name="pref_version_title">Версия сборки</string>
+    <string name="pref_version_summary">1.0</string>
+    <string name="pref_developer_title">Разработчик</string>
+    <string name="pref_developer_summary">FandroidApps</string>
+    <string name="pref_share_title">Поделитесь приложением</string>
+    <string name="pref_share_summary">Расскажите друзьям об этом приложении</string>
+    <string name="pref_rate_review_title">Поставьте оценку</string>
+    <string name="pref_rate_review_summary">Оцените приложение и оставьте отзыв в GooglePlay</string>
+
+    <string name="pref_share_key">prefShareKey</string>
+    <string name="pref_rate_review_key">prefRateReviewKey</string>
+
+    <string name="share_to">Поделиться</string>
+    <string name="subject">WhereWe</string>
+    <string name="message">Вы можете скачать приложение "Видеоуроки Start Android" для Android в </string>
+
+    <string name="dialog_title_yes_no">Важно!</string>
+    <string name="dialog_question_yes_no">Вы уверены что хотите выйти из FireBase?</string>
+    <string name="dialog_yes">Да</string>
+    <string name="dialog_no">Нет</string>
+
+
 </resources>

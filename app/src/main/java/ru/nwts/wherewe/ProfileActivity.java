@@ -2,11 +2,14 @@ package ru.nwts.wherewe;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +34,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.nwts.wherewe.aux_ui.About;
@@ -39,12 +43,13 @@ import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.SmallModel;
 import ru.nwts.wherewe.services.DeviceLocationService;
 import ru.nwts.wherewe.services.LocationService;
+import ru.nwts.wherewe.util.DialogFragmentYesNo;
 import ru.nwts.wherewe.util.PreferenceActivities;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static ru.nwts.wherewe.TODOApplication.*;
 
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, DialogFragmentYesNo.DialogFragmentYesNoListener {
 
     //LOG
     public static final String TAG = "MyLogs";
@@ -134,6 +139,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 .withHeaderBackground(R.drawable.header)
                 .build();
 
+
         drawer = new DrawerBuilder(this)
                 .withActivity(ProfileActivity.this)
                 .withAccountHeader(accountHeader)
@@ -151,6 +157,54 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        //
+                        selectedDrawerItem = position;
+                        if (drawerItem != null) {
+                            if (drawerItem.getIdentifier() >= 0 && selectedDrawerItem != -1) {
+                                setToolbarAndSelectedDrawerItem(
+                                        channelNames[selectedDrawerItem - 1],
+                                        (selectedDrawerItem - 1)
+                                );
+
+                                Log.d(TAG, "Drwaer:selectedDrawerItem:" + selectedDrawerItem);
+
+                                switch (selectedDrawerItem) {
+                                    case 1:
+                                        break;
+                                    case 2:
+                                        break;
+                                    case 5:
+                                        break;
+                                    case 6:
+                                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                                        shareIntent.setType("text/plain");
+                                        shareIntent.putExtra(Intent.EXTRA_SUBJECT,
+                                                getString(R.string.subject));
+                                        shareIntent.putExtra(Intent.EXTRA_TEXT, putEmailAndFireBasePathtoClient());
+                                        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
+                                        break;
+                                    case 7:
+                                        DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance();
+                                        FragmentManager manager = getSupportFragmentManager();
+                                        dialogFragmentYesNo.show(manager, "dialog");
+//
+//                                        firebaseAuth.signOut();
+//                                        //closing activity
+//                                        finish();
+//                                        //starting login activity
+//                                        startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+                                        break;
+                                    default:
+                                        break;
+                                }
+
+                            } else if (selectedDrawerItem == -1) {
+                                Intent aboutIntent = new Intent(getApplicationContext(),
+                                        About.class);
+                                startActivity(aboutIntent);
+                                overridePendingTransition(R.anim.open_next, R.anim.close_main);
+                            }
+                        }
                         return false;
                         //
                     }
@@ -184,6 +238,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //Preference
         initPreferences();
     }
+
+    private void setToolbarAndSelectedDrawerItem(String title, int selectedDrawerItem) {
+        toolbar.setTitle(title);
+        drawer.setSelection(selectedDrawerItem, false);
+    }
+
 
     @Override
     protected void onResume() {
@@ -287,6 +347,68 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         startActivityForResult(intent, 0);
     }
 
+    private String putEmailAndFireBasePathtoClient() {
+        //Log.d(TAG, "EmailAndFireBasePathtoClient:" + dbHelper.getEmailPartFBasePartFromMe());
+        String s = dbHelper.getEmailPartFBasePartFromMe();
+        byte[] bs = s.getBytes();
+        String strEncoded = Base64.encodeToString(bs, Base64.DEFAULT);
+        //Log.d(TAG, "EmailAndFireBasePathtoClient:base64 encoded:" + strEncoded);
+        return strEncoded;
+    }
+
+    private String getEmailAndFireBasePathtoClient(String strEncoded) {
+        String email;
+        String part_email;
+        String fbase_part;
+        String strDecoded = new String(Base64.decode(strEncoded.getBytes(), Base64.DEFAULT));
+        //Log.d(TAG, "EmailAndFireBasePathtoClient:base64 decoded:" + strDecoded);
+        return strDecoded;
+    }
+
+    private String getEmailFromDecoded(String strDecoded) {
+        String email = strDecoded.substring(0, strDecoded.indexOf(";"));
+        return email;
+    }
+
+    //Attention strDecoded include all data from decoded string
+    private String getPartEmailFromDecoded(String strDecoded){
+        String s = strDecoded.substring(strDecoded.indexOf(";") + 1, strDecoded.length());
+        String part_email = s.substring(0, s.indexOf(";"));
+        return part_email;
+    }
+
+    //Attention strDecoded include all data from decoded string
+    private String getFireBasePathFromDecoded(String strDecoded){
+        String s = strDecoded.substring(strDecoded.indexOf(";") + 1, strDecoded.length());
+        String fbase_part = s.substring(s.indexOf(";") + 1, s.length());
+        return fbase_part;
+    }
+
+    private boolean isEmailValidation(String email) {
+        try {
+            return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        } catch (NullPointerException exception){
+            return false;
+        }
+    }
+
+    private boolean isPartEmailValidation(String part_email){
+        if (part_email != null && !part_email.isEmpty() && part_email.length() > 5){
+            return true;
+        } else {
+            return false;
+
+        }
+    }
+
+    private boolean isFireBasePathValidation(String fbase_path){
+        if (fbase_path != null && !fbase_path.isEmpty() && fbase_path.length() > 20){
+            return true;
+        } else {
+            return false;
+
+        }
+    }
 
     public void showAbout() {
         String email;
@@ -295,6 +417,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         /*
         This test code begin
          */
+        Log.d(TAG, "EmailAndFireBasePathtoClient:" + putEmailAndFireBasePathtoClient());
+        Log.d(TAG, "EmailAndFireBasePathtoClient:" + getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient()));
+        Log.d(TAG, "EmailAndFireBasePathtoClient:email:" + getEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())));
+        if (isEmailValidation(getEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))){
+            Log.d(TAG, "EmailAndFireBasePathtoClient:is email:mathes");
+        }
+        if (isPartEmailValidation(getPartEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))){
+            Log.d(TAG, "EmailAndFireBasePathtoClient:part_email:"+getPartEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())));
+        }
+        if (isFireBasePathValidation(getFireBasePathFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))){
+            Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:"+getFireBasePathFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())));
+        }
+
         Log.d(TAG, "showAbout:" + dbHelper.getEmailPartFBasePartFromMe());
         String s = dbHelper.getEmailPartFBasePartFromMe();
         byte[] bs = s.getBytes();
@@ -311,8 +446,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         fbase_part = s.substring(s.indexOf(";") + 1, s.length());
         Log.d(TAG, "showAbout:Fbase_part:" + fbase_part);
         if (!dbHelper.checkExistClient(email, part_email, fbase_part)) {
-            dbHelper.dbInsertUser("", 0, 0, 0, 0, 0,  preferenceHelper.getLong("Time"), Double.longBitsToDouble(preferenceHelper.getLong("Longtitude")),
-                    Double.longBitsToDouble(preferenceHelper.getLong("Latitude")),fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email);
+            dbHelper.dbInsertUser("", 0, 0, 0, 0, 0, preferenceHelper.getLong("Time"), Double.longBitsToDouble(preferenceHelper.getLong("Longtitude")),
+                    Double.longBitsToDouble(preferenceHelper.getLong("Latitude")), fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email);
         }
         /*
         thies end of test code
@@ -322,4 +457,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Toast.makeText(getApplicationContext(), "Вы выбрали кнопку OK!",
+                Toast.LENGTH_LONG).show();
+        firebaseAuth.signOut();
+        //closing activity
+        finish();
+        //starting login activity
+        startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        Toast.makeText(getApplicationContext(), "Вы выбрали кнопку отмены!",
+                Toast.LENGTH_LONG).show();
+    }
 }
