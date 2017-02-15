@@ -48,6 +48,8 @@
     <string name="dialog_question_yes_no">Вы уверены что хотите выйти из FireBase?</string>
     <string name="dialog_yes">Да</string>
     <string name="dialog_no">Нет</string>
+    <string name="frag_btn_ok">OK</string>
+    <string name="frag_btn_negative">Cancel</string>
 
 
 </resources>

@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -31,13 +30,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ru.nwts.wherewe.TODOApplication;
 import ru.nwts.wherewe.database.DBHelper;
@@ -45,12 +41,8 @@ import ru.nwts.wherewe.model.FbaseModel;
 import ru.nwts.wherewe.model.ListFireBasePath;
 import ru.nwts.wherewe.model.ModelCheck;
 import ru.nwts.wherewe.model.TestModel;
-import ru.nwts.wherewe.util.BoardReceiverBattery;
+import ru.nwts.wherewe.receivers.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
-
-import static android.R.attr.data;
-import static android.R.attr.mode;
-import static android.R.attr.value;
 
 /**
  * Created by Надя on 10.01.2017.

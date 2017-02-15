@@ -419,6 +419,15 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return updateResult;
     }
 
+    public int dbUpdateFBase(String email, String part_email, String fbase) {
+        cv = new ContentValues();
+        cv.put(KEY_FBASE_PATH, fbase);
+        String where =  KEY_EMAIL + "='"+email+"' and "+KEY_PART_EMAIL +"='"+part_email+"'";
+        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        Log.d(TAG, where + " updated:" + updateResult);
+        return updateResult;
+    }
+
     //read Email _id = 1
     public String getEmail() {
         Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL}, KEY_ID + "= 1", null, null, null, null);
@@ -484,9 +493,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         }
     }
 
-    public boolean checkExistClient(String email, String part_email, String fbase_path){
+    public boolean checkExistClient(String email, String part_email){
         Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_EMAIL, KEY_PART_EMAIL, KEY_FBASE_PATH, KEY_ID},
-                KEY_EMAIL + "=? and "+KEY_PART_EMAIL + "=? and " + KEY_FBASE_PATH +"=?", new String[]{email,part_email,fbase_path},
+                KEY_EMAIL + "=? and "+KEY_PART_EMAIL +"=?", new String[]{email,part_email},
                 null, null, null);
 
         if (c != null && c.getCount() > 0 && c.moveToFirst()) {

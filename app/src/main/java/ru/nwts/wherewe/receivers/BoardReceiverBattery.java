@@ -1,4 +1,4 @@
-package ru.nwts.wherewe.util;
+package ru.nwts.wherewe.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.os.BatteryManager;
 import android.util.Log;
 
 import ru.nwts.wherewe.TODOApplication;
+import ru.nwts.wherewe.util.PreferenceHelper;
 
 /**
  * Created by Надя on 16.01.2017.

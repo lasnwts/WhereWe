@@ -43,13 +43,15 @@ import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.SmallModel;
 import ru.nwts.wherewe.services.DeviceLocationService;
 import ru.nwts.wherewe.services.LocationService;
+import ru.nwts.wherewe.util.DialogFragmentInputStr;
 import ru.nwts.wherewe.util.DialogFragmentYesNo;
 import ru.nwts.wherewe.util.PreferenceActivities;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static ru.nwts.wherewe.TODOApplication.*;
 
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, DialogFragmentYesNo.DialogFragmentYesNoListener {
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener,
+        OnMapReadyCallback, DialogFragmentYesNo.DialogFragmentYesNoListener, DialogFragmentInputStr.DialogFragmentInputStrListener {
 
     //LOG
     public static final String TAG = "MyLogs";
@@ -73,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private int selectedDrawerItem = 0;
 
+    FragmentManager manager;
     //
     private GoogleMap Map;
     public DBHelper dbHelper;
@@ -93,6 +96,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        manager = getSupportFragmentManager();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -174,34 +179,28 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                     case 2:
                                         break;
                                     case 5:
+                                        //FragmentManager manager = getSupportFragmentManager();
+                                        DialogFragmentInputStr editNameDialogFragment = new DialogFragmentInputStr();
+                                        editNameDialogFragment.show(manager, "fragment_edit_name");
                                         break;
                                     case 6:
                                         Intent shareIntent = new Intent(Intent.ACTION_SEND);
                                         shareIntent.setType("text/plain");
-                                        shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                                                getString(R.string.subject));
+                                        shareIntent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.subject));
                                         shareIntent.putExtra(Intent.EXTRA_TEXT, putEmailAndFireBasePathtoClient());
                                         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
                                         break;
                                     case 7:
                                         DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance();
-                                        FragmentManager manager = getSupportFragmentManager();
+                                        //FragmentManager manager = getSupportFragmentManager();
                                         dialogFragmentYesNo.show(manager, "dialog");
-//
-//                                        firebaseAuth.signOut();
-//                                        //closing activity
-//                                        finish();
-//                                        //starting login activity
-//                                        startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
                                         break;
                                     default:
                                         break;
                                 }
 
                             } else if (selectedDrawerItem == -1) {
-                                Intent aboutIntent = new Intent(getApplicationContext(),
-                                        About.class);
-                                startActivity(aboutIntent);
+                                showAbout();
                                 overridePendingTransition(R.anim.open_next, R.anim.close_main);
                             }
                         }
@@ -351,7 +350,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //Log.d(TAG, "EmailAndFireBasePathtoClient:" + dbHelper.getEmailPartFBasePartFromMe());
         String s = dbHelper.getEmailPartFBasePartFromMe();
         byte[] bs = s.getBytes();
-        String strEncoded = Base64.encodeToString(bs, Base64.DEFAULT);
+        String strEncoded = "00099999" + Base64.encodeToString(bs, Base64.DEFAULT);
         //Log.d(TAG, "EmailAndFireBasePathtoClient:base64 encoded:" + strEncoded);
         return strEncoded;
     }
@@ -360,7 +359,13 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         String email;
         String part_email;
         String fbase_part;
-        String strDecoded = new String(Base64.decode(strEncoded.getBytes(), Base64.DEFAULT));
+        String strDecoded;
+        try{
+            strDecoded = new String(Base64.decode(strEncoded.getBytes(), Base64.DEFAULT));
+        } catch (IllegalArgumentException error){
+            strDecoded = "";
+            Log.e(TAG, error.toString());
+        }
         //Log.d(TAG, "EmailAndFireBasePathtoClient:base64 decoded:" + strDecoded);
         return strDecoded;
     }
@@ -381,6 +386,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private String getFireBasePathFromDecoded(String strDecoded){
         String s = strDecoded.substring(strDecoded.indexOf(";") + 1, strDecoded.length());
         String fbase_part = s.substring(s.indexOf(";") + 1, s.length());
+        Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:22:"+fbase_part);
         return fbase_part;
     }
 
@@ -403,7 +409,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private boolean isFireBasePathValidation(String fbase_path){
         if (fbase_path != null && !fbase_path.isEmpty() && fbase_path.length() > 20){
-            return true;
+            Log.d(TAG,"putInputStrNewSendInformation:"+fbase_path);
+            Log.d(TAG,"putInputStrNewSendInformation:"+fbase_path.indexOf("99999"));
+            if (fbase_path.indexOf("99999")>0){
+                try{
+                    new String(Base64.decode(fbase_path.substring(8,fbase_path.length()).getBytes(), Base64.DEFAULT));
+                } catch (IllegalArgumentException error){
+                    Log.e(TAG, error.toString());
+                    return  false;
+                }
+                return true;
+            } else {
+                return  false;
+            }
         } else {
             return false;
 
@@ -445,7 +463,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         Log.d(TAG, "showAbout:part_email:" + part_email);
         fbase_part = s.substring(s.indexOf(";") + 1, s.length());
         Log.d(TAG, "showAbout:Fbase_part:" + fbase_part);
-        if (!dbHelper.checkExistClient(email, part_email, fbase_part)) {
+        if (!dbHelper.checkExistClient(email, part_email)) {
             dbHelper.dbInsertUser("", 0, 0, 0, 0, 0, preferenceHelper.getLong("Time"), Double.longBitsToDouble(preferenceHelper.getLong("Longtitude")),
                     Double.longBitsToDouble(preferenceHelper.getLong("Latitude")), fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email);
         }
@@ -473,4 +491,64 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         Toast.makeText(getApplicationContext(), "Вы выбрали кнопку отмены!",
                 Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void onFinishEditDialog(String inputText) {
+        if (!inputText.isEmpty() && inputText.length() > 20){
+            Toast.makeText(getApplicationContext(), "Привет, введено: " + inputText, Toast.LENGTH_SHORT).show();
+            if (!putInputStrNewSendInformation(inputText)){
+                Toast.makeText(getApplicationContext(), "Привет, введенная строка не проходит проверку!", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "Привет, вы ничего не ввели!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean putInputStrNewSendInformation(String sendMessage){
+        String email;
+        String part_email;
+        String fbase_part;
+
+        if (isFireBasePathValidation(sendMessage)){
+            sendMessage = getEmailAndFireBasePathtoClient(sendMessage.substring(8,sendMessage.length()));
+            Log.d(TAG,"EmailAndFireBasePathtoClient: "+sendMessage);
+
+            if (isEmailValidation(getEmailFromDecoded(sendMessage))){
+                email = getEmailFromDecoded(sendMessage).trim();
+                Log.d(TAG, "EmailAndFireBasePathtoClient:is email:mathes : " + email);
+            } else {
+                return false;
+            }
+            if (isPartEmailValidation(getPartEmailFromDecoded(sendMessage))){
+                part_email = getPartEmailFromDecoded(sendMessage).trim();
+                Log.d(TAG, "EmailAndFireBasePathtoClient:part_email:"+part_email);
+            } else {
+                return false;
+            }
+            if ((getFireBasePathFromDecoded(sendMessage).length()>20)){
+                fbase_part = getFireBasePathFromDecoded(sendMessage).trim();
+                Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:"+fbase_part);
+            } else {
+                return false;
+            }
+            if (!dbHelper.checkExistClient(email, part_email)) {
+                if (dbHelper.dbInsertUser("", 0, 0, 0, 0, 0, preferenceHelper.getLong("Time"), Double.longBitsToDouble(preferenceHelper.getLong("Longtitude")),
+                        Double.longBitsToDouble(preferenceHelper.getLong("Latitude")), fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email)==1){
+                    Toast.makeText(getApplicationContext(), "Запись добавлена!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Ошибка добавления записи!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                if (dbHelper.dbUpdateFBase(email, part_email, fbase_part)==1){
+                    Toast.makeText(getApplicationContext(), "Запись обновлена!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Ошибка обновления записи!", Toast.LENGTH_SHORT).show();
+                }
+            }
+            return true;
+        } else {
+            Log.d(TAG,"putInputStrNewSendInformation: error in str!");        }
+        return false;
+    }
+
 }

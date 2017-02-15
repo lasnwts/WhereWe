@@ -1,4 +1,4 @@
-package ru.nwts.wherewe.util;
+package ru.nwts.wherewe.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
