@@ -22,6 +22,11 @@
         android:key="allowedSendLocation"
         android:summary="@string/hintAllowedReceivedLocation"
         android:title="@string/allowedReceivedLocation"/>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="allowedSMSRead"
+        android:summary="@string/hintAllowedSMSRead"
+        android:title="@string/allowedSMSRead"/>
     <ListPreference
         android:key="behaviour"
         android:title="Type work sensor"

@@ -51,5 +51,8 @@
     <string name="frag_btn_ok">OK</string>
     <string name="frag_btn_negative">Cancel</string>
 
+    <string name="hintAllowedSMSRead">Разрешение читать входящие СМС</string>
+    <string name="allowedSMSRead">Чтение СМС</string>
+
 
 </resources>

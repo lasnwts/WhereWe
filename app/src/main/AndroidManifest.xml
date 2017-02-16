@@ -4,7 +4,7 @@
 
     <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"></uses-feature>
+        android:required="true" />
 
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
@@ -39,10 +39,10 @@
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyD-IjvaI4fdKsroXZYK5SME7V3asPMKdZ8"></meta-data>
+            android:value="AIzaSyD-IjvaI4fdKsroXZYK5SME7V3asPMKdZ8" />
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"></meta-data>
+            android:value="@integer/google_play_services_version" />
 
         <service
             android:name=".services.LocationService"
@@ -58,7 +58,15 @@
             android:name=".services.DeviceLocationService"
             android:exported="false" />
 
-        <activity android:name=".aux_ui.About"></activity>
+        <activity android:name=".aux_ui.About" />
+
+        <receiver android:name=".receivers.SmsReceiver">
+            <intent-filter android:priority="100">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".aux_ui.RecyclerViews"></activity>
     </application>
 
 </manifest>

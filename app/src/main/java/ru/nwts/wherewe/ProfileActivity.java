@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.nwts.wherewe.aux_ui.About;
+import ru.nwts.wherewe.aux_ui.RecyclerViews;
 import ru.nwts.wherewe.database.DBHelper;
 import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.SmallModel;
@@ -175,6 +176,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                                 switch (selectedDrawerItem) {
                                     case 1:
+                                        startActivity(new Intent(getApplicationContext(), RecyclerViews.class));
                                         break;
                                     case 2:
                                         break;
@@ -228,6 +230,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             dbHelper.dbInsertUser("Test name_115", 1, 1, 1, 1, 1, 198299922, 33.35324905, 65.84073992, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
             dbHelper.dbInsertUser("Test name_1", 1, 1, 1, 1, 1, 198299922, 28.55324905, 68.14073992, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
             dbHelper.dbInsertUser("Test name_3", 1, 1, 1, 1, 1, 198299922, 30.35324905, 64.84073992, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
+            dbHelper.dbInsertUser("Test 2 name_115", 1, 1, 1, 1, 1, 198299922, 33.35324905, 65.84073992, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
+            dbHelper.dbInsertUser("Test2 name_1", 1, 1, 1, 1, 1, 198299922, 28.55324905, 68.14073992, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
+            dbHelper.dbInsertUser("Test2 name_3", 1, 1, 1, 1, 1, 198299922, 30.35324905, 64.84073992, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
+            dbHelper.dbInsertUser("Test 3name_115", 1, 1, 1, 1, 1, 198299922, 33.35324905, 65.84073992, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
+            dbHelper.dbInsertUser("Test4 name_1", 1, 1, 1, 1, 1, 198299922, 28.55324905, 68.14073992, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
+            dbHelper.dbInsertUser("Test 5name_3", 1, 1, 1, 1, 1, 198299922, 30.35324905, 64.84073992, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
             dbHelper.dbReadInLog();
             smallModels = dbHelper.getListSmallModel();
         }
@@ -495,7 +503,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onFinishEditDialog(String inputText) {
         if (!inputText.isEmpty() && inputText.length() > 20){
-            Toast.makeText(getApplicationContext(), "Привет, введено: " + inputText, Toast.LENGTH_SHORT).show();
+           // Toast.makeText(getApplicationContext(), "Привет, введено: " + inputText, Toast.LENGTH_SHORT).show();
             if (!putInputStrNewSendInformation(inputText)){
                 Toast.makeText(getApplicationContext(), "Привет, введенная строка не проходит проверку!", Toast.LENGTH_SHORT).show();
             }
