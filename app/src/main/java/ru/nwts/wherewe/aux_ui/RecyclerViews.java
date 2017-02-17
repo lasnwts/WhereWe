@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +14,12 @@ import ru.nwts.wherewe.TODOApplication;
 import ru.nwts.wherewe.adapter.adapterSmallModel;
 import ru.nwts.wherewe.database.DBHelper;
 import ru.nwts.wherewe.model.SmallModel;
+import ru.nwts.wherewe.util.DialogFragmentOneItem;
 
-public class RecyclerViews extends AppCompatActivity {
+public class RecyclerViews extends AppCompatActivity implements DialogFragmentOneItem.EditingTaskListener{
+
+    //LOG
+    public static final String TAG = "MyLogs";
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -46,5 +51,10 @@ public class RecyclerViews extends AppCompatActivity {
         adapter = new adapterSmallModel(smallModels,this);
         recyclerView.setAdapter(adapter);
 
+    }
+
+    @Override
+    public void onTaskEdited(SmallModel updatedTask) {
+        Log.v(TAG,"adapterSmallModel: email updated: ="+updatedTask.getEmail());
     }
 }

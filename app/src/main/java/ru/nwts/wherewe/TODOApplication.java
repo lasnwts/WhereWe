@@ -2,6 +2,7 @@ package ru.nwts.wherewe;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.v4.app.FragmentManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 

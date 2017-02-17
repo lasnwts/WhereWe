@@ -35,8 +35,7 @@
         </activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".ProfileActivity" />
-        <activity android:name=".util.PreferenceActivities" />
-
+        <activity android:name=".util.PreferenceActivities"/>
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyD-IjvaI4fdKsroXZYK5SME7V3asPMKdZ8" />

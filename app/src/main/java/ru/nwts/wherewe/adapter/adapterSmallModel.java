@@ -2,6 +2,9 @@ package ru.nwts.wherewe.adapter;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +21,7 @@ import java.util.List;
 import ru.nwts.wherewe.R;
 import ru.nwts.wherewe.aux_ui.RecyclerViews;
 import ru.nwts.wherewe.model.SmallModel;
+import ru.nwts.wherewe.util.DialogFragmentOneItem;
 
 import static ru.nwts.wherewe.R.id.recyclerViewLayout;
 import static ru.nwts.wherewe.R.id.textViewHead;
@@ -47,12 +51,29 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
     }
 
     @Override
-    public void onBindViewHolder(final adapterSmallModel.ViewHolder holder, int position) {
-        SmallModel smallModel = smallModels.get(position);
+    public void onBindViewHolder(final adapterSmallModel.ViewHolder holder, final int position) {
+        final SmallModel smallModel = smallModels.get(position);
         holder.textViewHead.setText(smallModel.getName());
         holder.textViewDesc.setText(smallModel.getEmail());
         holder.textViewOption.setText(smallModel.getName());
 
+        //View One element
+        holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentActivity activity = (FragmentActivity)(context);
+                FragmentManager fm = activity.getSupportFragmentManager();
+
+                Log.v(TAG, "adapterSmallModel:item:"+"One setOnClickListener:"+ holder.textViewHead.getText().toString());
+                DialogFragment dialogFragmentOneItem = DialogFragmentOneItem.newInstance(smallModels.get(position));
+                //adapterSmallModel.this
+                dialogFragmentOneItem.show(fm,"NewW");
+               // dialogFragmentOneItem.show(adapterSmallModel.this.context.getApplicationContext(),"");
+            }
+        });
+
+
+        //Menu Options
         holder.relativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
