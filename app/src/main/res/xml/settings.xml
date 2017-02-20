@@ -9,11 +9,6 @@
         />
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="wifi"
-        android:summary="@string/wifi_summary"
-        android:title="@string/wifi_title"/>
-    <CheckBoxPreference
-        android:defaultValue="true"
         android:key="hints"
         android:summary="@string/hints_summary"
         android:title="@string/hints_title"/>

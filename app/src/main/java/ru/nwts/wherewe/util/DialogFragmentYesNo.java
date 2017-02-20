@@ -19,11 +19,15 @@ public class DialogFragmentYesNo extends DialogFragment {
 
     private DialogFragmentYesNoListener dialogFragmentYesNoListener;
 
-    public static DialogFragmentYesNo newInstance(){
+    public static DialogFragmentYesNo newInstance(int _id, int position){
         String title = "Важно!";
+        int Id = _id;
+        int pos = position;
         DialogFragmentYesNo dialogFragmentYesNo = new DialogFragmentYesNo();
         Bundle args = new Bundle();
         args.putString("title", title);
+        args.putInt("_id",Id);
+        args.putInt("position",pos);
         dialogFragmentYesNo.setArguments(args);
         return dialogFragmentYesNo;
     }
@@ -39,7 +43,8 @@ public class DialogFragmentYesNo extends DialogFragment {
                 .setTitle(title)
                 .setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialogFragmentYesNoListener.onDialogPositiveClick(DialogFragmentYesNo.this);
+                        dialogFragmentYesNoListener.onDialogPositiveClick(DialogFragmentYesNo.this,
+                                getArguments().getInt("_id"), getArguments().getInt("position"));
                     }
                 })
                 .setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
@@ -65,7 +70,7 @@ public class DialogFragmentYesNo extends DialogFragment {
     }
 
     public interface DialogFragmentYesNoListener{
-        void onDialogPositiveClick(DialogFragment dialog);
+        void onDialogPositiveClick(DialogFragment dialog, int id, int position);
         void onDialogNegativeClick(DialogFragment dialog);
     }
 }

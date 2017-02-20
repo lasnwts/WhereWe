@@ -419,6 +419,15 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return updateResult;
     }
 
+    public int dbUpdateName(long rowID, String name) {
+        cv = new ContentValues();
+        cv.put(KEY_NAME, name);
+        String where = KEY_ID + "=" + rowID;
+        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
+        return updateResult;
+    }
+
     public int dbUpdateFBase(String email, String part_email, String fbase) {
         cv = new ContentValues();
         cv.put(KEY_FBASE_PATH, fbase);

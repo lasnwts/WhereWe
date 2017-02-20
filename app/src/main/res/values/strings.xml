@@ -8,30 +8,27 @@
     <string name="googleplay_url">https://play.google.com/store/apps/details?id=ru.nwts.appsyoutube</string>
 
     <string name="about">О приложении</string>
-    <string name="prefer">Setting</string>
+    <string name="prefer">Настройки</string>
 
     <string-array name="channel_names">
-        <item>New Video</item>
-        <item>Java for beginners</item>
-        <item>Android Studio</item>
-        <item>Android Design</item>
-        <item>Input string data</item>
-        <item>Send my data</item>
-        <item>Logout</item>
+        <item>Список абонентов</item>
+        <item>Добавить абонента</item>
+        <item>Передать свои данные для подключения</item>
+        <item>Отключиться от системы</item>
     </string-array>
 
-    <string name="allowedReceivedLocation">Allow broad cast location?</string>
-    <string name="hintAllowedReceivedLocation">Allow or not send information from your location</string>
-    <string name="youname">Input your name</string>
-    <string name="hint_yourname">Your name</string>
-    <string name="summary_yourname">if you want to enter, it is not necessary</string>
+    <string name="allowedReceivedLocation">Мое местоположение</string>
+    <string name="hintAllowedReceivedLocation">Разрешить передавать информацию о моем м местоположении</string>
+    <string name="youname">Введите свое имя</string>
+    <string name="hint_yourname">Введите свое имя</string>
+    <string name="summary_yourname">Это необязательно</string>
 
     <string name="pref_app_title">О приложении</string>
-    <string name="pref_app_summary">Видеоуроки по разработке мобильных приложений</string>
+    <string name="pref_app_summary">Отображение местоположения друзей на карте</string>
     <string name="pref_version_title">Версия сборки</string>
     <string name="pref_version_summary">1.0</string>
     <string name="pref_developer_title">Разработчик</string>
-    <string name="pref_developer_summary">FandroidApps</string>
+    <string name="pref_developer_summary">A.Lyapustin</string>
     <string name="pref_share_title">Поделитесь приложением</string>
     <string name="pref_share_summary">Расскажите друзьям об этом приложении</string>
     <string name="pref_rate_review_title">Поставьте оценку</string>
@@ -45,14 +42,33 @@
     <string name="message">Вы можете скачать приложение "Видеоуроки Start Android" для Android в </string>
 
     <string name="dialog_title_yes_no">Важно!</string>
-    <string name="dialog_question_yes_no">Вы уверены что хотите выйти из FireBase?</string>
+    <string name="dialog_question_yes_no">Вы уверены?</string>
     <string name="dialog_yes">Да</string>
     <string name="dialog_no">Нет</string>
     <string name="frag_btn_ok">OK</string>
-    <string name="frag_btn_negative">Cancel</string>
+    <string name="frag_btn_negative">Отказаться</string>
 
     <string name="hintAllowedSMSRead">Разрешение читать входящие СМС</string>
     <string name="allowedSMSRead">Чтение СМС</string>
+    <string name="textViewCardHeadNaME">Наименование абонента</string>
+    <string name="textViewCardHeadEmail">Электронный адрес</string>
+
+    <string name="mene_option1">Открыть</string>
+    <string name="mene_option2">Зарезервировано</string>
+    <string name="mene_option3">Удалить</string>
+
+    <string name="delete_attention">Вы не можете удалить запись о себе!</string>
+    <string name="delete_completed">Запись удалена.</string>
+    <string name="delete_error">Ошибка удаления записи.</string>
+    <string name="update_done">Запись обновлена.</string>
+    <string name="update_error">Произошла ошибка при обновлении записи.</string>
+
+    <string name="dialog_edit_one_titile">Редактирование наименования абонента</string>
+    <string name="dialog_edit_one_email">E-mail абонента (не редактируется)</string>
+    <string name="dialog_edit_one_name">Наименование абонента</string>
+
+    <string name="dialog_insert_new_abonent_title">Вставьте строку:</string>
+    <string name="dialog_insert_new_abonent_hint">Полученная строка::</string>
 
 
 </resources>

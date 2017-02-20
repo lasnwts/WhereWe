@@ -11,11 +11,5 @@
         android:title="@string/prefer"
         app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/action_splash"
-        android:orderInCategory="100"
-        android:title="Text in string Value!"
-        android:checkable="true"
-        app:showAsAction="never" />
 
 </menu>

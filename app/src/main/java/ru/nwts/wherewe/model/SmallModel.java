@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class SmallModel implements Serializable {
 
-    private long id;
+    private int id;
     private String name;
     private int state;
     private int mode;
@@ -24,11 +24,15 @@ public class SmallModel implements Serializable {
     public SmallModel() {
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public SmallModel(long id, String name, int state, int mode, int rights, long speed, int moved, long track_date, long longtitude, long lattitude, int contact_id, String email) {
+    public SmallModel(int id, String name, int state, int mode, int rights, long speed, int moved, long track_date, long longtitude, long lattitude, int contact_id, String email) {
         this.id = id;
         this.name = name;
         this.state = state;
@@ -43,7 +47,7 @@ public class SmallModel implements Serializable {
         this.email = email;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

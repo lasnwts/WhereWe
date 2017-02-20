@@ -40,15 +40,12 @@ import java.util.List;
 import ru.nwts.wherewe.aux_ui.About;
 import ru.nwts.wherewe.aux_ui.RecyclerViews;
 import ru.nwts.wherewe.database.DBHelper;
-import ru.nwts.wherewe.model.Model;
 import ru.nwts.wherewe.model.SmallModel;
 import ru.nwts.wherewe.services.DeviceLocationService;
-import ru.nwts.wherewe.services.LocationService;
 import ru.nwts.wherewe.util.DialogFragmentInputStr;
 import ru.nwts.wherewe.util.DialogFragmentYesNo;
 import ru.nwts.wherewe.util.PreferenceActivities;
 import ru.nwts.wherewe.util.PreferenceHelper;
-
 import static ru.nwts.wherewe.TODOApplication.*;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener,
@@ -127,8 +124,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         setSupportActionBar(toolbar);
 
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
-        buttonLogout = (Button) findViewById(R.id.buttonLogout);
-        buttonService = (Button) findViewById(R.id.buttonService);
 
         channelNames = getResources().getStringArray(R.array.channel_names);
         PrimaryDrawerItem[] primaryDrawerItems = new PrimaryDrawerItem[channelNames.length];
@@ -179,22 +174,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                         startActivity(new Intent(getApplicationContext(), RecyclerViews.class));
                                         break;
                                     case 2:
-                                        break;
-                                    case 5:
-                                        //FragmentManager manager = getSupportFragmentManager();
                                         DialogFragmentInputStr editNameDialogFragment = new DialogFragmentInputStr();
                                         editNameDialogFragment.show(manager, "fragment_edit_name");
                                         break;
-                                    case 6:
+                                    case 3:
                                         Intent shareIntent = new Intent(Intent.ACTION_SEND);
                                         shareIntent.setType("text/plain");
                                         shareIntent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.subject));
                                         shareIntent.putExtra(Intent.EXTRA_TEXT, putEmailAndFireBasePathtoClient());
                                         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
                                         break;
-                                    case 7:
-                                        DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance();
-                                        //FragmentManager manager = getSupportFragmentManager();
+                                    case 4:
+                                        DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance(0,0);
                                         dialogFragmentYesNo.show(manager, "dialog");
                                         break;
                                     default:
@@ -216,11 +207,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
         //displaying logged in user name
-        textViewUserEmail.setText("Welcome " + user.getEmail() + " " + TODOApplication.getInstance().TEST_STRING);
-
-        //adding listener to button
-        buttonLogout.setOnClickListener(this);
-        buttonService.setOnClickListener(this);
+        textViewUserEmail.setText("Welcome " + user.getEmail());
 
         //Works Databases
         //dbHelper = new DBHelper(this);
@@ -261,10 +248,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         if (!preferenceHelper.getBoolean(KEY_LOCATION_SERVICE_STARTED)) {
             //Тест координат
             Log.d(TAG, "Start service! from ProfileActivity!");
-//
-//        locationService = new Intent(ProfileActivity.this, LocationService.class);
-//        locationService.putExtra("task", "GetMyLocation");
-//        startService(locationService);
         }
         startService(locationService);
     }
@@ -285,18 +268,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
-        //if logout is pressed
-        if (view == buttonLogout) {
-            //logging out the user
-            firebaseAuth.signOut();
-            //closing activity
-            finish();
-            //starting login activity
-            startActivity(new Intent(this, LoginActivity.class));
-        }
-        if (view == buttonService) {
-            startService(locationService);
-        }
+//        //if logout is pressed
+//        if (view == buttonLogout) {
+//            //logging out the user
+//            firebaseAuth.signOut();
+//            //closing activity
+//            finish();
+//            //starting login activity
+//            startActivity(new Intent(this, LoginActivity.class));
+//        }
+//        if (view == buttonService) {
+//            startService(locationService);
+//        }
     }
 
     @Override
@@ -484,7 +467,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
+    public void onDialogPositiveClick(DialogFragment dialog, int id, int position) {
         Toast.makeText(getApplicationContext(), "Вы выбрали кнопку OK!",
                 Toast.LENGTH_LONG).show();
         firebaseAuth.signOut();

@@ -17,17 +17,34 @@
             android:padding="@dimen/activity_horizontal_margin">
 
             <TextView
+                android:id="@+id/textViewCardHeadNaME"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/textViewCardHeadNaME"
+                android:textAppearance="?android:textAppearanceSmall" />
+
+            <TextView
                 android:id="@+id/textViewHead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/textViewCardHeadNaME"
                 android:text="Your Heading"
+                android:textAppearance="?android:textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/textViewCardHeadEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewHead"
+                android:text="@string/textViewCardHeadEmail"
                 android:textAppearance="?android:textAppearanceSmall" />
 
             <TextView
                 android:id="@+id/textViewDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/textViewHead"
+                android:layout_below="@+id/textViewCardHeadEmail"
+                android:layout_alignRight="@+id/textViewCardHeadEmail"
                 android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi molestie nisi dui. "
                 android:textAppearance="?android:textAppearanceMedium" />
 

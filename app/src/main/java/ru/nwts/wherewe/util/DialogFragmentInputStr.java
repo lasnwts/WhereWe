@@ -46,13 +46,11 @@ public class DialogFragmentInputStr extends DialogFragment {
             }
         });
 
-        getDialog().setTitle("Введите текст");
+        getDialog().setTitle(getResources().getString(R.string.dialog_insert_new_abonent_title));
         return view;
     }
 
     public interface DialogFragmentInputStrListener{
-//        void onDialogPositiveClickInputStr(DialogFragment dialog);
-//        void onDialogNegativeClickInputStr(DialogFragment dialog);
         void onFinishEditDialog(String inputText);
     }
 
