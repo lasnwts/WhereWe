@@ -1,7 +1,9 @@
 package ru.nwts.wherewe;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -17,12 +19,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,13 +53,26 @@ import ru.nwts.wherewe.util.DialogFragmentInputStr;
 import ru.nwts.wherewe.util.DialogFragmentYesNo;
 import ru.nwts.wherewe.util.PreferenceActivities;
 import ru.nwts.wherewe.util.PreferenceHelper;
+
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
+import static ru.nwts.wherewe.R.id.map;
 import static ru.nwts.wherewe.TODOApplication.*;
+import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
+import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
+import static ru.nwts.wherewe.database.DBConstant.KEY_LONGTITUDE;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener,
         OnMapReadyCallback, DialogFragmentYesNo.DialogFragmentYesNoListener, DialogFragmentInputStr.DialogFragmentInputStrListener {
 
     //LOG
     public static final String TAG = "MyLogs";
+
+    //Map
+    LatLngBounds bounds;
+    List<Marker> markers;
+    private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
+    //test
+    int i;
 
     PreferenceHelper preferenceHelper;
 
@@ -98,7 +118,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         manager = getSupportFragmentManager();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
 
@@ -214,15 +234,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         dbHelper = TODOApplication.getInstance().dbHelper;
         if (dbHelper != null) {
             dbHelper.dbDeleteUsers();
-            dbHelper.dbInsertUser("Test name_115", 1, 1, 1, 1, 1, 198299922, 33.35324905, 65.84073992, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
-            dbHelper.dbInsertUser("Test name_1", 1, 1, 1, 1, 1, 198299922, 28.55324905, 68.14073992, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
-            dbHelper.dbInsertUser("Test name_3", 1, 1, 1, 1, 1, 198299922, 30.35324905, 64.84073992, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
-            dbHelper.dbInsertUser("Test 2 name_115", 1, 1, 1, 1, 1, 198299922, 33.35324905, 65.84073992, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
-            dbHelper.dbInsertUser("Test2 name_1", 1, 1, 1, 1, 1, 198299922, 28.55324905, 68.14073992, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
-            dbHelper.dbInsertUser("Test2 name_3", 1, 1, 1, 1, 1, 198299922, 30.35324905, 64.84073992, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
-            dbHelper.dbInsertUser("Test 3name_115", 1, 1, 1, 1, 1, 198299922, 33.35324905, 65.84073992, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
-            dbHelper.dbInsertUser("Test4 name_1", 1, 1, 1, 1, 1, 198299922, 28.55324905, 68.14073992, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
-            dbHelper.dbInsertUser("Test 5name_3", 1, 1, 1, 1, 1, 198299922, 30.35324905, 64.84073992, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
+            dbHelper.dbInsertUser("Test0 name_115", 1, 1, 1, 1, 1, 198299922, 30.3667, 59.8793, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
+            dbHelper.dbInsertUser("Test1 name_1", 1, 1, 1, 1, 1, 198299922, 30.3467,  59.8693, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
+            dbHelper.dbInsertUser("Test2 name_3", 1, 1, 1, 1, 1, 198299922, 31.8350976, 58.9342803, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
+//            dbHelper.dbInsertUser("Test3 2 name_115", 1, 1, 1, 1, 1, 198299922, 32.6750986, 60.1055801, "M0erubb9976hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
+//            dbHelper.dbInsertUser("Test4 2 name_1", 1, 1, 1, 1, 1, 198299922, 32.1450981, 59.9000801, "Fkq99ze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
+//            dbHelper.dbInsertUser("Test5 2 name_3", 1, 1, 1, 1, 1, 198299922, 31.3350980, 60.9972887, "c8yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
+//            dbHelper.dbInsertUser("Test6  3name_115", 1, 1, 1, 1, 1, 198299922, 30.8950978, 59.9072801, "M0erubbT77hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
+//            dbHelper.dbInsertUser("Test7 4 name_1", 1, 1, 1, 1, 1, 198299922, 33.0950986, 59.8762564, "Fkq0Hze0sXg77Hf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
+//            dbHelper.dbInsertUser("Test8  5name_3", 1, 1, 1, 1, 1, 198299922, 31.9890990, 59.0942801, "c68J7FyUUwPH7CKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
             dbHelper.dbReadInLog();
             smallModels = dbHelper.getListSmallModel();
         }
@@ -232,6 +252,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //Preference
         initPreferences();
     }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int Id = (int) intent.getIntExtra(KEY_ID,0);
+            double Latitude = (double) intent.getDoubleExtra(KEY_LATTITUDE,0);
+            double Longtitude = (double) intent.getDoubleExtra(KEY_LONGTITUDE,0);
+            Log.d(TAG,"sendMessage:Id="+Id+" Latitude:"+Latitude+" Longtitude:"+Longtitude);
+            if (Id != 0 && Latitude != 0 && Longtitude != 0){
+                Log.d(TAG,"sendMessage Run Broadcastreceiver");
+            }
+        }
+    };
 
     private void setToolbarAndSelectedDrawerItem(String title, int selectedDrawerItem) {
         toolbar.setTitle(title);
@@ -250,13 +283,25 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             Log.d(TAG, "Start service! from ProfileActivity!");
         }
         startService(locationService);
+        //BroadCastReceiver register
+        registerReceiver(this.broadcastReceiver,
+                new IntentFilter(new IntentFilter(ACTION_MAPRECEIVER)));
     }
+
 
     @Override
     protected void onPause() {
         //Write to SharedPref what ProfActivity Started
         Log.d(TAG, "ProfileActivity onPaiused..");
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
+        try {
+            this.unregisterReceiver(broadcastReceiver);
+            Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG)
+                    .show();
+        }catch(IllegalArgumentException e){
+            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
+                    .show();
+        }
         super.onPause();
     }
 
@@ -320,21 +365,39 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             return;
         }
 
+        //Map
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        Map.getUiSettings().setZoomControlsEnabled(true);
+        markers = new ArrayList<>();
         for (int j = 0; j < smallModels.size(); j++) {
             SmallModel model = smallModels.get(j);
-            Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude())).title(model.getName()));
-            Map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(model.getLattitude(), model.getLongtitude())));
+            if (model.getId()==1){
+                i = j;
+                Log.d(TAG,"addMarker:Name:"+model.getName()+":getLongtitude:"+model.getLongtitude()+" getLattitude:"+model.getLattitude());
+                markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude()))
+                        .title(model.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
+            }else {
+                markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude())).title(model.getName())));
+            }
+           builder.include(markers.get(j).getPosition());
+            bounds = builder.build();
+            Map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
+                    int padding = 10; // offset from edges of the map in pixels
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                    //Map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
+                    Map.moveCamera(cu);
+                }
+            });
         }
-
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(-34, 151);
-        //Map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //Map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     public void showSettings() {
-        Intent intent = new Intent(ProfileActivity.this, PreferenceActivities.class);
-        startActivityForResult(intent, 0);
+        markers.get(i).setPosition(new LatLng(59.10002, 31.19086));
+        Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
+//        Intent intent = new Intent(ProfileActivity.this, PreferenceActivities.class);
+//        startActivityForResult(intent, 0);
     }
 
     private String putEmailAndFireBasePathtoClient() {

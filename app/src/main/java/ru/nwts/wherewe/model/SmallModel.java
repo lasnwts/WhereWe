@@ -16,8 +16,8 @@ public class SmallModel implements Serializable {
     private long speed;
     private int moved;
     private long track_date;
-    private long longtitude;
-    private long lattitude;
+    private double longtitude;
+    private double lattitude;
     private int contact_id;
     private String email;
 
@@ -32,7 +32,7 @@ public class SmallModel implements Serializable {
         this.email = email;
     }
 
-    public SmallModel(int id, String name, int state, int mode, int rights, long speed, int moved, long track_date, long longtitude, long lattitude, int contact_id, String email) {
+    public SmallModel(int id, String name, int state, int mode, int rights, long speed, int moved, long track_date, double longtitude, double lattitude, int contact_id, String email) {
         this.id = id;
         this.name = name;
         this.state = state;
@@ -79,11 +79,11 @@ public class SmallModel implements Serializable {
         return track_date;
     }
 
-    public long getLongtitude() {
+    public double getLongtitude() {
         return longtitude;
     }
 
-    public long getLattitude() {
+    public double getLattitude() {
         return lattitude;
     }
 

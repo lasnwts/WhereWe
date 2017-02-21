@@ -17,8 +17,8 @@ public interface DBTables extends DBConstant {
                     KEY_SPEED                   + " NUMERIC," +
                     KEY_MOVED                   + " INTEGER," +
                     KEY_DATE                    + " NUMERIC," +
-                    KEY_LONGTITUDE              + " INTEGER," +
-                    KEY_LATTITUDE               + " INTEGER," +
+                    KEY_LONGTITUDE              + " REAL," +
+                    KEY_LATTITUDE               + " REAL," +
                     KEY_FBASE_PATH              + " TEXT," +
                     KEY_FBASE_OLD               + " TEXT," +
                     KEY_TRACK_COUNT             + " INTEGER," +
@@ -53,8 +53,8 @@ public interface DBTables extends DBConstant {
                     KEY_ID                      +" INTEGER PRIMARY KEY AUTOINCREMENT,"+
                     KEY_USER_ID                 + " INTEGER," +
                     KEY_DATE                    + " NUMERIC," +
-                    KEY_LONGTITUDE              + " INTEGER," +
-                    KEY_LATTITUDE               + " INTEGER," +
+                    KEY_LONGTITUDE              + " REAL," +
+                    KEY_LATTITUDE               + " REAL," +
                     KEY_SPEED                   + " NUMERIC," +
                     KEY_MOVED                   + " INTEGER," +
                     KEY_MODE                    + " INTEGER " +

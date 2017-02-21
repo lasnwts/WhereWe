@@ -143,7 +143,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
     //Update record to Users
     public int dbUpdateUsers(long rowID, String name, int state, int mode, int rights,
-                             long speed, int moved, long track_date, long longtitude, long lattitude,
+                             long speed, int moved, long track_date, double longtitude, double lattitude,
                              String fbase_path, String fbase_old, int track_count, int track_count_allowed,
                              String key, String key_old, int contact_id, String email, String part_email) {
 
@@ -281,7 +281,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
                 //(long id, String name, int state, int mode, int rights, long speed, int moved, long track_date, long longtitude, long lattitude, int contact_id, String email)
                 SmallModels.add(i, new SmallModel(c.getInt(idColIndex), c.getString(nameColIndex), c.getInt(stateColIndex),
                         c.getInt(modeColIndex), c.getInt(rightsColIndex), c.getInt(speedColIndex), c.getInt(movedColIndex),
-                        c.getLong(dateColIndex), c.getLong(longtitudeColIndex), c.getLong(lattitudeColIndex),
+                        c.getLong(dateColIndex), c.getDouble(longtitudeColIndex), c.getDouble(lattitudeColIndex),
                         c.getInt(contactColIndex), c.getString(emailColIndex)
                 ));
                 i++;
@@ -452,6 +452,20 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         return null;
     }
 
+    //get _id
+    public int getId(String email) {
+        Cursor c = getReadableDatabase().query(TABLE_USERS, new String[]{KEY_ID}, KEY_EMAIL + "= ?", new String[] {email}, null, null, null);
+
+        // определяем номера столбцов по имени в выборке
+        int IdColIndex = c.getColumnIndex(KEY_ID);
+
+        if (c != null && c.getCount() > 0 && c.moveToFirst()) {
+            Log.d(TAG, "getEmail()");
+            return c.getInt(IdColIndex);
+        }
+        c.close();
+        return 0;
+    }
     //update information from FireBase for clients
     public int updateFbaseModel(int state, int mode, int rights,
                                 double speed, int moved, long track_date, double longtitude, double lattitude,

@@ -44,6 +44,10 @@ import ru.nwts.wherewe.model.TestModel;
 import ru.nwts.wherewe.receivers.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
+import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
+import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
+import static ru.nwts.wherewe.database.DBConstant.KEY_LONGTITUDE;
+
 /**
  * Created by Надя on 10.01.2017.
  */
@@ -55,6 +59,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     private long timeAccpetWait = 15 * 60 * 1000; //Время (15 мин) через которое необходимо обязательно записать в FB информацию
     private double acceptDistance = 200;
     private String accprtDistanceString = "meter";
+    private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
     /*
     "M" -   Miles
     "K" -   Kilometers
@@ -134,6 +139,17 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG, "onConnectionFailed");
     }
 
+    private void sendMessage(double Latitude, double Longtitude, int id){
+        Intent intent = new Intent();
+        intent.setAction(ACTION_MAPRECEIVER);
+        intent.putExtra(KEY_ID, id);
+        intent.putExtra(KEY_LATTITUDE,Latitude);
+        intent.putExtra(KEY_LONGTITUDE,Longtitude);
+//        intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        Log.d(TAG,"sendMessage");
+        sendBroadcast(intent);
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         myLatitude = location.getLatitude();
@@ -147,8 +163,10 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         if (getCheckWriteOrNotInFirerBase(myLatitude, myLongitude, myTime)) {
             //Write to FireBase
             putWriteMyDataToFireBase(myLatitude, myLongitude, myTime, mySpeed);
+            if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
+                sendMessage(myLatitude, myLongitude, 1);
+            }
         }
-
 
         Log.d(TAG, "KEY_ACTIVITY_READY : " + preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
         //if ProfActivity not Start, may disabled service location
@@ -518,6 +536,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                                 fbaseModel.getLattitude(), fbaseModel.getFbase_path(),
                                 fbaseModel.getEmail(), fbaseModel.getPart_email());
                         dbHelper.dbReadInLog();
+                        if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
+                            if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
+                                sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),dbHelper.getId(fbaseModel.getEmail()));
+                            }
+                        }
                     }
                 }
             }
@@ -539,6 +562,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                                 fbaseModel.getLattitude(), fbaseModel.getFbase_path(),
                                 fbaseModel.getEmail(), fbaseModel.getPart_email());
                         dbHelper.dbReadInLog();
+                        if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
+                            if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
+                                sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),dbHelper.getId(fbaseModel.getEmail()));
+                            }
+                        }
                     }
                 }
             }
