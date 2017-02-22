@@ -163,9 +163,10 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         if (getCheckWriteOrNotInFirerBase(myLatitude, myLongitude, myTime)) {
             //Write to FireBase
             putWriteMyDataToFireBase(myLatitude, myLongitude, myTime, mySpeed);
-            if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
-                sendMessage(myLatitude, myLongitude, 1);
-            }
+        }
+        //sendMessage to profile activity
+        if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
+            sendMessage(myLatitude, myLongitude, 1);
         }
 
         Log.d(TAG, "KEY_ACTIVITY_READY : " + preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
@@ -538,7 +539,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                         dbHelper.dbReadInLog();
                         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
                             if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
-                                sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),dbHelper.getId(fbaseModel.getEmail()));
+                                if (dbHelper.getId(fbaseModel.getEmail())>1){
+                                    sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),dbHelper.getId(fbaseModel.getEmail()));
+                                }
                             }
                         }
                     }
@@ -564,7 +567,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                         dbHelper.dbReadInLog();
                         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
                             if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
-                                sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),dbHelper.getId(fbaseModel.getEmail()));
+                                if (dbHelper.getId(fbaseModel.getEmail())>1){
+                                    sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),dbHelper.getId(fbaseModel.getEmail()));
+                                }
                             }
                         }
                     }

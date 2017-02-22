@@ -531,5 +531,45 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
             return false;
         }
     }
+
+    public SmallModel getSmallModelFromEmail(String email) {
+
+        SmallModel smallModel;
+
+        Log.d(TAG, "--- Rows in mytable: ---");
+        // делаем запрос всех данных из таблицы mytable, получаем Cursor
+        Cursor c = getReadableDatabase().query(TABLE_USERS, null,   KEY_EMAIL + "= ?", new String[] {email}, null, null, null);
+
+        if (c != null && c.getCount() > 0 && c.moveToFirst()) {
+
+            // определяем номера столбцов по имени в выборке
+            int idColIndex = c.getColumnIndex(KEY_ID);
+            int nameColIndex = c.getColumnIndex(KEY_NAME);
+            int stateColIndex = c.getColumnIndex(KEY_STATE);
+            int modeColIndex = c.getColumnIndex(KEY_MODE);
+            int rightsColIndex = c.getColumnIndex(KEY_RIGHTS);
+            int speedColIndex = c.getColumnIndex(KEY_SPEED);
+            int movedColIndex = c.getColumnIndex(KEY_MOVED);
+            int dateColIndex = c.getColumnIndex(KEY_DATE);
+            int longtitudeColIndex = c.getColumnIndex(KEY_LONGTITUDE);
+            int lattitudeColIndex = c.getColumnIndex(KEY_LATTITUDE);
+            int contactColIndex = c.getColumnIndex(KEY_CONTACT_ID);
+            int emailColIndex = c.getColumnIndex(KEY_EMAIL);
+
+            Log.d(TAG,
+                    "ID = " + c.getInt(idColIndex) +
+                            ", name = " + c.getString(nameColIndex) +
+                            ", email = " + c.getString(emailColIndex));
+            smallModel = new SmallModel(c.getInt(idColIndex), c.getString(nameColIndex), c.getInt(stateColIndex),
+                    c.getInt(modeColIndex), c.getInt(rightsColIndex), c.getInt(speedColIndex), c.getInt(movedColIndex),
+                    c.getLong(dateColIndex), c.getDouble(longtitudeColIndex), c.getDouble(lattitudeColIndex),
+                    c.getInt(contactColIndex), c.getString(emailColIndex));
+        } else {
+            Log.d(TAG, "0 rows");
+            smallModel =  new SmallModel(0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, "");
+        }
+        c.close();
+        return smallModel;
+    }
 }
 

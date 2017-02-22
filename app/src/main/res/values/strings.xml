@@ -42,6 +42,7 @@
     <string name="message">Вы можете скачать приложение "Видеоуроки Start Android" для Android в </string>
 
     <string name="dialog_title_yes_no">Важно!</string>
+    <string name="dialog_title_yes_no_logout">Обновление инормации будет невозможно!</string>
     <string name="dialog_question_yes_no">Вы уверены?</string>
     <string name="dialog_yes">Да</string>
     <string name="dialog_no">Нет</string>

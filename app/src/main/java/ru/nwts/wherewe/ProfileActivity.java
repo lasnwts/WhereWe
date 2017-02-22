@@ -60,6 +60,8 @@ import static ru.nwts.wherewe.TODOApplication.*;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LONGTITUDE;
+import static ru.nwts.wherewe.database.DBConstant.KEY_MODE;
+import static ru.nwts.wherewe.database.DBConstant.KEY_NAME;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener,
         OnMapReadyCallback, DialogFragmentYesNo.DialogFragmentYesNoListener, DialogFragmentInputStr.DialogFragmentInputStrListener {
@@ -71,6 +73,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     LatLngBounds bounds;
     List<Marker> markers;
     private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
+    private final String ACTION_EDIT_ABONENT = "ru.nwts.wherewe.edit";
+    private final int ACTION_DELETE = 0;
+    private final int ACTION_EDIT_NAME = 1;
     //test
     int i;
 
@@ -205,7 +210,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
                                         break;
                                     case 4:
-                                        DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance(0,0);
+                                        DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance(0,0,getResources().getString(R.string.dialog_title_yes_no_logout));
                                         dialogFragmentYesNo.show(manager, "dialog");
                                         break;
                                     default:
@@ -251,6 +256,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         locationService = new Intent(ProfileActivity.this, DeviceLocationService.class);
         //Preference
         initPreferences();
+        registerReceiver(this.broadcastReceiverEdit,
+                new IntentFilter(ACTION_EDIT_ABONENT));
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -261,7 +268,47 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             double Longtitude = (double) intent.getDoubleExtra(KEY_LONGTITUDE,0);
             Log.d(TAG,"sendMessage:Id="+Id+" Latitude:"+Latitude+" Longtitude:"+Longtitude);
             if (Id != 0 && Latitude != 0 && Longtitude != 0){
-                Log.d(TAG,"sendMessage Run Broadcastreceiver");
+                Log.d(TAG,"sendMessage Run Broadcastreceiver:length:"+markers.size());
+                if (Id == 1){
+                    markers.get(i).setPosition(new LatLng(Latitude, Longtitude));
+                    Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
+                }else {
+                    //others marker
+                    for (int m  = 0; m < smallModels.size(); m++){
+                        if (smallModels.get(m).getId() == Id){
+                            markers.get(m).setPosition(new LatLng(Latitude, Longtitude));
+                            Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(m).getPosition()));
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+
+    private BroadcastReceiver broadcastReceiverEdit = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "sendBroadcast():sendBroadCastEditAbonent:ProfileActivity");
+            int Id = (int) intent.getIntExtra(KEY_ID,0);
+            int action = (int) intent.getIntExtra(KEY_MODE,1);
+            String name = (String) intent.getStringExtra(KEY_NAME);
+            //edit name
+            if (action == ACTION_EDIT_NAME){
+                for (int m  = 0; m < smallModels.size(); m++){
+                    if (smallModels.get(m).getId() == Id){
+                        markers.get(m).setTitle(name);
+                        smallModels.get(m).setName(name);
+                    }
+                }
+            }
+            if (action == ACTION_DELETE){
+                for (int m  = 0; m < smallModels.size(); m++){
+                    if (smallModels.get(m).getId() == Id){
+                        markers.get(m).remove();
+                       // smallModels.remove(m);
+                    }
+                }
             }
         }
     };
@@ -558,6 +605,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        try {
+            this.unregisterReceiver(broadcastReceiverEdit);
+            Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG)
+                    .show();
+        }catch(IllegalArgumentException e){
+            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
+                    .show();
+        }
+        super.onDestroy();
+    }
+
     private boolean putInputStrNewSendInformation(String sendMessage){
         String email;
         String part_email;
@@ -587,8 +647,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             }
             if (!dbHelper.checkExistClient(email, part_email)) {
                 if (dbHelper.dbInsertUser("", 0, 0, 0, 0, 0, preferenceHelper.getLong("Time"), Double.longBitsToDouble(preferenceHelper.getLong("Longtitude")),
-                        Double.longBitsToDouble(preferenceHelper.getLong("Latitude")), fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email)==1){
+                        Double.longBitsToDouble(preferenceHelper.getLong("Latitude")), fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email)>1){
                     Toast.makeText(getApplicationContext(), "Запись добавлена!", Toast.LENGTH_SHORT).show();
+                    //Here function add new marker
+                    if (dbHelper.getSmallModelFromEmail(email).getId() != 0){
+                        smallModels.add(dbHelper.getSmallModelFromEmail(email));
+                        markers.add(Map.addMarker(new MarkerOptions().position(new LatLng(dbHelper.getSmallModelFromEmail(email).getLattitude(),
+                                dbHelper.getSmallModelFromEmail(email).getLongtitude())).title(dbHelper.getSmallModelFromEmail(email).getName())));
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(), "Ошибка добавления записи!", Toast.LENGTH_SHORT).show();
                 }

@@ -1,5 +1,6 @@
 package ru.nwts.wherewe.aux_ui;
 
+import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,7 +20,14 @@ import ru.nwts.wherewe.model.SmallModel;
 import ru.nwts.wherewe.util.DialogFragmentOneItem;
 import ru.nwts.wherewe.util.DialogFragmentYesNo;
 
+import static android.content.Intent.FLAG_RECEIVER_FOREGROUND;
 import static android.os.Build.ID;
+import static android.provider.Contacts.SettingsColumns.KEY;
+import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
+import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
+import static ru.nwts.wherewe.database.DBConstant.KEY_LONGTITUDE;
+import static ru.nwts.wherewe.database.DBConstant.KEY_MODE;
+import static ru.nwts.wherewe.database.DBConstant.KEY_NAME;
 
 public class RecyclerViews extends AppCompatActivity
         implements DialogFragmentOneItem.EditingTaskListener,DialogFragmentYesNo.DialogFragmentYesNoListener{
@@ -33,7 +41,9 @@ public class RecyclerViews extends AppCompatActivity
     private adapterSmallModel adapter;
 
     private List<SmallModel> smallModels;
-
+    private final String ACTION_EDIT_ABONENT = "ru.nwts.wherewe.edit";
+    private final int ACTION_DELETE = 0;
+    private final int ACTION_EDIT_NAME = 1;
     public DBHelper dbHelper;
 
     @Override
@@ -58,12 +68,25 @@ public class RecyclerViews extends AppCompatActivity
 
     }
 
+    private void sendBroadCastEditAbonent(int id, String name, int action){
+        Intent intent = new Intent();
+        intent.setAction(ACTION_EDIT_ABONENT);
+        intent.putExtra(KEY_ID, id);
+        intent.putExtra(KEY_NAME,name);
+        intent.putExtra(KEY_MODE,action);
+        //intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+        Log.d(TAG,"sendMessage:sendBroadCastEditAbonent:send from Recycler");
+        sendBroadcast(intent);
+    }
+
     @Override
     public void onTaskEdited(SmallModel updatedTask, int position, int id) {
         Log.d(TAG,"onDialogPositiveClick:onTaskEdited:getId()"+id+" position:"+position);
         if (dbHelper.dbUpdateName(id,updatedTask.getName())==1){
             Toast.makeText(this,R.string.update_done, Toast.LENGTH_SHORT).show();
             adapter.setNotifyDataChange(updatedTask.getName(),position);
+            sendBroadCastEditAbonent(id,updatedTask.getName(),ACTION_EDIT_NAME);
         }else {
             Toast.makeText(this,R.string.update_error, Toast.LENGTH_SHORT).show();
         }
@@ -78,6 +101,7 @@ public class RecyclerViews extends AppCompatActivity
             if (dbHelper.dbDeleteUser(id)>0){
                 Toast.makeText(this,R.string.delete_completed, Toast.LENGTH_SHORT).show();
                 adapter.setNotifyItemRemoved(position);
+                sendBroadCastEditAbonent(id,"deleted",ACTION_DELETE);
             }else {
                 Toast.makeText(this,R.string.delete_attention, Toast.LENGTH_SHORT).show();
             }

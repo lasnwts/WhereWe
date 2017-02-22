@@ -1,6 +1,7 @@
 package ru.nwts.wherewe.util;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,8 +20,12 @@ public class DialogFragmentYesNo extends DialogFragment {
 
     private DialogFragmentYesNoListener dialogFragmentYesNoListener;
 
-    public static DialogFragmentYesNo newInstance(int _id, int position){
-        String title = "Важно!";
+    public static DialogFragmentYesNo newInstance(int _id, int position, String title){
+        //String title = "Важно!";
+        if (title == null){
+            title = "Attention!";
+          //  title = getRe R.string.dialog_title_yes_no;
+        }
         int Id = _id;
         int pos = position;
         DialogFragmentYesNo dialogFragmentYesNo = new DialogFragmentYesNo();
