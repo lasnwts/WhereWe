@@ -86,8 +86,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     //view objects
     private TextView textViewUserEmail;
-    private Button buttonLogout;
-    private Button buttonService;
+//    private Button buttonLogout;
+//    private Button buttonService;
+    private Button buttonScale;
 
     private Drawer drawer = null;
     private Toolbar toolbar;
@@ -233,15 +234,16 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         //displaying logged in user name
         textViewUserEmail.setText("Welcome " + user.getEmail());
+        buttonScale = (Button) findViewById(R.id.buttonProfileScale);
 
         //Works Databases
         //dbHelper = new DBHelper(this);
         dbHelper = TODOApplication.getInstance().dbHelper;
         if (dbHelper != null) {
-            dbHelper.dbDeleteUsers();
-            dbHelper.dbInsertUser("Test0 name_115", 1, 1, 1, 1, 1, 198299922, 30.3667, 59.8793, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
-            dbHelper.dbInsertUser("Test1 name_1", 1, 1, 1, 1, 1, 198299922, 30.3467,  59.8693, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
-            dbHelper.dbInsertUser("Test2 name_3", 1, 1, 1, 1, 1, 198299922, 31.8350976, 58.9342803, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
+//            dbHelper.dbDeleteUsers();
+//            dbHelper.dbInsertUser("Test0 name_115", 1, 1, 1, 1, 1, 198299922, 30.3667, 59.8793, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
+//            dbHelper.dbInsertUser("Test1 name_1", 1, 1, 1, 1, 1, 198299922, 30.3467,  59.8693, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
+//            dbHelper.dbInsertUser("Test2 name_3", 1, 1, 1, 1, 1, 198299922, 31.8350976, 58.9342803, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
 //            dbHelper.dbInsertUser("Test3 2 name_115", 1, 1, 1, 1, 1, 198299922, 32.6750986, 60.1055801, "M0erubb9976hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
 //            dbHelper.dbInsertUser("Test4 2 name_1", 1, 1, 1, 1, 1, 198299922, 32.1450981, 59.9000801, "Fkq99ze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
 //            dbHelper.dbInsertUser("Test5 2 name_3", 1, 1, 1, 1, 1, 198299922, 31.3350980, 60.9972887, "c8yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
@@ -258,6 +260,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         initPreferences();
         registerReceiver(this.broadcastReceiverEdit,
                 new IntentFilter(ACTION_EDIT_ABONENT));
+        buttonScale.setOnClickListener(this);
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -271,13 +274,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG,"sendMessage Run Broadcastreceiver:length:"+markers.size());
                 if (Id == 1){
                     markers.get(i).setPosition(new LatLng(Latitude, Longtitude));
-                    Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
+                    //Move camera to that coordinates
+                    //Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
                 }else {
                     //others marker
                     for (int m  = 0; m < smallModels.size(); m++){
                         if (smallModels.get(m).getId() == Id){
                             markers.get(m).setPosition(new LatLng(Latitude, Longtitude));
-                            Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(m).getPosition()));
+                            //Move camera to that coordinates
+                            //Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(m).getPosition()));
                         }
                     }
                 }
@@ -343,11 +348,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
         try {
             this.unregisterReceiver(broadcastReceiver);
-            Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG)
-                    .show();
+            //Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG).show();
         }catch(IllegalArgumentException e){
-            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
-                    .show();
+//            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
+//                    .show();
         }
         super.onPause();
     }
@@ -369,9 +373,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 //            //starting login activity
 //            startActivity(new Intent(this, LoginActivity.class));
 //        }
-//        if (view == buttonService) {
-//            startService(locationService);
-//        }
+        if (view == buttonScale) {
+          setScale();
+        }
     }
 
     @Override
@@ -440,11 +444,30 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+
+    private void setScale(){
+        //Map
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (int j = 0; j < markers.size(); j++) {
+            builder.include(markers.get(j).getPosition());
+        }
+        bounds = builder.build();
+        Map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                int padding = 10; // offset from edges of the map in pixels
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                //Map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
+                Map.moveCamera(cu);
+            }
+        });
+    }
+
     public void showSettings() {
-        markers.get(i).setPosition(new LatLng(59.10002, 31.19086));
-        Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
-//        Intent intent = new Intent(ProfileActivity.this, PreferenceActivities.class);
-//        startActivityForResult(intent, 0);
+//        markers.get(i).setPosition(new LatLng(59.10002, 31.19086));
+//        Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
+        Intent intent = new Intent(ProfileActivity.this, PreferenceActivities.class);
+        startActivityForResult(intent, 0);
     }
 
     private String putEmailAndFireBasePathtoClient() {
@@ -609,11 +632,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     protected void onDestroy() {
         try {
             this.unregisterReceiver(broadcastReceiverEdit);
-            Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG)
-                    .show();
+//            Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG)
+//                    .show();
         }catch(IllegalArgumentException e){
-            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
-                    .show();
+//            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
+//                    .show();
         }
         super.onDestroy();
     }

@@ -597,12 +597,12 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         /*
         Тестироввание Создадим объект в FireBase`
          */
-        databaseReference.child(user.getUid()).push().setValue(new TestModel("test101", "email@mail.ru", 129l));
-        databaseReference.child(user.getUid()).push().setValue(new TestModel("test202", "email@mail.ru", 129l));
+        //databaseReference.child(user.getUid()).push().setValue(new TestModel("test101", "email@mail.ru", 129l));
+       // databaseReference.child(user.getUid()).push().setValue(new TestModel("test202", "email@mail.ru", 129l));
 
-        databaseReference.child("M0erubbTS6hbInqmOmnZOPelZfE2").push().setValue(new TestModel("test202", "email@mail.ru", 129l));
+      //  databaseReference.child("M0erubbTS6hbInqmOmnZOPelZfE2").push().setValue(new TestModel("test202", "email@mail.ru", 129l));
 
-        databaseReference.child(user.getUid()).child("test83737MAILRU").setValue(new TestModel("For more information see", "email@mail.ru", 129l));
+      //  databaseReference.child(user.getUid()).child("test83737MAILRU").setValue(new TestModel("For more information see", "email@mail.ru", 129l));
         // Map<String, TestModel> testModels = new HashMap<String, TestModel>();
         // testModels.put("testoviy Rklient", new TestModel("New Test User1"));
         // databaseReference.child(user.getUid()).setValue(testModels); // все стирает в ключе! Остается одна запись!
@@ -645,7 +645,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.MINUTE, 1);
+        calendar.add(Calendar.MINUTE, 5);
         alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
         Log.d(TAG,"alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);");
     }

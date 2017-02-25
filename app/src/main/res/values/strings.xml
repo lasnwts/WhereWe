@@ -71,5 +71,7 @@
     <string name="dialog_insert_new_abonent_title">Вставьте строку:</string>
     <string name="dialog_insert_new_abonent_hint">Полученная строка::</string>
 
+    <string name="scale">Масштаб</string>
+
 
 </resources>
