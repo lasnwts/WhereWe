@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +44,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +61,7 @@ import ru.nwts.wherewe.util.PreferenceHelper;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
 import static ru.nwts.wherewe.R.id.map;
 import static ru.nwts.wherewe.TODOApplication.*;
+import static ru.nwts.wherewe.database.DBConstant.KEY_DATE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LONGTITUDE;
@@ -88,7 +93,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private TextView textViewUserEmail;
 //    private Button buttonLogout;
 //    private Button buttonService;
-    private Button buttonScale;
+    private ImageButton buttonScale;
 
     private Drawer drawer = null;
     private Toolbar toolbar;
@@ -114,6 +119,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private final String KEY_ACTIVITY_READY = "PROF_ACTIVITY";
     private final String KEY_LOCATION_SERVICE_STARTED = "LOCATION_SERVICE";
     private final String KEY_EMAIL_SHARED_PREF = "EMAIL_SHARED_PREF";
+
+    //date format
+    SimpleDateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy' 'HH:mm:ss");
+    private String wordTimeOnMarker;
 
 
     @Override
@@ -150,6 +159,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         setSupportActionBar(toolbar);
 
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
+        wordTimeOnMarker = getResources().getString(R.string.word_marker_time);
 
         channelNames = getResources().getStringArray(R.array.channel_names);
         PrimaryDrawerItem[] primaryDrawerItems = new PrimaryDrawerItem[channelNames.length];
@@ -214,6 +224,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                         DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance(0,0,getResources().getString(R.string.dialog_title_yes_no_logout));
                                         dialogFragmentYesNo.show(manager, "dialog");
                                         break;
+                                    case 5: //масштабировать
+                                        setScale();
+                                        break;
                                     default:
                                         break;
                                 }
@@ -234,7 +247,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         //displaying logged in user name
         textViewUserEmail.setText("Welcome " + user.getEmail());
-        buttonScale = (Button) findViewById(R.id.buttonProfileScale);
+        buttonScale = (ImageButton) findViewById(R.id.buttonProfileScale);
 
         //Works Databases
         //dbHelper = new DBHelper(this);
@@ -269,6 +282,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             int Id = (int) intent.getIntExtra(KEY_ID,0);
             double Latitude = (double) intent.getDoubleExtra(KEY_LATTITUDE,0);
             double Longtitude = (double) intent.getDoubleExtra(KEY_LONGTITUDE,0);
+            long dateTime = (long) intent.getLongExtra(KEY_DATE,0);
             Log.d(TAG,"sendMessage:Id="+Id+" Latitude:"+Latitude+" Longtitude:"+Longtitude);
             if (Id != 0 && Latitude != 0 && Longtitude != 0){
                 Log.d(TAG,"sendMessage Run Broadcastreceiver:length:"+markers.size());
@@ -281,6 +295,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                     for (int m  = 0; m < smallModels.size(); m++){
                         if (smallModels.get(m).getId() == Id){
                             markers.get(m).setPosition(new LatLng(Latitude, Longtitude));
+                            if (dateTime !=0){
+                                markers.get(m).setSnippet(wordTimeOnMarker+dateformat.format(dateTime));
+                            }
                             //Move camera to that coordinates
                             //Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(m).getPosition()));
                         }
@@ -419,6 +436,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //Map
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         Map.getUiSettings().setZoomControlsEnabled(true);
+        Map.getUiSettings().setCompassEnabled(true);
+        //Check permission
+        if (ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         markers = new ArrayList<>();
         for (int j = 0; j < smallModels.size(); j++) {
             SmallModel model = smallModels.get(j);
@@ -428,7 +453,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude()))
                         .title(model.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
             }else {
-                markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude())).title(model.getName())));
+                String snippet = wordTimeOnMarker+dateformat.format(model.getTrack_date());
+                markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(),
+                        model.getLongtitude())).title(model.getName()).snippet(snippet)));
             }
            builder.include(markers.get(j).getPosition());
             bounds = builder.build();

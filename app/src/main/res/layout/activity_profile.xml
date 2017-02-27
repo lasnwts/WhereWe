@@ -41,11 +41,13 @@
                     android:id="@+id/textViewUserEmail"
                     android:layout_gravity="center_horizontal" />
 
-                <Button
+
+                <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/buttonProfileScale"
-                    android:text="@string/scale" />
+                    android:hint="@string/scale"
+                    android:src="@drawable/ic_zoom_out_map_white_24dp" />
 
 
                 <fragment

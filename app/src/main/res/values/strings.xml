@@ -15,6 +15,7 @@
         <item>Добавить абонента</item>
         <item>Передать свои данные для подключения</item>
         <item>Отключиться от системы</item>
+        <item>Масштабировать</item>
     </string-array>
 
     <string name="allowedReceivedLocation">Мое местоположение</string>
@@ -72,6 +73,7 @@
     <string name="dialog_insert_new_abonent_hint">Полученная строка::</string>
 
     <string name="scale">Масштаб</string>
+    <string name="word_marker_time">Обновлено:</string>
 
 
 </resources>

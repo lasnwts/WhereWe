@@ -44,6 +44,7 @@ import ru.nwts.wherewe.model.TestModel;
 import ru.nwts.wherewe.receivers.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
+import static ru.nwts.wherewe.database.DBConstant.KEY_DATE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LONGTITUDE;
@@ -57,7 +58,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     //VARIABBLES MONITORING
     private long timeAccpetWait = 15 * 60 * 1000; //Время (15 мин) через которое необходимо обязательно записать в FB информацию
-    private double acceptDistance = 5; //meters from transfer
+    private double acceptDistance = 10; //meters from transfer
     private String accprtDistanceString = "meter";
     private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
     /*
@@ -139,12 +140,13 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG, "onConnectionFailed");
     }
 
-    private void sendMessage(double Latitude, double Longtitude, int id){
+    private void sendMessage(double Latitude, double Longtitude, int id, Long myTime){
         Intent intent = new Intent();
         intent.setAction(ACTION_MAPRECEIVER);
         intent.putExtra(KEY_ID, id);
         intent.putExtra(KEY_LATTITUDE,Latitude);
         intent.putExtra(KEY_LONGTITUDE,Longtitude);
+        intent.putExtra(KEY_DATE, myTime);
 //        intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         Log.d(TAG,"sendMessage");
         sendBroadcast(intent);
@@ -167,7 +169,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         }
         //sendMessage to profile activity
         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
-            sendMessage(myLatitude, myLongitude, 1);
+            sendMessage(myLatitude, myLongitude, 1, myTime);
         }
 
         Log.d(TAG, "KEY_ACTIVITY_READY : " + preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
@@ -543,7 +545,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
                             if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
                                 if (dbHelper.getId(fbaseModel.getEmail())>1){
-                                    sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),dbHelper.getId(fbaseModel.getEmail()));
+                                    sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
+                                            dbHelper.getId(fbaseModel.getEmail()),fbaseModel.getDateTime());
                                 }
                             }
                         }
@@ -571,7 +574,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
                             if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
                                 if (dbHelper.getId(fbaseModel.getEmail())>1){
-                                    sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),dbHelper.getId(fbaseModel.getEmail()));
+                                    sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
+                                            dbHelper.getId(fbaseModel.getEmail()),fbaseModel.getDateTime());
                                 }
                             }
                         }
