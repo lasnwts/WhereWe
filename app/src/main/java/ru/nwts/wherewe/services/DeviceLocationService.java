@@ -57,7 +57,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     //VARIABBLES MONITORING
     private long timeAccpetWait = 15 * 60 * 1000; //Время (15 мин) через которое необходимо обязательно записать в FB информацию
-    private double acceptDistance = 200;
+    private double acceptDistance = 5; //meters from transfer
     private String accprtDistanceString = "meter";
     private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
     /*
@@ -154,10 +154,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     public void onLocationChanged(Location location) {
         myLatitude = location.getLatitude();
         myLongitude = location.getLongitude();
-        myTime = location.getTime();
+        //myTime = location.getTime();
         preferenceHelper.putLong("Latitude",Double.doubleToRawLongBits(myLatitude));
         preferenceHelper.putLong("Longtitude",Double.doubleToRawLongBits(myLongitude));
-        preferenceHelper.putLong("Time",myTime);
+        //preferenceHelper.putLong("Time",myTime);
+        myTime = preferenceHelper.getLong("Time"); //get time when last write to firebase
         mySpeed = (long) location.getSpeed();
         //Call function check Write OR not in FireBase
         if (getCheckWriteOrNotInFirerBase(myLatitude, myLongitude, myTime)) {
@@ -199,6 +200,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         //get new object
         fbaseModel = new FbaseModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
                 databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(), myTime);
+        //put myTime
+        preferenceHelper.putLong("Time",System.currentTimeMillis());
         //Пишем в SQLite о себеreplaceALL
         dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
 
