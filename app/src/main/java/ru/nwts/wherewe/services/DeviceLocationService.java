@@ -60,13 +60,17 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     private long timeAccpetWait = 15 * 60 * 1000; //Время (15 мин) через которое необходимо обязательно записать в FB информацию
     private double acceptDistance = 10; //meters from transfer
     private String accprtDistanceString = "meter";
-    private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
     /*
     "M" -   Miles
     "K" -   Kilometers
     "N" -   Nautical Miles
     "meter" -   meters
-     */
+ */
+    private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
+    private final int WAKEUP_MIN_2  =  2;
+    private final int WAKEUP_MIN_5  =  5;
+    private final int WAKEUP_MIN_10 =  10;
+    private int wakeup_min = 5; //default time alarm
 
     //AlarmManager for Periodical starts
     AlarmManager alarmManager;
@@ -166,6 +170,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         if (getCheckWriteOrNotInFirerBase(myLatitude, myLongitude, myTime)) {
             //Write to FireBase
             putWriteMyDataToFireBase(myLatitude, myLongitude, myTime, mySpeed);
+            wakeup_min = WAKEUP_MIN_2;
         }
         //sendMessage to profile activity
         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
@@ -270,8 +275,20 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         long calcTimeDistance = System.currentTimeMillis() - myTime;
         if (acceptDistance < calcDistance || timeAccpetWait < calcTimeDistance) {
             //Wirte to FireBasde
+            wakeup_min = WAKEUP_MIN_2;
             return true;
         } else {
+            switch (wakeup_min){
+                case WAKEUP_MIN_2:
+                    wakeup_min = WAKEUP_MIN_5;
+                    break;
+                case WAKEUP_MIN_5:
+                    wakeup_min = WAKEUP_MIN_10;
+                    break;
+                default:
+                    wakeup_min = WAKEUP_MIN_5;
+                    break;
+            }
             return false;
         }
     }
@@ -652,7 +669,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.MINUTE, 5);
+        calendar.add(Calendar.MINUTE, wakeup_min);
         alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
         Log.d(TAG,"alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);");
     }

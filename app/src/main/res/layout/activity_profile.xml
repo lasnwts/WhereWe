@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,59 +11,60 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ru.nwts.wherewe.ProfileActivity">
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/toolbar" />
 
     <FrameLayout
 
+        android:id="@+id/drawer_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/drawer_container"
         android:layout_below="@+id/toolbar">
 
         <RelativeLayout
+            android:id="@+id/frame_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/frame_container">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:id="@+id/LinLayout"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true">
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Large Text"
-                    android:id="@+id/textViewUserEmail"
-                    android:layout_gravity="center_horizontal" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
+                    <ImageButton
+                        android:id="@+id/buttonProfileScale"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/scale"
+                        android:src="@drawable/ic_zoom_out_map_white_24dp" />
 
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/buttonProfileScale"
-                    android:hint="@string/scale"
-                    android:src="@drawable/ic_zoom_out_map_white_24dp" />
+                    <TextView
+                        android:id="@+id/textViewUserEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:text="Large Text"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
 
+                </LinearLayout>
 
                 <fragment
                     android:id="@+id/map"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    tools:context="ru.nwts.wherewe.ProfileActivity"
-                    />
+                    tools:context="ru.nwts.wherewe.ProfileActivity" />
 
             </LinearLayout>
 
         </RelativeLayout>
 
     </FrameLayout>
-
-
 
 </RelativeLayout>

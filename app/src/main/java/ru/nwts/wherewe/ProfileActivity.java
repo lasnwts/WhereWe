@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Icon;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
@@ -59,6 +61,7 @@ import ru.nwts.wherewe.util.PreferenceActivities;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
+import static ru.nwts.wherewe.R.drawable.ic_view_list_white_18dp;
 import static ru.nwts.wherewe.R.id.map;
 import static ru.nwts.wherewe.TODOApplication.*;
 import static ru.nwts.wherewe.database.DBConstant.KEY_DATE;
@@ -164,10 +167,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         channelNames = getResources().getStringArray(R.array.channel_names);
         PrimaryDrawerItem[] primaryDrawerItems = new PrimaryDrawerItem[channelNames.length];
 
+        int[] drawableId = new int[]{R.drawable.ic_view_list_white_18dp,
+                R.drawable.ic_add_box_white_18dp,R.drawable.ic_mail_white_18dp,
+                R.drawable.ic_location_disabled_white_18dp,R.drawable.ic_zoom_out_map_white_18dp,
+                R.drawable.ic_android_white_18dp,R.drawable.ic_settings_applications_white_18dp};
+
+
+
         for (int i = 0; i < channelNames.length; i++) {
             primaryDrawerItems[i] = new PrimaryDrawerItem()
                     .withName(channelNames[i])
                     .withIdentifier(i)
+                    .withIcon(drawableId[i])
                     .withSelectable(false);
         }
 
@@ -187,8 +198,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 .addDrawerItems(primaryDrawerItems)
                 .addStickyDrawerItems(
                         new SecondaryDrawerItem()
-                                .withName(getString(R.string.about))
+                                .withName(getString(R.string.exit))
                                 .withIdentifier(channelNames.length - 1)
+                                .withIcon(R.drawable.ic_exit_to_app_white_18dp)
                                 .withSelectable(false)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -227,13 +239,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                     case 5: //масштабировать
                                         setScale();
                                         break;
+                                    case 6: //About
+                                        showAbout();
+                                        break;
+                                    case 7: //About
+                                        showSettings();
+                                        break;
                                     default:
                                         break;
                                 }
 
                             } else if (selectedDrawerItem == -1) {
-                                showAbout();
                                 overridePendingTransition(R.anim.open_next, R.anim.close_main);
+                                finish();
                             }
                         }
                         return false;
@@ -399,6 +417,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     public boolean onCreateOptionsMenu(Menu menu) {
         //return super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_option, menu);
+        //This visible icon on menu, google design hide icon on menu
+        if(menu instanceof MenuBuilder){
+            MenuBuilder m = (MenuBuilder) menu;
+            m.setOptionalIconsVisible(true);
+        }
         return true;
     }
 

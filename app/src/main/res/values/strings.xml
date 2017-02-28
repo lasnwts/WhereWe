@@ -9,6 +9,7 @@
 
     <string name="about">О приложении</string>
     <string name="prefer">Настройки</string>
+    <string name="exit">Выйти</string>
 
     <string-array name="channel_names">
         <item>Список абонентов</item>
@@ -16,6 +17,8 @@
         <item>Передать свои данные для подключения</item>
         <item>Отключиться от системы</item>
         <item>Масштабировать</item>
+        <item>О приложении</item>
+        <item>Настройки</item>
     </string-array>
 
     <string name="allowedReceivedLocation">Мое местоположение</string>
