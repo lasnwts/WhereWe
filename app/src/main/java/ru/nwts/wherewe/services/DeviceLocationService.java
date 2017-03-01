@@ -40,7 +40,6 @@ import ru.nwts.wherewe.database.DBHelper;
 import ru.nwts.wherewe.model.FbaseModel;
 import ru.nwts.wherewe.model.ListFireBasePath;
 import ru.nwts.wherewe.model.ModelCheck;
-import ru.nwts.wherewe.model.TestModel;
 import ru.nwts.wherewe.receivers.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
@@ -151,6 +150,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         intent.putExtra(KEY_LATTITUDE,Latitude);
         intent.putExtra(KEY_LONGTITUDE,Longtitude);
         intent.putExtra(KEY_DATE, myTime);
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 //        intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         Log.d(TAG,"sendMessage");
         sendBroadcast(intent);
@@ -547,8 +547,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 Log.d(TAG, "FBase addChildEventListener onChildAdded value = s." + s);
                 Log.d(TAG, "FBase addChildEventListener onChildAdded dataSnapshot key = " + dataSnapshot.getKey());
                 if (!dataSnapshot.getKey().isEmpty()) {
-                    TestModel testModel4 = dataSnapshot.getValue(TestModel.class);
-                    Log.d(TAG, "FBase TestModel3 class =" + testModel4.getTest());
+                    //TestModel testModel4 = dataSnapshot.getValue(TestModel.class);
+                    //Log.d(TAG, "FBase TestModel3 class =" + testModel4.getTest());
                     fbaseModel = dataSnapshot.getValue(FbaseModel.class);
                     databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                     if (fbaseModel != null) {
@@ -576,8 +576,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 Log.d(TAG, "FBase addChildEventListener onChildChanged value = s." + s);
                 Log.d(TAG, "FBase addChildEventListener onChildChanged dataSnapshot key = " + dataSnapshot.getKey());
                 if (!dataSnapshot.getKey().isEmpty()) {
-                    TestModel testModel3 = dataSnapshot.getValue(TestModel.class);
-                    Log.d(TAG, "FBase TestModel3 class =" + testModel3.getTest());
+                    //TestModel testModel3 = dataSnapshot.getValue(TestModel.class);
+                    //Log.d(TAG, "FBase TestModel3 class =" + testModel3.getTest());
                     fbaseModel = dataSnapshot.getValue(FbaseModel.class);
                     databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                     if (fbaseModel != null) {

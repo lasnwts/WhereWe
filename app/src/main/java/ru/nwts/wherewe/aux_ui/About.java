@@ -1,6 +1,7 @@
 package ru.nwts.wherewe.aux_ui;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,8 +12,14 @@ import com.lb.material_preferences_library.custom_preferences.Preference;
 import ru.nwts.wherewe.R;
 import ru.nwts.wherewe.util.PreferenceActivities;
 
+import static android.R.attr.versionName;
+
 public class About extends PreferenceActivity
         implements Preference.OnPreferenceClickListener {
+
+    //builds
+    private String versionBuild = "1.0.0";
+
 
     @Override
     protected int getPreferencesXmlId() {
@@ -23,8 +30,17 @@ public class About extends PreferenceActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        try {
+           versionBuild = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         Preference prefShareKey      = (Preference) findPreference(getString(R.string.pref_share_key));
         Preference prefRateReviewKey = (Preference) findPreference(getString(R.string.pref_rate_review_key));
+        Preference prefBuild         = (Preference) findPreference(getString(R.string.build));
+
+        prefBuild.setSummary(versionBuild);
 
         prefShareKey.setOnPreferenceClickListener(this);
         prefRateReviewKey.setOnPreferenceClickListener(this);

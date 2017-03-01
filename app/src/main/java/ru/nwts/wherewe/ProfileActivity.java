@@ -77,6 +77,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     //LOG
     public static final String TAG = "MyLogs";
 
+
     //Map
     LatLngBounds bounds;
     List<Marker> markers;
@@ -306,6 +307,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG,"sendMessage Run Broadcastreceiver:length:"+markers.size());
                 if (Id == 1){
                     markers.get(i).setPosition(new LatLng(Latitude, Longtitude));
+                    if (dateTime !=0){
+                        markers.get(i).setSnippet(wordTimeOnMarker+dateformat.format(dateTime));
+                    }
                     //Move camera to that coordinates
                     //Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
                 }else {
@@ -470,15 +474,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         markers = new ArrayList<>();
         for (int j = 0; j < smallModels.size(); j++) {
             SmallModel model = smallModels.get(j);
+            String snippets = wordTimeOnMarker+dateformat.format(model.getTrack_date());
             if (model.getId()==1){
                 i = j;
                 Log.d(TAG,"addMarker:Name:"+model.getName()+":getLongtitude:"+model.getLongtitude()+" getLattitude:"+model.getLattitude());
                 markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude()))
-                        .title(model.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
+                        .title(model.getName()).snippet(snippets).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
             }else {
-                String snippet = wordTimeOnMarker+dateformat.format(model.getTrack_date());
                 markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(),
-                        model.getLongtitude())).title(model.getName()).snippet(snippet)));
+                        model.getLongtitude())).title(model.getName()).snippet(snippets)));
             }
            builder.include(markers.get(j).getPosition());
             bounds = builder.build();

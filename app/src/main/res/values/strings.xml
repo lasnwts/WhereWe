@@ -77,6 +77,7 @@
 
     <string name="scale">Масштаб</string>
     <string name="word_marker_time">Обновлено:</string>
+    <string name="build">Сборка:</string>
 
 
 </resources>

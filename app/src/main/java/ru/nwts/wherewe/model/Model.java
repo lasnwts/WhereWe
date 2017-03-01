@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 /**
  * Created by Надя on 27.12.2016.
+ * This model created for Future option
+ * and not use in this version
  */
 
 public class Model implements Serializable {

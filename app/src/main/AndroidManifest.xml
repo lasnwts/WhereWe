@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.nwts.wherewe">
+    package="ru.nwts.wherewe"
+    android:versionCode="1"
+    android:versionName="1.0.01" >
+    >
 
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
 
     <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -54,12 +55,6 @@
             android:exported="false" />
 
         <activity android:name=".aux_ui.About" />
-
-        <receiver android:name=".receivers.SmsReceiver">
-            <intent-filter android:priority="100">
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-            </intent-filter>
-        </receiver>
 
         <activity android:name=".aux_ui.RecyclerViews"></activity>
     </application>
