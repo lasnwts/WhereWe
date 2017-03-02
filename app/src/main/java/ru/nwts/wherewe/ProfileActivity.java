@@ -292,6 +292,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         initPreferences();
         registerReceiver(this.broadcastReceiverEdit,
                 new IntentFilter(ACTION_EDIT_ABONENT));
+
+        //BroadCastReceiver register
+        registerReceiver(this.broadcastReceiver,
+                new IntentFilter(new IntentFilter(ACTION_MAPRECEIVER)));
+
+        //Write to SharedPref what ProfActivity Started
+        preferenceHelper.putBoolean(KEY_ACTIVITY_READY, true);
+
         buttonScale.setOnClickListener(this);
     }
 
@@ -302,9 +310,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             double Latitude = (double) intent.getDoubleExtra(KEY_LATTITUDE,0);
             double Longtitude = (double) intent.getDoubleExtra(KEY_LONGTITUDE,0);
             long dateTime = (long) intent.getLongExtra(KEY_DATE,0);
-            Log.d(TAG,"sendMessage:Id="+Id+" Latitude:"+Latitude+" Longtitude:"+Longtitude);
+            Log.d(TAG,"broadcastReceiver:sendMessage:Id="+Id+" Latitude:"+Latitude+" Longtitude:"+Longtitude);
             if (Id != 0 && Latitude != 0 && Longtitude != 0){
-                Log.d(TAG,"sendMessage Run Broadcastreceiver:length:"+markers.size());
+                Log.d(TAG,"broadcastReceiver:sendMessage Run Broadcastreceiver:length:"+markers.size());
                 if (Id == 1){
                     markers.get(i).setPosition(new LatLng(Latitude, Longtitude));
                     if (dateTime !=0){
@@ -315,6 +323,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 }else {
                     //others marker
                     for (int m  = 0; m < smallModels.size(); m++){
+                        Log.d(TAG,"broadcastReceiver:sendMessage Run Broadcastreceiver:m:"+m);
+                        Log.d(TAG,"broadcastReceiver:sendMessage Run Broadcastreceiver:smallModels.get(m).getId():"+smallModels.get(m).getId());
+                        Log.d(TAG,"broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():"+markers.get(m).getId());
                         if (smallModels.get(m).getId() == Id){
                             markers.get(m).setPosition(new LatLng(Latitude, Longtitude));
                             if (dateTime !=0){
@@ -366,7 +377,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
-        //Write to SharedPref what ProfActivity Started
+        if (smallModels != null && markers != null){
+            for (int m  = 0; m < smallModels.size(); m++) {
+                Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:m:" + m);
+                Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:smallModels.get(m).getId():" + smallModels.get(m).getId());
+                Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():" + markers.get(m).getId());
+            }
+        }
+
+            //Write to SharedPref what ProfActivity Started
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, true);
         //Tested Run LocationService Or Not
         if (!preferenceHelper.getBoolean(KEY_LOCATION_SERVICE_STARTED)) {
@@ -374,9 +393,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             Log.d(TAG, "Start service! from ProfileActivity!");
         }
         startService(locationService);
-        //BroadCastReceiver register
+/*        //BroadCastReceiver register
         registerReceiver(this.broadcastReceiver,
-                new IntentFilter(new IntentFilter(ACTION_MAPRECEIVER)));
+                new IntentFilter(new IntentFilter(ACTION_MAPRECEIVER)));*/
     }
 
 
@@ -384,14 +403,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     protected void onPause() {
         //Write to SharedPref what ProfActivity Started
         Log.d(TAG, "ProfileActivity onPaiused..");
-        preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
+/*        preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
         try {
             this.unregisterReceiver(broadcastReceiver);
             //Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG).show();
         }catch(IllegalArgumentException e){
 //            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
 //                    .show();
-        }
+        }*/
         super.onPause();
     }
 
@@ -684,10 +703,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onDestroy() {
+        preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
         try {
             this.unregisterReceiver(broadcastReceiverEdit);
 //            Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG)
 //                    .show();
+        }catch(IllegalArgumentException e){
+//            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
+//                    .show();
+        }
+        try {
+            this.unregisterReceiver(broadcastReceiver);
+            //Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG).show();
         }catch(IllegalArgumentException e){
 //            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
 //                    .show();

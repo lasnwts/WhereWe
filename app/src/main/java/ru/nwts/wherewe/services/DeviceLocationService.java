@@ -43,6 +43,7 @@ import ru.nwts.wherewe.model.ModelCheck;
 import ru.nwts.wherewe.receivers.BoardReceiverBattery;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
+import static android.R.attr.id;
 import static ru.nwts.wherewe.database.DBConstant.KEY_DATE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
@@ -152,7 +153,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         intent.putExtra(KEY_DATE, myTime);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 //        intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        Log.d(TAG,"sendMessage");
+        Log.d(TAG,"broadcastReceiver:dls:sendMessage:"+id);
         sendBroadcast(intent);
     }
 
@@ -544,14 +545,17 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         databaseReference.child(user.getUid()).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.d(TAG,"broadcastReceiver:dls:sendMessage:onChildAdded");
                 Log.d(TAG, "FBase addChildEventListener onChildAdded value = s." + s);
                 Log.d(TAG, "FBase addChildEventListener onChildAdded dataSnapshot key = " + dataSnapshot.getKey());
                 if (!dataSnapshot.getKey().isEmpty()) {
+                    Log.d(TAG,"broadcastReceiver:dls:sendMessage:!isEmpty");
                     //TestModel testModel4 = dataSnapshot.getValue(TestModel.class);
                     //Log.d(TAG, "FBase TestModel3 class =" + testModel4.getTest());
                     fbaseModel = dataSnapshot.getValue(FbaseModel.class);
                     databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                     if (fbaseModel != null) {
+                        Log.d(TAG,"broadcastReceiver:dls:sendMessage:fbaseModel != null");
                         dbHelper.updateFbaseModel(fbaseModel.getState(),
                                 fbaseModel.getMode(), fbaseModel.getRights(),
                                 fbaseModel.getSpeed(), fbaseModel.getMoved(),
@@ -560,8 +564,10 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                                 fbaseModel.getEmail(), fbaseModel.getPart_email());
                         dbHelper.dbReadInLog();
                         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
+                            Log.d(TAG,"broadcastReceiver:dls:sendMessage:KEY_ACTIVITY_READY");
                             if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
                                 if (dbHelper.getId(fbaseModel.getEmail())>1){
+                                    Log.d(TAG,"broadcastReceiver:dls:sendMessage:fbaseModel.getEmail())>1");
                                     sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
                                             dbHelper.getId(fbaseModel.getEmail()),fbaseModel.getDateTime());
                                 }
@@ -575,6 +581,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Log.d(TAG, "FBase addChildEventListener onChildChanged value = s." + s);
                 Log.d(TAG, "FBase addChildEventListener onChildChanged dataSnapshot key = " + dataSnapshot.getKey());
+                Log.d(TAG,"broadcastReceiver:dls:sendMessage:onChildAdded");
+                Log.d(TAG, "FBase addChildEventListener onChildAdded value = s." + s);
+                Log.d(TAG, "FBase addChildEventListener onChildAdded dataSnapshot key = " + dataSnapshot.getKey());
                 if (!dataSnapshot.getKey().isEmpty()) {
                     //TestModel testModel3 = dataSnapshot.getValue(TestModel.class);
                     //Log.d(TAG, "FBase TestModel3 class =" + testModel3.getTest());
@@ -604,6 +613,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "FBase addChildEventListener onChildRemoved value");
                 Log.d(TAG, "FBase addChildEventListener onChildRemoved dataSnapshot key = " + dataSnapshot.getKey());
+                Log.d(TAG,"broadcastReceiver:dls:sendMessage:onChildAdded");
+                Log.d(TAG, "FBase addChildEventListener onChildAdded value = s.");
+                Log.d(TAG, "FBase addChildEventListener onChildAdded dataSnapshot key = " + dataSnapshot.getKey());
             }
 
             @Override
