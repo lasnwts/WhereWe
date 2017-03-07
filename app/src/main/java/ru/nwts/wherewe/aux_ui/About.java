@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.lb.material_preferences_library.PreferenceActivity;
 import com.lb.material_preferences_library.custom_preferences.Preference;
@@ -17,8 +18,9 @@ import static android.R.attr.versionName;
 public class About extends PreferenceActivity
         implements Preference.OnPreferenceClickListener {
 
-    //builds
-    private String versionBuild = "1.0.0";
+//    //builds
+    private int versionBuild = 0;
+    private String versionName = "";
 
 
     @Override
@@ -31,7 +33,8 @@ public class About extends PreferenceActivity
         super.onCreate(savedInstanceState);
 
         try {
-           versionBuild = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+           versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+//           versionBuild = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -40,11 +43,13 @@ public class About extends PreferenceActivity
         Preference prefRateReviewKey = (Preference) findPreference(getString(R.string.pref_rate_review_key));
         Preference prefBuild         = (Preference) findPreference(getString(R.string.build));
 
-        prefBuild.setSummary(versionBuild);
+        prefBuild.setSummary(versionName);
 
         prefShareKey.setOnPreferenceClickListener(this);
         prefRateReviewKey.setOnPreferenceClickListener(this);
     }
+
+
 
     @Override
     public boolean onPreferenceClick(android.preference.Preference preference) {

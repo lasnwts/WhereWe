@@ -67,9 +67,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     "meter" -   meters
  */
     private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
-    private final int WAKEUP_MIN_2  =  2;
-    private final int WAKEUP_MIN_5  =  5;
-    private final int WAKEUP_MIN_10 =  10;
+    private final int WAKEUP_MIN_2 = 2;
+    private final int WAKEUP_MIN_5 = 5;
+    private final int WAKEUP_MIN_10 = 10;
     private int wakeup_min = 5; //default time alarm
 
     //AlarmManager for Periodical starts
@@ -144,16 +144,16 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG, "onConnectionFailed");
     }
 
-    private void sendMessage(double Latitude, double Longtitude, int id, Long myTime){
+    private void sendMessage(double Latitude, double Longtitude, int id, Long myTime) {
         Intent intent = new Intent();
         intent.setAction(ACTION_MAPRECEIVER);
         intent.putExtra(KEY_ID, id);
-        intent.putExtra(KEY_LATTITUDE,Latitude);
-        intent.putExtra(KEY_LONGTITUDE,Longtitude);
+        intent.putExtra(KEY_LATTITUDE, Latitude);
+        intent.putExtra(KEY_LONGTITUDE, Longtitude);
         intent.putExtra(KEY_DATE, myTime);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 //        intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        Log.d(TAG,"broadcastReceiver:dls:sendMessage:"+id);
+        Log.d(TAG, "broadcastReceiver:dls:sendMessage:" + id);
         sendBroadcast(intent);
     }
 
@@ -161,10 +161,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     public void onLocationChanged(Location location) {
         myLatitude = location.getLatitude();
         myLongitude = location.getLongitude();
-        //myTime = location.getTime();
-        preferenceHelper.putLong("Latitude",Double.doubleToRawLongBits(myLatitude));
-        preferenceHelper.putLong("Longtitude",Double.doubleToRawLongBits(myLongitude));
-        //preferenceHelper.putLong("Time",myTime);
+        preferenceHelper.putLong("Latitude", Double.doubleToRawLongBits(myLatitude));
+        preferenceHelper.putLong("Longtitude", Double.doubleToRawLongBits(myLongitude));
         myTime = preferenceHelper.getLong("Time"); //get time when last write to firebase
         mySpeed = (long) location.getSpeed();
         //Call function check Write OR not in FireBase
@@ -179,17 +177,14 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         }
 
         Log.d(TAG, "KEY_ACTIVITY_READY : " + preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
-        //if ProfActivity not Start, may disabled service location
         if (!preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
             if (myAccuracy == location.getAccuracy()) {
                 Log.d(TAG, " Destroy on myAccuracy == location.getAccuracy().");
                 this.stopSelf();
-                //onDestroy();
             }
             if (System.currentTimeMillis() - timeWork > 60 * 1000) {
                 Log.d(TAG, " Destroy on timeWork > 4 min.");
                 this.stopSelf();
-                //onDestroy();
             }
         }
 
@@ -209,12 +204,12 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         fbaseModel = new FbaseModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
                 databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(), myTime);
         //put myTime
-        preferenceHelper.putLong("Time",System.currentTimeMillis());
+        preferenceHelper.putLong("Time", System.currentTimeMillis());
         //Пишем в SQLite о себеreplaceALL
         dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
 
         //check Allow OR no send you location Global
-        if (!preferenceHelper.getBoolean("allowedSendLocation")){
+        if (!preferenceHelper.getBoolean("allowedSendLocation")) {
             return;
         }
 
@@ -241,22 +236,16 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                     + " listFireBasePaths.get(j).getBadCount() :" + listFireBasePaths.get(jCount).getBadCount());
             if (!listFireBasePaths.get(jCount).getPathFireBase().isEmpty()) {
                 Log.d(TAG, "listFireBasePaths:Jcount:0" + jCount + " size:" + listFireBasePaths.size());
-//                DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(listFireBasePaths.get(jCount).getEmail() + listFireBasePaths.get(jCount).getPartEmail()));
                 DatabaseReference databaseReferenceOnce = databaseReference.child(listFireBasePaths.get(jCount).getPathFireBase()).child(getNormalizeString(modelCheck.getEmail() + modelCheck.getPart_email()));
                 databaseReferenceOnce.setValue(fbaseModel, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         if (databaseError != null) {
                             Log.d(TAG, "listFireBasePaths:" + databaseReference.getRef().toString());
-                            //   dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()+1);
                             Log.d(TAG, "listFireBasePaths:onComplete:(databaseError != null)" + databaseError.getMessage());
                         } else {
                             Log.d(TAG, "listFireBasePaths:onComplete:successfully!");
                             Log.d(TAG, "listFireBasePaths:" + databaseReference.getRef().toString());
-//                            if (listFireBasePaths.get(jCount).getBadCount() > 0){
-//                                Log.d(TAG, "listFireBasePaths:Jcount:PP"+jCount + " size:"+listFireBasePaths.size());
-//                                dbHelper.dbUpdateBadCount(listFireBasePaths.get(jCount).getId(),listFireBasePaths.get(jCount).getBadCount()-1);
-//                            }
                         }
                     }
                 });
@@ -279,7 +268,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             wakeup_min = WAKEUP_MIN_2;
             return true;
         } else {
-            switch (wakeup_min){
+            switch (wakeup_min) {
                 case WAKEUP_MIN_2:
                     wakeup_min = WAKEUP_MIN_5;
                     break;
@@ -390,10 +379,6 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             locationRequest = new LocationRequest();
             if (preferenceHelper.getInt(BATTERY_CHARGED) > 35) {
                 Log.d(TAG, "(BATTERY_CHARGED) >35");
-//                if (preferenceHelper.getInt(LOCATION_MODE)==1){
-//                    Log.d(TAG, "Mode = 1");
-//                    return;
-//                }
                 preferenceHelper.putInt(LOCATION_MODE, 1); //Mode location = 1
                 locationRequest.setInterval(10 * 1000);
                 locationRequest.setFastestInterval(5 * 1000);
@@ -401,26 +386,16 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             } else {
                 if (preferenceHelper.getInt(BATTERY_CHARGED) > 18) {
                     Log.d(TAG, "(BATTERY_CHARGED) >18");
-//                    if (preferenceHelper.getInt(LOCATION_MODE)==2){
-//                        Log.d(TAG, "Mode = 2");
-//                        return;
-//                    }
                     preferenceHelper.putInt(LOCATION_MODE, 2); //Mode location = 2
                     locationRequest.setInterval(20 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    //locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
                 } else if (preferenceHelper.getInt(BATTERY_CHARGED) < 19) {
                     Log.d(TAG, "(BATTERY_CHARGED) <19");
-//                    if (preferenceHelper.getInt(LOCATION_MODE)==3){
-//                        Log.d(TAG, "Mode = 3");
-//                        return;
-//                    }
                     preferenceHelper.putInt(LOCATION_MODE, 3); //Mode location = 3
                     locationRequest.setInterval(30 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    //locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
                 }
             }
         }
@@ -436,17 +411,10 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         if (checkPlayServices()) {
             Log.d(TAG, "buildGoogleApiClient");
 
-            //  createLocationRequest();
             buildGoogleApiClient();
             if (locationRequest == null) {
                 //Изменение параметров прогслушивания
                 changelocationRequestOnBattery();
-/*
-                locationRequest = new LocationRequest();
-                locationRequest.setInterval(10 * 1000);
-                locationRequest.setFastestInterval(5 * 1000);
-                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-*/
             }
             Log.d(TAG, "Google API Yастройки законченны");
             if (googleApiClient.isConnected()) {
@@ -476,8 +444,6 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             onDestroy();
         }
 
-        //initializing firebase authentication object
-        //firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth = TODOApplication.getFireBaseAuth();
 
         //if the user is not logged in
@@ -504,58 +470,18 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         Log.d(TAG, "DeviceLocartionService FireBase Key: " + databaseReference.child(user.getUid()).getKey().toString());
         Log.d(TAG, "DeviceLocartionService FireBase: " + databaseReference.child(user.getUid()).toString());
 
-//        databaseReference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String value = dataSnapshot.child("test").toString();
-//                Log.d(TAG, "FBase value = " + value.toString());
-//                if (dataSnapshot.exists()) {
-//                    String valueJson = dataSnapshot.getValue().toString();
-//                    Log.d(TAG, "FBase value Json =" + valueJson);
-//                    //               TestModel testModel = dataSnapshot.child("-KboI4Ia6DSToPRURKmG").getValue(TestModel.class);
-//                    //               Log.d(TAG,"FBase TestModel class ="+testModel.getTest());
-////                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()){
-////                        TestModel testModel2 = dataSnapshot.child("-KboI4IdtZiiNh921-RB").getValue(TestModel.class);
-////                        Log.d(TAG,"FBase TestModel2 class ="+testModel2.getTest());
-////                    }
-//                }
-//            }
-//
-//            //Ce2N4qWXF5UahlEHiHuLJSBzBzk1
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.d(TAG, "FBase value = read Failed.");
-//            }
-//        });
-//
-//        databaseReference.child("Fkq0Hze0sXgatHf0dsnkD0gTGiO2").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                Log.d(TAG, "addValueEventListener : Fkq0Hze0sXgatHf0dsnkD0gTGiO2 :successfully! ");
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.d(TAG, "addValueEventListener : Fkq0Hze0sXgatHf0dsnkD0gTGiO2 :error! ");
-//            }
-//        });
-
         //FireBase addValue Child Listner
         databaseReference.child(user.getUid()).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG,"broadcastReceiver:dls:sendMessage:onChildAdded");
+                Log.d(TAG, "broadcastReceiver:dls:sendMessage:onChildAdded");
                 Log.d(TAG, "FBase addChildEventListener onChildAdded value = s." + s);
                 Log.d(TAG, "FBase addChildEventListener onChildAdded dataSnapshot key = " + dataSnapshot.getKey());
                 if (!dataSnapshot.getKey().isEmpty()) {
-                    Log.d(TAG,"broadcastReceiver:dls:sendMessage:!isEmpty");
-                    //TestModel testModel4 = dataSnapshot.getValue(TestModel.class);
-                    //Log.d(TAG, "FBase TestModel3 class =" + testModel4.getTest());
                     fbaseModel = dataSnapshot.getValue(FbaseModel.class);
                     databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                     if (fbaseModel != null) {
-                        Log.d(TAG,"broadcastReceiver:dls:sendMessage:fbaseModel != null");
+                        Log.d(TAG, "broadcastReceiver:dls:sendMessage:fbaseModel != null");
                         dbHelper.updateFbaseModel(fbaseModel.getState(),
                                 fbaseModel.getMode(), fbaseModel.getRights(),
                                 fbaseModel.getSpeed(), fbaseModel.getMoved(),
@@ -564,12 +490,12 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                                 fbaseModel.getEmail(), fbaseModel.getPart_email());
                         dbHelper.dbReadInLog();
                         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
-                            Log.d(TAG,"broadcastReceiver:dls:sendMessage:KEY_ACTIVITY_READY");
+                            Log.d(TAG, "broadcastReceiver:dls:sendMessage:KEY_ACTIVITY_READY");
                             if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
-                                if (dbHelper.getId(fbaseModel.getEmail())>1){
-                                    Log.d(TAG,"broadcastReceiver:dls:sendMessage:fbaseModel.getEmail())>1");
+                                if (dbHelper.getId(fbaseModel.getEmail()) > 1) {
+                                    Log.d(TAG, "broadcastReceiver:dls:sendMessage:fbaseModel.getEmail())>1");
                                     sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
-                                            dbHelper.getId(fbaseModel.getEmail()),fbaseModel.getDateTime());
+                                            dbHelper.getId(fbaseModel.getEmail()), fbaseModel.getDateTime());
                                 }
                             }
                         }
@@ -581,12 +507,10 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Log.d(TAG, "FBase addChildEventListener onChildChanged value = s." + s);
                 Log.d(TAG, "FBase addChildEventListener onChildChanged dataSnapshot key = " + dataSnapshot.getKey());
-                Log.d(TAG,"broadcastReceiver:dls:sendMessage:onChildAdded");
+                Log.d(TAG, "broadcastReceiver:dls:sendMessage:onChildAdded");
                 Log.d(TAG, "FBase addChildEventListener onChildAdded value = s." + s);
                 Log.d(TAG, "FBase addChildEventListener onChildAdded dataSnapshot key = " + dataSnapshot.getKey());
                 if (!dataSnapshot.getKey().isEmpty()) {
-                    //TestModel testModel3 = dataSnapshot.getValue(TestModel.class);
-                    //Log.d(TAG, "FBase TestModel3 class =" + testModel3.getTest());
                     fbaseModel = dataSnapshot.getValue(FbaseModel.class);
                     databaseReference.child(user.getUid()).child(dataSnapshot.getKey()).removeValue();
                     if (fbaseModel != null) {
@@ -599,9 +523,9 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                         dbHelper.dbReadInLog();
                         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
                             if (dbHelper.getId(fbaseModel.getEmail()) != 0) {
-                                if (dbHelper.getId(fbaseModel.getEmail())>1){
+                                if (dbHelper.getId(fbaseModel.getEmail()) > 1) {
                                     sendMessage(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
-                                            dbHelper.getId(fbaseModel.getEmail()),fbaseModel.getDateTime());
+                                            dbHelper.getId(fbaseModel.getEmail()), fbaseModel.getDateTime());
                                 }
                             }
                         }
@@ -613,7 +537,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "FBase addChildEventListener onChildRemoved value");
                 Log.d(TAG, "FBase addChildEventListener onChildRemoved dataSnapshot key = " + dataSnapshot.getKey());
-                Log.d(TAG,"broadcastReceiver:dls:sendMessage:onChildAdded");
+                Log.d(TAG, "broadcastReceiver:dls:sendMessage:onChildAdded");
                 Log.d(TAG, "FBase addChildEventListener onChildAdded value = s.");
                 Log.d(TAG, "FBase addChildEventListener onChildAdded dataSnapshot key = " + dataSnapshot.getKey());
             }
@@ -630,23 +554,6 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             }
         });
 
-        /*
-        Тестироввание Создадим объект в FireBase`
-         */
-        //databaseReference.child(user.getUid()).push().setValue(new TestModel("test101", "email@mail.ru", 129l));
-       // databaseReference.child(user.getUid()).push().setValue(new TestModel("test202", "email@mail.ru", 129l));
-
-      //  databaseReference.child("M0erubbTS6hbInqmOmnZOPelZfE2").push().setValue(new TestModel("test202", "email@mail.ru", 129l));
-
-      //  databaseReference.child(user.getUid()).child("test83737MAILRU").setValue(new TestModel("For more information see", "email@mail.ru", 129l));
-        // Map<String, TestModel> testModels = new HashMap<String, TestModel>();
-        // testModels.put("testoviy Rklient", new TestModel("New Test User1"));
-        // databaseReference.child(user.getUid()).setValue(testModels); // все стирает в ключе! Остается одна запись!
-
-        /*
-        Коненц тестирования
-         */
-        //  initService();1388714548
         //Ставим broadcast на батарею
         br = new BoardReceiverBattery();
         receiver = br.InitReceiver();
@@ -675,14 +582,14 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         super.onDestroy();
     }
 
-    private void onWakeUpInstallation(){
+    private void onWakeUpInstallation() {
         Intent intent = new Intent(this, DeviceLocationService.class);
-        pendingIntent = PendingIntent.getService(this,0,intent,0);
+        pendingIntent = PendingIntent.getService(this, 0, intent, 0);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.MINUTE, wakeup_min);
-        alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
-        Log.d(TAG,"alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);");
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        Log.d(TAG, "alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);");
     }
 }

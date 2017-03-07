@@ -65,12 +65,9 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
             public void onClick(View view) {
                 FragmentActivity activity = (FragmentActivity)(context);
                 FragmentManager fm = activity.getSupportFragmentManager();
-
                 Log.v(TAG, "adapterSmallModel:item:"+"One setOnClickListener:"+ holder.textViewHead.getText().toString());
                 DialogFragment dialogFragmentOneItem = DialogFragmentOneItem.newInstance(smallModels.get(position),position);
-                //adapterSmallModel.this
                 dialogFragmentOneItem.show(fm,"NewW");
-               // dialogFragmentOneItem.show(adapterSmallModel.this.context.getApplicationContext(),"");
             }
         });
 
@@ -89,8 +86,6 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
                         switch (item.getItemId()) {
                             case R.id.menu1:
                                 Log.v(TAG, "adapterSmallModel:item:"+item+"smallModel.getName():"+ holder.textViewHead.getText().toString());
-//                                FragmentActivity activity = (FragmentActivity)(context);
-//                                FragmentManager fm = activity.getSupportFragmentManager();
                                 Log.v(TAG, "adapterSmallModel:item:"+"One setOnClickListener:"+ holder.textViewHead.getText().toString());
                                 DialogFragment dialogFragmentOneItem = DialogFragmentOneItem.newInstance(smallModels.get(position),position);
                                 dialogFragmentOneItem.show(fm,"NewW");
@@ -123,8 +118,6 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
                         switch (item.getItemId()) {
                             case R.id.menu1:
                                 Log.v(TAG, "adapterSmallModel:item:"+item+"smallModel.getName():"+ holder.textViewHead.getText().toString());
-//                                FragmentActivity activity = (FragmentActivity)(context);
-//                                FragmentManager fm = activity.getSupportFragmentManager();
                                 Log.v(TAG, "adapterSmallModel:item:"+"One setOnClickListener:"+ holder.textViewHead.getText().toString());
                                 DialogFragment dialogFragmentOneItem = DialogFragmentOneItem.newInstance(smallModels.get(position),position);
                                 dialogFragmentOneItem.show(fm,"NewW");

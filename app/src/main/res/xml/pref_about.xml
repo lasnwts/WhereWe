@@ -8,7 +8,7 @@
     <com.lb.material_preferences_library.custom_preferences.Preference
         android:key="@string/build"
         android:title="@string/pref_version_title"
-        android:summary="@string/pref_version_summary"/>
+        android:summary=""/>
 
     <com.lb.material_preferences_library.custom_preferences.Preference
         android:title="@string/pref_developer_title"

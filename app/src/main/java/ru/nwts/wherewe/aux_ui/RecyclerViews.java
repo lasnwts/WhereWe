@@ -54,7 +54,7 @@ public class RecyclerViews extends AppCompatActivity
         dbHelper = TODOApplication.getInstance().dbHelper;
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        //recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         smallModels = dbHelper.getListSmallModel();

@@ -30,7 +30,7 @@
     <string name="pref_app_title">О приложении</string>
     <string name="pref_app_summary">Отображение местоположения друзей на карте</string>
     <string name="pref_version_title">Версия сборки</string>
-    <string name="pref_version_summary">1.0</string>
+    <!--<string name="pref_version_summary">7.7</string>-->
     <string name="pref_developer_title">Разработчик</string>
     <string name="pref_developer_summary">A.Lyapustin</string>
     <string name="pref_share_title">Поделитесь приложением</string>

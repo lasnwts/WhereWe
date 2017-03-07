@@ -95,17 +95,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     //view objects
     private TextView textViewUserEmail;
-//    private Button buttonLogout;
-//    private Button buttonService;
     private ImageButton buttonScale;
 
     private Drawer drawer = null;
     private Toolbar toolbar;
 
     private String[] channelNames;
-//    private String[] channelId;
-//    private String[] videoTypes;
-
     private int selectedDrawerItem = 0;
 
     FragmentManager manager;
@@ -140,15 +135,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
-
-        //initializing firebase authentication object
-        //firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth = TODOApplication.getFireBaseAuth();
 
-        //if the user is not logged in
-        //that means current user will return null
         if (firebaseAuth.getCurrentUser() == null) {
-            //closing this activity
             finish();
             //starting login activity
             startActivity(new Intent(this, LoginActivity.class));
@@ -156,7 +145,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         //getting current user
         FirebaseUser user = firebaseAuth.getCurrentUser();
-
 
         //initializing views
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -169,10 +157,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         PrimaryDrawerItem[] primaryDrawerItems = new PrimaryDrawerItem[channelNames.length];
 
         int[] drawableId = new int[]{R.drawable.ic_view_list_white_18dp,
-                R.drawable.ic_add_box_white_18dp,R.drawable.ic_mail_white_18dp,
-                R.drawable.ic_location_disabled_white_18dp,R.drawable.ic_zoom_out_map_white_18dp,
-                R.drawable.ic_android_white_18dp,R.drawable.ic_settings_applications_white_18dp};
-
+                R.drawable.ic_add_box_white_18dp, R.drawable.ic_mail_white_18dp,
+                R.drawable.ic_location_disabled_white_18dp, R.drawable.ic_zoom_out_map_white_18dp,
+                R.drawable.ic_android_white_18dp, R.drawable.ic_settings_applications_white_18dp};
 
 
         for (int i = 0; i < channelNames.length; i++) {
@@ -229,12 +216,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                     case 3:
                                         Intent shareIntent = new Intent(Intent.ACTION_SEND);
                                         shareIntent.setType("text/plain");
-                                        shareIntent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.subject));
+                                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.subject));
                                         shareIntent.putExtra(Intent.EXTRA_TEXT, putEmailAndFireBasePathtoClient());
                                         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
                                         break;
                                     case 4:
-                                        DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance(0,0,getResources().getString(R.string.dialog_title_yes_no_logout));
+                                        DialogFragmentYesNo dialogFragmentYesNo = DialogFragmentYesNo.newInstance(0, 0, getResources().getString(R.string.dialog_title_yes_no_logout));
                                         dialogFragmentYesNo.show(manager, "dialog");
                                         break;
                                     case 5: //масштабировать
@@ -272,16 +259,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //dbHelper = new DBHelper(this);
         dbHelper = TODOApplication.getInstance().dbHelper;
         if (dbHelper != null) {
-//            dbHelper.dbDeleteUsers();
-//            dbHelper.dbInsertUser("Test0 name_115", 1, 1, 1, 1, 1, 198299922, 30.3667, 59.8793, "M0erubbTS6hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
-//            dbHelper.dbInsertUser("Test1 name_1", 1, 1, 1, 1, 1, 198299922, 30.3467,  59.8693, "Fkq0Hze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
-//            dbHelper.dbInsertUser("Test2 name_3", 1, 1, 1, 1, 1, 198299922, 31.8350976, 58.9342803, "c6yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
-//            dbHelper.dbInsertUser("Test3 2 name_115", 1, 1, 1, 1, 1, 198299922, 32.6750986, 60.1055801, "M0erubb9976hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
-//            dbHelper.dbInsertUser("Test4 2 name_1", 1, 1, 1, 1, 1, 198299922, 32.1450981, 59.9000801, "Fkq99ze0sXgatHf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
-//            dbHelper.dbInsertUser("Test5 2 name_3", 1, 1, 1, 1, 1, 198299922, 31.3350980, 60.9972887, "c8yJ7FyUUwPHsCKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
-//            dbHelper.dbInsertUser("Test6  3name_115", 1, 1, 1, 1, 1, 198299922, 30.8950978, 59.9072801, "M0erubbT77hbInqmOmnZOPelZfE2", null, 0, 999, "i123456789", "o123456789", "test1@mail.ru", "076077669");
-//            dbHelper.dbInsertUser("Test7 4 name_1", 1, 1, 1, 1, 1, 198299922, 33.0950986, 59.8762564, "Fkq0Hze0sXg77Hf0dsnkD0gTGiO2", null, 0, 999, "067", "o123456789", "alexl1967@mail.ru", "067");
-//            dbHelper.dbInsertUser("Test8  5name_3", 1, 1, 1, 1, 1, 198299922, 31.9890990, 59.0942801, "c68J7FyUUwPH7CKGq4IvtkEZ93f1", null, 0, 999, "i123456789", "o123456789", "atest@mail.ru", "0979799");
             dbHelper.dbReadInLog();
             smallModels = dbHelper.getListSmallModel();
         }
@@ -306,33 +283,29 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int Id = (int) intent.getIntExtra(KEY_ID,0);
-            double Latitude = (double) intent.getDoubleExtra(KEY_LATTITUDE,0);
-            double Longtitude = (double) intent.getDoubleExtra(KEY_LONGTITUDE,0);
-            long dateTime = (long) intent.getLongExtra(KEY_DATE,0);
-            Log.d(TAG,"broadcastReceiver:sendMessage:Id="+Id+" Latitude:"+Latitude+" Longtitude:"+Longtitude);
-            if (Id != 0 && Latitude != 0 && Longtitude != 0){
-                Log.d(TAG,"broadcastReceiver:sendMessage Run Broadcastreceiver:length:"+markers.size());
-                if (Id == 1){
+            int Id = (int) intent.getIntExtra(KEY_ID, 0);
+            double Latitude = (double) intent.getDoubleExtra(KEY_LATTITUDE, 0);
+            double Longtitude = (double) intent.getDoubleExtra(KEY_LONGTITUDE, 0);
+            long dateTime = (long) intent.getLongExtra(KEY_DATE, 0);
+            Log.d(TAG, "broadcastReceiver:sendMessage:Id=" + Id + " Latitude:" + Latitude + " Longtitude:" + Longtitude);
+            if (Id != 0 && Latitude != 0 && Longtitude != 0) {
+                Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:length:" + markers.size());
+                if (Id == 1) {
                     markers.get(i).setPosition(new LatLng(Latitude, Longtitude));
-                    if (dateTime !=0){
-                        markers.get(i).setSnippet(wordTimeOnMarker+dateformat.format(dateTime));
+                    if (dateTime != 0) {
+                        markers.get(i).setSnippet(wordTimeOnMarker + dateformat.format(dateTime));
                     }
-                    //Move camera to that coordinates
-                    //Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
-                }else {
+                } else {
                     //others marker
-                    for (int m  = 0; m < smallModels.size(); m++){
-                        Log.d(TAG,"broadcastReceiver:sendMessage Run Broadcastreceiver:m:"+m);
-                        Log.d(TAG,"broadcastReceiver:sendMessage Run Broadcastreceiver:smallModels.get(m).getId():"+smallModels.get(m).getId());
-                        Log.d(TAG,"broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():"+markers.get(m).getId());
-                        if (smallModels.get(m).getId() == Id){
+                    for (int m = 0; m < smallModels.size(); m++) {
+                        Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:m:" + m);
+                        Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:smallModels.get(m).getId():" + smallModels.get(m).getId());
+                        Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():" + markers.get(m).getId());
+                        if (smallModels.get(m).getId() == Id) {
                             markers.get(m).setPosition(new LatLng(Latitude, Longtitude));
-                            if (dateTime !=0){
-                                markers.get(m).setSnippet(wordTimeOnMarker+dateformat.format(dateTime));
+                            if (dateTime != 0) {
+                                markers.get(m).setSnippet(wordTimeOnMarker + dateformat.format(dateTime));
                             }
-                            //Move camera to that coordinates
-                            //Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(m).getPosition()));
                         }
                     }
                 }
@@ -341,27 +314,26 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     };
 
 
-    private BroadcastReceiver broadcastReceiverEdit = new BroadcastReceiver(){
+    private BroadcastReceiver broadcastReceiverEdit = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "sendBroadcast():sendBroadCastEditAbonent:ProfileActivity");
-            int Id = (int) intent.getIntExtra(KEY_ID,0);
-            int action = (int) intent.getIntExtra(KEY_MODE,1);
+            int Id = (int) intent.getIntExtra(KEY_ID, 0);
+            int action = (int) intent.getIntExtra(KEY_MODE, 1);
             String name = (String) intent.getStringExtra(KEY_NAME);
             //edit name
-            if (action == ACTION_EDIT_NAME){
-                for (int m  = 0; m < smallModels.size(); m++){
-                    if (smallModels.get(m).getId() == Id){
+            if (action == ACTION_EDIT_NAME) {
+                for (int m = 0; m < smallModels.size(); m++) {
+                    if (smallModels.get(m).getId() == Id) {
                         markers.get(m).setTitle(name);
                         smallModels.get(m).setName(name);
                     }
                 }
             }
-            if (action == ACTION_DELETE){
-                for (int m  = 0; m < smallModels.size(); m++){
-                    if (smallModels.get(m).getId() == Id){
+            if (action == ACTION_DELETE) {
+                for (int m = 0; m < smallModels.size(); m++) {
+                    if (smallModels.get(m).getId() == Id) {
                         markers.get(m).remove();
-                       // smallModels.remove(m);
                     }
                 }
             }
@@ -377,15 +349,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
-        if (smallModels != null && markers != null){
-            for (int m  = 0; m < smallModels.size(); m++) {
+        if (smallModels != null && markers != null) {
+            for (int m = 0; m < smallModels.size(); m++) {
                 Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:m:" + m);
                 Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:smallModels.get(m).getId():" + smallModels.get(m).getId());
                 Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():" + markers.get(m).getId());
             }
         }
 
-            //Write to SharedPref what ProfActivity Started
+        //Write to SharedPref what ProfActivity Started
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, true);
         //Tested Run LocationService Or Not
         if (!preferenceHelper.getBoolean(KEY_LOCATION_SERVICE_STARTED)) {
@@ -393,9 +365,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             Log.d(TAG, "Start service! from ProfileActivity!");
         }
         startService(locationService);
-/*        //BroadCastReceiver register
-        registerReceiver(this.broadcastReceiver,
-                new IntentFilter(new IntentFilter(ACTION_MAPRECEIVER)));*/
     }
 
 
@@ -403,14 +372,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     protected void onPause() {
         //Write to SharedPref what ProfActivity Started
         Log.d(TAG, "ProfileActivity onPaiused..");
-/*        preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
-        try {
-            this.unregisterReceiver(broadcastReceiver);
-            //Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG).show();
-        }catch(IllegalArgumentException e){
-//            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
-//                    .show();
-        }*/
         super.onPause();
     }
 
@@ -422,17 +383,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
-//        //if logout is pressed
-//        if (view == buttonLogout) {
-//            //logging out the user
-//            firebaseAuth.signOut();
-//            //closing activity
-//            finish();
-//            //starting login activity
-//            startActivity(new Intent(this, LoginActivity.class));
-//        }
         if (view == buttonScale) {
-          setScale();
+            setScale();
         }
     }
 
@@ -441,7 +393,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //return super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_option, menu);
         //This visible icon on menu, google design hide icon on menu
-        if(menu instanceof MenuBuilder){
+        if (menu instanceof MenuBuilder) {
             MenuBuilder m = (MenuBuilder) menu;
             m.setOptionalIconsVisible(true);
         }
@@ -493,17 +445,17 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         markers = new ArrayList<>();
         for (int j = 0; j < smallModels.size(); j++) {
             SmallModel model = smallModels.get(j);
-            String snippets = wordTimeOnMarker+dateformat.format(model.getTrack_date());
-            if (model.getId()==1){
+            String snippets = wordTimeOnMarker + dateformat.format(model.getTrack_date());
+            if (model.getId() == 1) {
                 i = j;
-                Log.d(TAG,"addMarker:Name:"+model.getName()+":getLongtitude:"+model.getLongtitude()+" getLattitude:"+model.getLattitude());
+                Log.d(TAG, "addMarker:Name:" + model.getName() + ":getLongtitude:" + model.getLongtitude() + " getLattitude:" + model.getLattitude());
                 markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude()))
                         .title(model.getName()).snippet(snippets).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
-            }else {
+            } else {
                 markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(),
                         model.getLongtitude())).title(model.getName()).snippet(snippets)));
             }
-           builder.include(markers.get(j).getPosition());
+            builder.include(markers.get(j).getPosition());
             bounds = builder.build();
             Map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                 @Override
@@ -518,7 +470,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    private void setScale(){
+    private void setScale() {
         //Map
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (int j = 0; j < markers.size(); j++) {
@@ -537,18 +489,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void showSettings() {
-//        markers.get(i).setPosition(new LatLng(59.10002, 31.19086));
-//        Map.moveCamera(CameraUpdateFactory.newLatLng(markers.get(i).getPosition()));
         Intent intent = new Intent(ProfileActivity.this, PreferenceActivities.class);
         startActivityForResult(intent, 0);
     }
 
     private String putEmailAndFireBasePathtoClient() {
-        //Log.d(TAG, "EmailAndFireBasePathtoClient:" + dbHelper.getEmailPartFBasePartFromMe());
         String s = dbHelper.getEmailPartFBasePartFromMe();
         byte[] bs = s.getBytes();
         String strEncoded = "00099999" + Base64.encodeToString(bs, Base64.DEFAULT);
-        //Log.d(TAG, "EmailAndFireBasePathtoClient:base64 encoded:" + strEncoded);
         return strEncoded;
     }
 
@@ -557,13 +505,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         String part_email;
         String fbase_part;
         String strDecoded;
-        try{
+        try {
             strDecoded = new String(Base64.decode(strEncoded.getBytes(), Base64.DEFAULT));
-        } catch (IllegalArgumentException error){
+        } catch (IllegalArgumentException error) {
             strDecoded = "";
             Log.e(TAG, error.toString());
         }
-        //Log.d(TAG, "EmailAndFireBasePathtoClient:base64 decoded:" + strDecoded);
         return strDecoded;
     }
 
@@ -573,30 +520,30 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     //Attention strDecoded include all data from decoded string
-    private String getPartEmailFromDecoded(String strDecoded){
+    private String getPartEmailFromDecoded(String strDecoded) {
         String s = strDecoded.substring(strDecoded.indexOf(";") + 1, strDecoded.length());
         String part_email = s.substring(0, s.indexOf(";"));
         return part_email;
     }
 
     //Attention strDecoded include all data from decoded string
-    private String getFireBasePathFromDecoded(String strDecoded){
+    private String getFireBasePathFromDecoded(String strDecoded) {
         String s = strDecoded.substring(strDecoded.indexOf(";") + 1, strDecoded.length());
         String fbase_part = s.substring(s.indexOf(";") + 1, s.length());
-        Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:22:"+fbase_part);
+        Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:22:" + fbase_part);
         return fbase_part;
     }
 
     private boolean isEmailValidation(String email) {
         try {
             return Patterns.EMAIL_ADDRESS.matcher(email).matches();
-        } catch (NullPointerException exception){
+        } catch (NullPointerException exception) {
             return false;
         }
     }
 
-    private boolean isPartEmailValidation(String part_email){
-        if (part_email != null && !part_email.isEmpty() && part_email.length() > 5){
+    private boolean isPartEmailValidation(String part_email) {
+        if (part_email != null && !part_email.isEmpty() && part_email.length() > 5) {
             return true;
         } else {
             return false;
@@ -604,20 +551,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private boolean isFireBasePathValidation(String fbase_path){
-        if (fbase_path != null && !fbase_path.isEmpty() && fbase_path.length() > 20){
-            Log.d(TAG,"putInputStrNewSendInformation:"+fbase_path);
-            Log.d(TAG,"putInputStrNewSendInformation:"+fbase_path.indexOf("99999"));
-            if (fbase_path.indexOf("99999")>0){
-                try{
-                    new String(Base64.decode(fbase_path.substring(8,fbase_path.length()).getBytes(), Base64.DEFAULT));
-                } catch (IllegalArgumentException error){
+    private boolean isFireBasePathValidation(String fbase_path) {
+        if (fbase_path != null && !fbase_path.isEmpty() && fbase_path.length() > 20) {
+            Log.d(TAG, "putInputStrNewSendInformation:" + fbase_path);
+            Log.d(TAG, "putInputStrNewSendInformation:" + fbase_path.indexOf("99999"));
+            if (fbase_path.indexOf("99999") > 0) {
+                try {
+                    new String(Base64.decode(fbase_path.substring(8, fbase_path.length()).getBytes(), Base64.DEFAULT));
+                } catch (IllegalArgumentException error) {
                     Log.e(TAG, error.toString());
-                    return  false;
+                    return false;
                 }
                 return true;
             } else {
-                return  false;
+                return false;
             }
         } else {
             return false;
@@ -635,14 +582,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         Log.d(TAG, "EmailAndFireBasePathtoClient:" + putEmailAndFireBasePathtoClient());
         Log.d(TAG, "EmailAndFireBasePathtoClient:" + getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient()));
         Log.d(TAG, "EmailAndFireBasePathtoClient:email:" + getEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())));
-        if (isEmailValidation(getEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))){
+        if (isEmailValidation(getEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))) {
             Log.d(TAG, "EmailAndFireBasePathtoClient:is email:mathes");
         }
-        if (isPartEmailValidation(getPartEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))){
-            Log.d(TAG, "EmailAndFireBasePathtoClient:part_email:"+getPartEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())));
+        if (isPartEmailValidation(getPartEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))) {
+            Log.d(TAG, "EmailAndFireBasePathtoClient:part_email:" + getPartEmailFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())));
         }
-        if (isFireBasePathValidation(getFireBasePathFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))){
-            Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:"+getFireBasePathFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())));
+        if (isFireBasePathValidation(getFireBasePathFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())))) {
+            Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:" + getFireBasePathFromDecoded(getEmailAndFireBasePathtoClient(putEmailAndFireBasePathtoClient())));
         }
 
         Log.d(TAG, "showAbout:" + dbHelper.getEmailPartFBasePartFromMe());
@@ -691,9 +638,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onFinishEditDialog(String inputText) {
-        if (!inputText.isEmpty() && inputText.length() > 20){
-           // Toast.makeText(getApplicationContext(), "Привет, введено: " + inputText, Toast.LENGTH_SHORT).show();
-            if (!putInputStrNewSendInformation(inputText)){
+        if (!inputText.isEmpty() && inputText.length() > 20) {
+            if (!putInputStrNewSendInformation(inputText)) {
                 Toast.makeText(getApplicationContext(), "Привет, введенная строка не проходит проверку!", Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -706,55 +652,48 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
         try {
             this.unregisterReceiver(broadcastReceiverEdit);
-//            Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG)
-//                    .show();
-        }catch(IllegalArgumentException e){
-//            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
-//                    .show();
+        } catch (IllegalArgumentException e) {
         }
         try {
             this.unregisterReceiver(broadcastReceiver);
-            //Toast.makeText(getApplicationContext(), "Приёмник автоматически выключён", Toast.LENGTH_LONG).show();
-        }catch(IllegalArgumentException e){
-//            Toast.makeText(getApplicationContext(), "Приёмник не был выключён", Toast.LENGTH_LONG)
-//                    .show();
+        } catch (IllegalArgumentException e) {
         }
         super.onDestroy();
     }
 
-    private boolean putInputStrNewSendInformation(String sendMessage){
+    private boolean putInputStrNewSendInformation(String sendMessage) {
         String email;
         String part_email;
         String fbase_part;
 
-        if (isFireBasePathValidation(sendMessage)){
-            sendMessage = getEmailAndFireBasePathtoClient(sendMessage.substring(8,sendMessage.length()));
-            Log.d(TAG,"EmailAndFireBasePathtoClient: "+sendMessage);
+        if (isFireBasePathValidation(sendMessage)) {
+            sendMessage = getEmailAndFireBasePathtoClient(sendMessage.substring(8, sendMessage.length()));
+            Log.d(TAG, "EmailAndFireBasePathtoClient: " + sendMessage);
 
-            if (isEmailValidation(getEmailFromDecoded(sendMessage))){
+            if (isEmailValidation(getEmailFromDecoded(sendMessage))) {
                 email = getEmailFromDecoded(sendMessage).trim();
                 Log.d(TAG, "EmailAndFireBasePathtoClient:is email:mathes : " + email);
             } else {
                 return false;
             }
-            if (isPartEmailValidation(getPartEmailFromDecoded(sendMessage))){
+            if (isPartEmailValidation(getPartEmailFromDecoded(sendMessage))) {
                 part_email = getPartEmailFromDecoded(sendMessage).trim();
-                Log.d(TAG, "EmailAndFireBasePathtoClient:part_email:"+part_email);
+                Log.d(TAG, "EmailAndFireBasePathtoClient:part_email:" + part_email);
             } else {
                 return false;
             }
-            if ((getFireBasePathFromDecoded(sendMessage).length()>20)){
+            if ((getFireBasePathFromDecoded(sendMessage).length() > 20)) {
                 fbase_part = getFireBasePathFromDecoded(sendMessage).trim();
-                Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:"+fbase_part);
+                Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:" + fbase_part);
             } else {
                 return false;
             }
             if (!dbHelper.checkExistClient(email, part_email)) {
                 if (dbHelper.dbInsertUser("", 0, 0, 0, 0, 0, preferenceHelper.getLong("Time"), Double.longBitsToDouble(preferenceHelper.getLong("Longtitude")),
-                        Double.longBitsToDouble(preferenceHelper.getLong("Latitude")), fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email)>1){
+                        Double.longBitsToDouble(preferenceHelper.getLong("Latitude")), fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email) > 1) {
                     Toast.makeText(getApplicationContext(), "Запись добавлена!", Toast.LENGTH_SHORT).show();
                     //Here function add new marker
-                    if (dbHelper.getSmallModelFromEmail(email).getId() != 0){
+                    if (dbHelper.getSmallModelFromEmail(email).getId() != 0) {
                         smallModels.add(dbHelper.getSmallModelFromEmail(email));
                         markers.add(Map.addMarker(new MarkerOptions().position(new LatLng(dbHelper.getSmallModelFromEmail(email).getLattitude(),
                                 dbHelper.getSmallModelFromEmail(email).getLongtitude())).title(dbHelper.getSmallModelFromEmail(email).getName())));
@@ -763,15 +702,16 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                     Toast.makeText(getApplicationContext(), "Ошибка добавления записи!", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                if (dbHelper.dbUpdateFBase(email, part_email, fbase_part)==1){
+                if (dbHelper.dbUpdateFBase(email, part_email, fbase_part) == 1) {
                     Toast.makeText(getApplicationContext(), "Запись обновлена!", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     Toast.makeText(getApplicationContext(), "Ошибка обновления записи!", Toast.LENGTH_SHORT).show();
                 }
             }
             return true;
         } else {
-            Log.d(TAG,"putInputStrNewSendInformation: error in str!");        }
+            Log.d(TAG, "putInputStrNewSendInformation: error in str!");
+        }
         return false;
     }
 
