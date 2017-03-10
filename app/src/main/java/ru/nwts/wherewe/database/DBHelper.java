@@ -51,13 +51,17 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
     @Override
     public void onCreate(SQLiteDatabase db) {
         initPreferences();
+        String youFirstName = "Input You Name";
+        if (preferenceHelper.getString("YouName") != null){
+            youFirstName = preferenceHelper.getString("YouName");
+        }
         db.execSQL(SQL_CREATE_ENTRIES_USERS);
         db.execSQL(SQL_CREATE_ENTRIES_GROUPS);
         db.execSQL(SQL_CREATE_ENTRIES_LINKS);
         db.execSQL(SQL_CREATE_ENTRIES_TRACKS);
         db.execSQL("insert into " + TABLE_USERS + "(" + KEY_NAME + "," + KEY_EMAIL + "," + KEY_PART_EMAIL +
                 "," + KEY_DATE + "," + KEY_FBASE_PATH + "," + KEY_LATTITUDE + "," + KEY_LONGTITUDE + ")" +
-                "VALUES('Input You Name','" + preferenceHelper.getString("login") + "'," + this.hashCode() + ",0,'fbasepathInstall',0,0)");
+                "VALUES('"+ youFirstName + "','" + preferenceHelper.getString("login") + "'," + this.hashCode() + ",0,'fbasepathInstall',0,0)");
     }
 
     @Override

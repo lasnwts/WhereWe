@@ -67,6 +67,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     "meter" -   meters
  */
     private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
+    private final int WAKEUP_MIN_1 = 1;
     private final int WAKEUP_MIN_2 = 2;
     private final int WAKEUP_MIN_5 = 5;
     private final int WAKEUP_MIN_10 = 10;
@@ -169,7 +170,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         if (getCheckWriteOrNotInFirerBase(myLatitude, myLongitude, myTime)) {
             //Write to FireBase
             putWriteMyDataToFireBase(myLatitude, myLongitude, myTime, mySpeed);
-            wakeup_min = WAKEUP_MIN_2;
+            wakeup_min = WAKEUP_MIN_1;
         }
         //sendMessage to profile activity
         if (preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
@@ -265,10 +266,13 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         long calcTimeDistance = System.currentTimeMillis() - myTime;
         if (acceptDistance < calcDistance || timeAccpetWait < calcTimeDistance) {
             //Wirte to FireBasde
-            wakeup_min = WAKEUP_MIN_2;
+            wakeup_min = WAKEUP_MIN_1;
             return true;
         } else {
             switch (wakeup_min) {
+                case WAKEUP_MIN_1:
+                    wakeup_min = WAKEUP_MIN_2;
+                    break;
                 case WAKEUP_MIN_2:
                     wakeup_min = WAKEUP_MIN_5;
                     break;
@@ -387,13 +391,19 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 if (preferenceHelper.getInt(BATTERY_CHARGED) > 18) {
                     Log.d(TAG, "(BATTERY_CHARGED) >18");
                     preferenceHelper.putInt(LOCATION_MODE, 2); //Mode location = 2
-                    locationRequest.setInterval(20 * 1000);
-                    locationRequest.setFastestInterval(5 * 1000);
+                    locationRequest.setInterval(30 * 1000);
+                    locationRequest.setFastestInterval(10 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 } else if (preferenceHelper.getInt(BATTERY_CHARGED) < 19) {
                     Log.d(TAG, "(BATTERY_CHARGED) <19");
                     preferenceHelper.putInt(LOCATION_MODE, 3); //Mode location = 3
-                    locationRequest.setInterval(30 * 1000);
+                    locationRequest.setInterval(50 * 1000);
+                    locationRequest.setFastestInterval(25 * 1000);
+                    locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                } else {
+                    Log.d(TAG, "(Battery not defined = mode 1 how Battery > 35");
+                    preferenceHelper.putInt(LOCATION_MODE, 1); //Mode location = 1
+                    locationRequest.setInterval(10 * 1000);
                     locationRequest.setFastestInterval(5 * 1000);
                     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 }
