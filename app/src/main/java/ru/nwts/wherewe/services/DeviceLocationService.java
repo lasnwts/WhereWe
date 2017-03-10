@@ -72,6 +72,11 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     private final int WAKEUP_MIN_5 = 5;
     private final int WAKEUP_MIN_10 = 10;
     private int wakeup_min = 5; //default time alarm
+    //
+    private long myTimeUpdate;
+    private double myLatitudeUpdate;
+    private double myLongtitudeUpdate;
+    private double mySpeedUpdate;
 
     //AlarmManager for Periodical starts
     AlarmManager alarmManager;
@@ -205,9 +210,13 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         fbaseModel = new FbaseModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
                 databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(), myTime);
         //put myTime
-        preferenceHelper.putLong("Time", System.currentTimeMillis());
+//        preferenceHelper.putLong("Time", System.currentTimeMillis());
         //Пишем в SQLite о себеreplaceALL
-        dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
+        myLatitudeUpdate = myLatitude;
+        myLongtitudeUpdate = myLongitude;
+        myTimeUpdate = myTime;
+        mySpeedUpdate = mySpeed;
+//        dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeed, 0, myTime, myLongitude, myLatitude, databaseReference.child(user.getUid()).getKey().toString());
 
         //check Allow OR no send you location Global
         if (!preferenceHelper.getBoolean("allowedSendLocation")) {
@@ -247,6 +256,10 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                         } else {
                             Log.d(TAG, "listFireBasePaths:onComplete:successfully!");
                             Log.d(TAG, "listFireBasePaths:" + databaseReference.getRef().toString());
+                            //put myTime
+                            preferenceHelper.putLong("Time", System.currentTimeMillis());
+                            //Пишем в SQLite о себеreplaceALL
+                            dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeedUpdate, 0, myTimeUpdate, myLongtitudeUpdate, myLatitudeUpdate, databaseReference.child(user.getUid()).getKey().toString());
                         }
                     }
                 });

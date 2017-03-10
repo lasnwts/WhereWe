@@ -400,7 +400,7 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
 
 
         int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
-        Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
+        Log.d(TAG, "DBHelper:dbUpdateMe:rowID =" + rowID + " updated:" + updateResult);
 
         return updateResult;
     }
