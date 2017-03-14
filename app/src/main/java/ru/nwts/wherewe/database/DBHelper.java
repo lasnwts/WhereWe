@@ -106,8 +106,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv.put(KEY_EMAIL, email);
         cv.put(KEY_PART_EMAIL, part_email);
 
-
-        long rowID = getWritableDatabase().insert(TABLE_USERS, null, cv);
+        SQLiteDatabase database = getWritableDatabase();
+        long rowID = database.insert(TABLE_USERS, null, cv);
+        database.close();
         Log.d(TAG, "row inserted, ID =" + rowID);
 
         return rowID;
@@ -138,8 +139,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv.put(KEY_EMAIL, email);
         cv.put(KEY_PART_EMAIL, part_email);
 
-
-        long rowID = getWritableDatabase().insert(TABLE_USERS, null, cv);
+        SQLiteDatabase database = getWritableDatabase();
+        long rowID = database.insert(TABLE_USERS, null, cv);
+        database.close();
         Log.d(TAG, "row inserted, ID =" + rowID);
 
         return rowID;
@@ -171,11 +173,10 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv.put(KEY_EMAIL, email);
         cv.put(KEY_PART_EMAIL, part_email);
         String where = KEY_ID + "=" + rowID;
-
-
-        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        SQLiteDatabase database = getWritableDatabase();
+        int updateResult = database.update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        database.close();
         Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
-
         return updateResult;
     }
 
@@ -186,14 +187,18 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
             return 0;
         }
         String where = KEY_ID + "=" + rowID;
-        int deleteCount = getWritableDatabase().delete(TABLE_USERS, where, null);
+        SQLiteDatabase database = getWritableDatabase();
+        int deleteCount = database.delete(TABLE_USERS, where, null);
+        database.close();
         Log.d(TAG, "rowID =" + rowID + " delete:" + deleteCount);
         return deleteCount;
     }
 
     //Delete all record to Users
     public int dbDeleteUsers() {
-        int deleteCount = getWritableDatabase().delete(TABLE_USERS, KEY_ID + " !=1", null);
+        SQLiteDatabase database = getWritableDatabase();
+        int deleteCount = database.delete(TABLE_USERS, KEY_ID + " !=1", null);
+        database.close();
         Log.d(TAG, "Delete count =" + " delete:" + deleteCount);
         return deleteCount;
     }
@@ -398,10 +403,10 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv.put(KEY_FBASE_PATH, fbase_path);
         String where = KEY_ID + "=" + rowID;
 
-
-        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        SQLiteDatabase database = getWritableDatabase();
+        int updateResult = database.update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        database.close();
         Log.d(TAG, "DBHelper:dbUpdateMe:rowID =" + rowID + " updated:" + updateResult);
-
         return updateResult;
     }
 
@@ -409,7 +414,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv = new ContentValues();
         cv.put(KEY_BADCOUNT, badCount);
         String where = KEY_ID + "=" + rowID;
-        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        SQLiteDatabase database = getWritableDatabase();
+        int updateResult = database.update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        database.close();
         Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
         return updateResult;
     }
@@ -418,7 +425,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv = new ContentValues();
         cv.put(KEY_EMAIL, email);
         String where = KEY_ID + "=" + rowID;
-        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        SQLiteDatabase database = getWritableDatabase();
+        int updateResult = database.update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        database.close();
         Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
         return updateResult;
     }
@@ -427,7 +436,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv = new ContentValues();
         cv.put(KEY_NAME, name);
         String where = KEY_ID + "=" + rowID;
-        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        SQLiteDatabase database = getWritableDatabase();
+        int updateResult = database.update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        database.close();
         Log.d(TAG, "rowID =" + rowID + " updated:" + updateResult);
         return updateResult;
     }
@@ -436,7 +447,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv = new ContentValues();
         cv.put(KEY_FBASE_PATH, fbase);
         String where =  KEY_EMAIL + "='"+email+"' and "+KEY_PART_EMAIL +"='"+part_email+"'";
-        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        SQLiteDatabase database = getWritableDatabase();
+        int updateResult = database.update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        database.close();
         Log.d(TAG, where + " updated:" + updateResult);
         return updateResult;
     }
@@ -496,7 +509,9 @@ public class DBHelper extends SQLiteOpenHelper implements DBTables {
         cv.put(KEY_FBASE_PATH, fbase_path);
         String where = KEY_EMAIL + "='" + email + "' and " + KEY_PART_EMAIL + "='" + part_email + "'";
         Log.d(TAG, "DBHelper:updateFbaseModel: " + cv.toString()+" where :"+where);
-        int updateResult = getWritableDatabase().update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        SQLiteDatabase database = getWritableDatabase();
+        int updateResult = database.update(TABLE_USERS, cv, where, null); //uodateResult - count of Updated record
+        database.close();
         Log.d(TAG, "DBHelper:updateFbaseModel: updated where =" + where + " updated:" + updateResult);
         return updateResult;
     }

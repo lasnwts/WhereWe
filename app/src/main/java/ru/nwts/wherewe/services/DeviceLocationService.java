@@ -386,7 +386,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Location Service onStartCommand " + this.hashCode());
         initService();
-        return super.onStartCommand(intent, flags, startId);
+        //return super.onStartCommand(intent, flags, startId);
+        return Service.START_STICKY;
     }
 
     private void changelocationRequestOnBattery() {

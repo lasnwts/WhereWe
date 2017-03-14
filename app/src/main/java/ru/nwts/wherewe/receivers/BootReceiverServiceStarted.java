@@ -15,7 +15,9 @@ import ru.nwts.wherewe.services.DeviceLocationService;
 public class BootReceiverServiceStarted extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent serviceIntent = new Intent(context, DeviceLocationService.class);
-        context.startService(serviceIntent);
+        Context context1 = context.getApplicationContext();
+        Intent serviceIntent = new Intent(context1, DeviceLocationService.class);
+        context1.startService(serviceIntent);
+        Log.d("myLogs","BootReceiverServiceStarted");
     }
 }
