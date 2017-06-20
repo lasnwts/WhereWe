@@ -1,4 +1,4 @@
-package ru.nwts.wherewe.util;
+package ru.nwts.wherewe.fragments.dialog;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

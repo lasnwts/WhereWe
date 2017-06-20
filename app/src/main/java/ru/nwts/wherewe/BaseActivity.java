@@ -1,7 +1,5 @@
 package ru.nwts.wherewe;
 
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -22,16 +20,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import ru.nwts.wherewe.database.DBHelper;
-import ru.nwts.wherewe.util.DialogFragmentGooglePlayService;
-import ru.nwts.wherewe.util.PreferenceActivities;
+import ru.nwts.wherewe.fragments.dialog.DialogFragmentGooglePlayService;
+import ru.nwts.wherewe.aux_ui.PreferenceActivities;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static android.view.View.GONE;
-import static java.lang.Boolean.getBoolean;
 
 
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener, DialogFragmentGooglePlayService.DialogFragmentGooglePlayServiceListener {
+public class BaseActivity extends AppCompatActivity implements View.OnClickListener,
+        DialogFragmentGooglePlayService.DialogFragmentGooglePlayServiceListener {
 
     //defining view objects
     private EditText editTextEmail;

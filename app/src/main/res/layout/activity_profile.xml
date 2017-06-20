@@ -42,6 +42,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:hint="@string/scale"
+                        android:visibility="gone"
                         android:src="@drawable/ic_zoom_out_map_white_24dp" />
 
                     <TextView

@@ -1,4 +1,4 @@
-package ru.nwts.wherewe.util;
+package ru.nwts.wherewe.fragments;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;

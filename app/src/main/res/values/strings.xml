@@ -10,6 +10,7 @@
     <string name="about">О приложении</string>
     <string name="prefer">Настройки</string>
     <string name="exit">Выйти</string>
+    <string name="prof_scae">Масштабировать</string>
 
     <string-array name="channel_names">
         <item>Список абонентов</item>
@@ -17,6 +18,16 @@
         <item>Передать свои данные для подключения</item>
         <item>Отключиться от системы</item>
         <item>Масштабировать</item>
+        <item>О приложении</item>
+        <item>Настройки</item>
+    </string-array>
+
+    <string-array name="channel_names_RecyclerViewsActivity">
+        <item>Вернуться к карте</item>
+        <item>Добавить абонента</item>
+        <item>Передать свои данные для подключения</item>
+        <item>Отключиться от системы</item>
+        <item>...........</item>
         <item>О приложении</item>
         <item>Настройки</item>
     </string-array>
@@ -55,7 +66,7 @@
 
     <string name="hintAllowedSMSRead">Разрешение читать входящие СМС</string>
     <string name="allowedSMSRead">Чтение СМС</string>
-    <string name="textViewCardHeadNaME">Наименование абонента</string>
+    <string name="textViewCardHeadNaME">Наименование:</string>
     <string name="textViewCardHeadEmail">Электронный адрес</string>
 
     <string name="mene_option1">Открыть</string>
@@ -78,6 +89,8 @@
     <string name="scale">Масштаб</string>
     <string name="word_marker_time">Обновлено:</string>
     <string name="build">Сборка:</string>
+    <string name="pref_setting">Настройки</string>
+    <string name="prompt_email">Email</string>
 
 
 </resources>

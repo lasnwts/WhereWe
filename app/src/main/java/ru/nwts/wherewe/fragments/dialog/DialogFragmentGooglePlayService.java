@@ -1,4 +1,4 @@
-package ru.nwts.wherewe.util;
+package ru.nwts.wherewe.fragments.dialog;
 
 import android.app.Dialog;
 import android.content.Context;

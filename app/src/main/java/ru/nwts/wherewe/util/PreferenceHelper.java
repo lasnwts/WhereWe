@@ -88,4 +88,8 @@ public class PreferenceHelper {
     public float getFloat(String key){
         return preferences.getFloat(key,0);
     }
+
+    public boolean get_allowedSendLocation(){
+        return preferences.getBoolean("allowedSendLocation",true);
+    }
 }

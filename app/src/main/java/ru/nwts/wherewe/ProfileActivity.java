@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Icon;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -19,7 +18,6 @@ import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,11 +25,9 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -55,15 +51,15 @@ import ru.nwts.wherewe.aux_ui.RecyclerViews;
 import ru.nwts.wherewe.database.DBHelper;
 import ru.nwts.wherewe.model.SmallModel;
 import ru.nwts.wherewe.services.DeviceLocationService;
-import ru.nwts.wherewe.util.DialogFragmentInputStr;
-import ru.nwts.wherewe.util.DialogFragmentYesNo;
-import ru.nwts.wherewe.util.PreferenceActivities;
+import ru.nwts.wherewe.fragments.dialog.DialogFragmentInputStr;
+import ru.nwts.wherewe.fragments.dialog.DialogFragmentYesNo;
+import ru.nwts.wherewe.aux_ui.PreferenceActivities;
+import ru.nwts.wherewe.settings.Constants;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
+import static android.R.attr.name;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
-import static ru.nwts.wherewe.R.drawable.ic_view_list_white_18dp;
 import static ru.nwts.wherewe.R.id.map;
-import static ru.nwts.wherewe.TODOApplication.*;
 import static ru.nwts.wherewe.database.DBConstant.KEY_DATE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
@@ -122,7 +118,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     //date format
     SimpleDateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy' 'HH:mm:ss");
     private String wordTimeOnMarker;
-
+    final private int FOR_RESULT_EXIT = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +145,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //initializing views
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle(R.string.app_name);
 
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
         wordTimeOnMarker = getResources().getString(R.string.word_marker_time);
@@ -207,7 +204,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                                 switch (selectedDrawerItem) {
                                     case 1:
-                                        startActivity(new Intent(getApplicationContext(), RecyclerViews.class));
+                                        startActivityForResult( new Intent(getApplicationContext(), RecyclerViews.class),0);
                                         break;
                                     case 2:
                                         DialogFragmentInputStr editNameDialogFragment = new DialogFragmentInputStr();
@@ -253,7 +250,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         //displaying logged in user name
         textViewUserEmail.setText("Welcome " + user.getEmail());
-        buttonScale = (ImageButton) findViewById(R.id.buttonProfileScale);
+       // buttonScale = (ImageButton) findViewById(R.id.buttonProfileScale);
 
         //Works Databases
         //dbHelper = new DBHelper(this);
@@ -267,6 +264,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         locationService = new Intent(ProfileActivity.this, DeviceLocationService.class);
         //Preference
         initPreferences();
+/*
         registerReceiver(this.broadcastReceiverEdit,
                 new IntentFilter(ACTION_EDIT_ABONENT));
 
@@ -274,10 +272,23 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         registerReceiver(this.broadcastReceiver,
                 new IntentFilter(new IntentFilter(ACTION_MAPRECEIVER)));
 
+        */
         //Write to SharedPref what ProfActivity Started
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, true);
 
-        buttonScale.setOnClickListener(this);
+   //     buttonScale.setOnClickListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        toolbar.setTitle(R.string.app_name);
+        registerReceiver(this.broadcastReceiverEdit,
+                new IntentFilter(ACTION_EDIT_ABONENT));
+
+        //BroadCastReceiver register
+        registerReceiver(this.broadcastReceiver,
+                new IntentFilter(new IntentFilter(ACTION_MAPRECEIVER)));
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -372,6 +383,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     protected void onPause() {
         //Write to SharedPref what ProfActivity Started
         Log.d(TAG, "ProfileActivity onPaiused..");
+        overridePendingTransition(R.anim.open_main, R.anim.close_next);
         super.onPause();
     }
 
@@ -409,6 +421,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 return true;
             case R.id.menuAbout:
                 showAbout();
+                return true;
+            case  R.id.menuProfileScale:
+                setScale();
                 return true;
         }
 
@@ -649,6 +664,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
         try {
             this.unregisterReceiver(broadcastReceiverEdit);
@@ -658,7 +678,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             this.unregisterReceiver(broadcastReceiver);
         } catch (IllegalArgumentException e) {
         }
-        super.onDestroy();
+        super.onStop();
     }
 
     private boolean putInputStrNewSendInformation(String sendMessage) {
@@ -713,6 +733,16 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             Log.d(TAG, "putInputStrNewSendInformation: error in str!");
         }
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) {return;}
+        boolean exit_flag = data.getBooleanExtra(Constants.EXIT_POOL,false);
+        if (resultCode==RESULT_OK && exit_flag) {
+            finish();
+        }
     }
 
 }

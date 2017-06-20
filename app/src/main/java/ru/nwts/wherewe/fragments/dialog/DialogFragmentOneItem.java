@@ -1,4 +1,4 @@
-package ru.nwts.wherewe.util;
+package ru.nwts.wherewe.fragments.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -7,18 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import ru.nwts.wherewe.R;
 import ru.nwts.wherewe.model.SmallModel;
-
-import static android.R.attr.name;
 
 /**
  * Created by пользователь on 17.02.2017.

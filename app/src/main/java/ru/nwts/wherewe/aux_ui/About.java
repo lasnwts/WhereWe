@@ -3,17 +3,12 @@ package ru.nwts.wherewe.aux_ui;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.lb.material_preferences_library.PreferenceActivity;
 import com.lb.material_preferences_library.custom_preferences.Preference;
 
 import ru.nwts.wherewe.R;
-import ru.nwts.wherewe.util.PreferenceActivities;
-
-import static android.R.attr.versionName;
 
 public class About extends PreferenceActivity
         implements Preference.OnPreferenceClickListener {
@@ -50,6 +45,11 @@ public class About extends PreferenceActivity
     }
 
 
+    @Override
+    protected void onPause() {
+        overridePendingTransition (R.anim.open_main, R.anim.close_next);
+        super.onPause();
+    }
 
     @Override
     public boolean onPreferenceClick(android.preference.Preference preference) {

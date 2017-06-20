@@ -183,6 +183,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         }
 
         Log.d(TAG, "KEY_ACTIVITY_READY : " + preferenceHelper.getBoolean(KEY_ACTIVITY_READY));
+        Log.d(TAG, "allowedSendLocation : " + preferenceHelper.get_allowedSendLocation());
+
         if (!preferenceHelper.getBoolean(KEY_ACTIVITY_READY)) {
             if (myAccuracy == location.getAccuracy()) {
                 Log.d(TAG, " Destroy on myAccuracy == location.getAccuracy().");
@@ -334,7 +336,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     private void requestLocationUpdates() {
         Log.d(TAG, "requestLocationUpdates()..");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -342,6 +345,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            Log.d(TAG, "Permission not granted for => connected requestLocationUpdates()..");
             return;
         }
         Log.d(TAG, "test connected requestLocationUpdates()..");
@@ -432,6 +436,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         }
         preferenceHelper.putBoolean(KEY_LOCATION_SERVICE_STARTED, true);
         Log.d(TAG, "Start service location!");
+        Log.d(TAG, "allowedSendLocation : " + preferenceHelper.get_allowedSendLocation());
         if (checkPlayServices()) {
             Log.d(TAG, "buildGoogleApiClient");
 
@@ -445,7 +450,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 requestLocationUpdates();
             }
         } else {
-            Log.d(TAG, "Внимание!! = Опрежеление координат невозможно!");
+            Log.d(TAG, "Внимание!! = Определение координат невозможно!");
             onDestroy();
         }
     }
@@ -587,6 +592,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     @Override
     public void onDestroy() {
+        //last record save..
+        dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeedUpdate, 0, myTimeUpdate, myLongtitudeUpdate, myLatitudeUpdate, databaseReference.child(user.getUid()).getKey().toString());
         preferenceHelper.putBoolean(KEY_LOCATION_SERVICE_STARTED, false);
         Log.d(TAG, "onDestroy begining");
         if (googleApiClient.isConnected()) {

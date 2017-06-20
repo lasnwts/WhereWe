@@ -1,7 +1,5 @@
-package ru.nwts.wherewe.util;
+package ru.nwts.wherewe.fragments.dialog;
 
-import android.app.Activity;
-import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;

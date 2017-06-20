@@ -1,6 +1,6 @@
 package ru.nwts.wherewe.adapter;
 
-import android.app.Application;
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,18 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
 import ru.nwts.wherewe.R;
-import ru.nwts.wherewe.aux_ui.RecyclerViews;
 import ru.nwts.wherewe.model.SmallModel;
-import ru.nwts.wherewe.util.DialogFragmentOneItem;
-import ru.nwts.wherewe.util.DialogFragmentYesNo;
-
-import static ru.nwts.wherewe.R.id.recyclerViewLayout;
-import static ru.nwts.wherewe.R.id.textViewHead;
+import ru.nwts.wherewe.fragments.dialog.DialogFragmentOneItem;
+import ru.nwts.wherewe.fragments.dialog.DialogFragmentYesNo;
 
 /**
  * Created by пользователь on 16.02.2017.
@@ -40,17 +35,21 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
 
     private List<SmallModel> smallModels;
     private Context context;
+    private adapterClickListener mAdapterClickListener;
+    private Activity activity;
 
-    public adapterSmallModel(List<SmallModel> smallModels, Context context) {
+    public adapterSmallModel(List<SmallModel> smallModels, Context context, adapterClickListener mAdapterClickListener) {
         this.smallModels = smallModels;
         this.context = context;
+        this.mAdapterClickListener = mAdapterClickListener;
     }
 
     @Override
     public adapterSmallModel.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_item, parent, false);
-        return new ViewHolder(v);
+        context = parent.getContext();
+        return new ViewHolder(v,mAdapterClickListener);
     }
 
     @Override
@@ -66,6 +65,7 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
                 FragmentActivity activity = (FragmentActivity)(context);
                 FragmentManager fm = activity.getSupportFragmentManager();
                 Log.v(TAG, "adapterSmallModel:item:"+"One setOnClickListener:"+ holder.textViewHead.getText().toString());
+                holder.mAdapterClickListener.adapterOnClickListener(position);
                 DialogFragment dialogFragmentOneItem = DialogFragmentOneItem.newInstance(smallModels.get(position),position);
                 dialogFragmentOneItem.show(fm,"NewW");
             }
@@ -142,7 +142,11 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
 
     @Override
     public int getItemCount() {
-        return smallModels.size();
+        if (smallModels == null) {
+            return 0;
+        } else {
+            return smallModels.size();
+        }
     }
 
     public void setNotifyItemRemoved(int position){
@@ -166,14 +170,16 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
         public TextView textViewDesc;
         public TextView textViewOption;
         public RelativeLayout relativeLayout;
+        adapterClickListener mAdapterClickListener;
       //  public Lay
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, adapterClickListener madapterClickListener) {
             super(itemView);
             textViewHead = (TextView) itemView.findViewById(R.id.textViewHead);
             textViewDesc = (TextView) itemView.findViewById(R.id.textViewDesc);
             textViewOption = (TextView) itemView.findViewById(R.id.textViewOptions);
             relativeLayout = (RelativeLayout) itemView.findViewById(R.id.recyclerViewLayout);
+            mAdapterClickListener = madapterClickListener;
         }
     }
 }
