@@ -91,6 +91,9 @@
     <string name="build">Сборка:</string>
     <string name="pref_setting">Настройки</string>
     <string name="prompt_email">Email</string>
+    <string name="bottom_menu_abonent">Абонент</string>
+    <string name="bottom_menu_statistics">Статистика</string>
+    <string name="bottom_menu_track">Карта</string>
 
 
 </resources>

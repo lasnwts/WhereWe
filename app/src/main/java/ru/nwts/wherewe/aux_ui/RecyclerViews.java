@@ -93,7 +93,7 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
         channelNames = getResources().getStringArray(R.array.channel_names_RecyclerViewsActivity);
         PrimaryDrawerItem[] primaryDrawerItems = new PrimaryDrawerItem[channelNames.length];
 
-        int[] drawableId = new int[]{R.drawable.ic_view_list_white_18dp,
+        int[] drawableId = new int[]{R.drawable.ic_map_icon,
                 R.drawable.ic_add_box_white_18dp, R.drawable.ic_mail_white_18dp,
                 R.drawable.ic_location_disabled_white_18dp, R.drawable.ic_zoom_out_map_white_18dp,
                 R.drawable.ic_android_white_18dp, R.drawable.ic_settings_applications_white_18dp};
