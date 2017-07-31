@@ -20,6 +20,7 @@ public class SmallModel implements Serializable {
     private double lattitude;
     private int contact_id;
     private String email;
+    private String imgView;
 
     public SmallModel() {
     }
@@ -32,7 +33,8 @@ public class SmallModel implements Serializable {
         this.email = email;
     }
 
-    public SmallModel(int id, String name, int state, int mode, int rights, long speed, int moved, long track_date, double longtitude, double lattitude, int contact_id, String email) {
+    public SmallModel(int id, String name, int state, int mode, int rights, long speed, int moved,
+                      long track_date, double longtitude, double lattitude, int contact_id, String email) {
         this.id = id;
         this.name = name;
         this.state = state;
@@ -45,6 +47,32 @@ public class SmallModel implements Serializable {
         this.lattitude = lattitude;
         this.contact_id = contact_id;
         this.email = email;
+    }
+
+    public SmallModel(int id, String name, int state, int mode, int rights, long speed, int moved,
+                      long track_date, double longtitude, double lattitude, int contact_id,
+                      String email, String imgView) {
+        this.id = id;
+        this.name = name;
+        this.state = state;
+        this.mode = mode;
+        this.rights = rights;
+        this.speed = speed;
+        this.moved = moved;
+        this.track_date = track_date;
+        this.longtitude = longtitude;
+        this.lattitude = lattitude;
+        this.contact_id = contact_id;
+        this.email = email;
+        this.imgView = imgView;
+    }
+
+    public String getImgView() {
+        return imgView;
+    }
+
+    public void setImgView(String imgView) {
+        this.imgView = imgView;
     }
 
     public int getId() {
@@ -93,5 +121,9 @@ public class SmallModel implements Serializable {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setRights(int rights) {
+        this.rights = rights;
     }
 }

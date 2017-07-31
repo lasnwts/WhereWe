@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
@@ -19,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,7 +73,8 @@ import static ru.nwts.wherewe.database.DBConstant.KEY_MODE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_NAME;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener,
-        OnMapReadyCallback, DialogFragmentYesNo.DialogFragmentYesNoListener, DialogFragmentInputStr.DialogFragmentInputStrListener {
+        OnMapReadyCallback, DialogFragmentYesNo.DialogFragmentYesNoListener,
+        DialogFragmentInputStr.DialogFragmentInputStrListener {
 
     //LOG
     public static final String TAG = "MyLogs";
@@ -81,6 +87,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private final String ACTION_EDIT_ABONENT = "ru.nwts.wherewe.edit";
     private final int ACTION_DELETE = 0;
     private final int ACTION_EDIT_NAME = 1;
+    private List<ImageView> mImageViewList;
     //test
     int i;
 
@@ -126,6 +133,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.activity_profile);
 
         manager = getSupportFragmentManager();
+        mImageViewList = new ArrayList<>();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
@@ -204,7 +212,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                                 switch (selectedDrawerItem) {
                                     case 1:
-                                        startActivityForResult( new Intent(getApplicationContext(), RecyclerViews.class),0);
+                                        startActivityForResult(new Intent(getApplicationContext(), RecyclerViews.class), 0);
                                         break;
                                     case 2:
                                         DialogFragmentInputStr editNameDialogFragment = new DialogFragmentInputStr();
@@ -250,14 +258,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         //displaying logged in user name
         textViewUserEmail.setText("Welcome " + user.getEmail());
-       // buttonScale = (ImageButton) findViewById(R.id.buttonProfileScale);
+        // buttonScale = (ImageButton) findViewById(R.id.buttonProfileScale);
 
         //Works Databases
         //dbHelper = new DBHelper(this);
         dbHelper = TODOApplication.getInstance().dbHelper;
         if (dbHelper != null) {
             dbHelper.dbReadInLog();
-            smallModels = dbHelper.getListSmallModel();
+            //smallModels = dbHelper.getListSmallModel();
+            smallModels = dbHelper.getListSmallModelView();
         }
 
 
@@ -276,7 +285,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //Write to SharedPref what ProfActivity Started
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, true);
 
-   //     buttonScale.setOnClickListener(this);
+        //     buttonScale.setOnClickListener(this);
     }
 
     @Override
@@ -289,6 +298,17 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         //BroadCastReceiver register
         registerReceiver(this.broadcastReceiver,
                 new IntentFilter(new IntentFilter(ACTION_MAPRECEIVER)));
+        if (dbHelper != null) {
+            if (smallModels != null) {
+                smallModels = null;
+            }
+            //smallModels = dbHelper.getListSmallModel();
+            smallModels = dbHelper.getListSmallModelView();
+            if (markers != null) {
+                setMapMarkers();
+                setScale();
+            }
+        }
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -306,17 +326,30 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                     if (dateTime != 0) {
                         markers.get(i).setSnippet(wordTimeOnMarker + dateformat.format(dateTime));
                     }
+//                    if (smallModels.get(0).getImgView() != null && !TextUtils.isEmpty(smallModels.get(0).getImgView())) {
+//                        ImageView imageView = (ImageView) findViewById(R.id.imgMarker1);
+//                        imageView.setImageURI(Uri.parse(smallModels.get(0).getImgView()));
+//                        imageView.buildDrawingCache();
+//                        Bitmap bitmap = imageView.getDrawingCache();
+//                        markers.get(i).setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+//
+//                    }
+
                 } else {
                     //others marker
                     for (int m = 0; m < smallModels.size(); m++) {
                         Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:m:" + m);
                         Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:smallModels.get(m).getId():" + smallModels.get(m).getId());
-                        Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():" + markers.get(m).getId());
+//                        Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():" + markers.get(m).getId());
                         if (smallModels.get(m).getId() == Id) {
                             markers.get(m).setPosition(new LatLng(Latitude, Longtitude));
                             if (dateTime != 0) {
                                 markers.get(m).setSnippet(wordTimeOnMarker + dateformat.format(dateTime));
                             }
+//                            if (smallModels.get(m).getImgView() != null && !TextUtils.isEmpty(smallModels.get(m).getImgView())) {
+//                               // markers.get(m).setIcon(BitmapDescriptorFactory.fromPath(smallModels.get(m).getImgView()));
+//
+//                            }
                         }
                     }
                 }
@@ -364,7 +397,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             for (int m = 0; m < smallModels.size(); m++) {
                 Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:m:" + m);
                 Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:smallModels.get(m).getId():" + smallModels.get(m).getId());
-                Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():" + markers.get(m).getId());
+                if (markers.size() < m) {
+                    Log.d(TAG, "broadcastReceiver:sendMessage Run Broadcastreceiver:markers.get(m).getId():" + markers.get(m).getId());
+                }
             }
         }
 
@@ -383,6 +418,22 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     protected void onPause() {
         //Write to SharedPref what ProfActivity Started
         Log.d(TAG, "ProfileActivity onPaiused..");
+        /**
+         * Последняя транзакция
+         */
+        if (dbHelper != null){
+         dbHelper.dbUpdateBadCount(1,1);
+        }
+        preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
+        try {
+            this.unregisterReceiver(broadcastReceiverEdit);
+        } catch (IllegalArgumentException e) {
+        }
+        try {
+            this.unregisterReceiver(broadcastReceiver);
+        } catch (IllegalArgumentException e) {
+        }
+
         overridePendingTransition(R.anim.open_main, R.anim.close_next);
         super.onPause();
     }
@@ -422,12 +473,52 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.menuAbout:
                 showAbout();
                 return true;
-            case  R.id.menuProfileScale:
+            case R.id.menuProfileScale:
                 setScale();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Установка маркеров на карту
+     */
+    private void setMapMarkers() {
+        if (Map == null) {
+            Toast.makeText(getApplicationContext(),
+                    "Error creating map", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (smallModels == null) {
+            Toast.makeText(getApplicationContext(),
+                    "Error SmallModel empty Error!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (markers == null) {
+            markers = new ArrayList<>();
+        } else {
+            Map.clear();
+            markers.clear();
+        }
+
+        for (int j = 0; j < smallModels.size(); j++) {
+            SmallModel model = smallModels.get(j);
+            String snippets = wordTimeOnMarker + dateformat.format(model.getTrack_date());
+            //Это ваша запись? = 1 => Означает вашу запись
+            if (model.getId() == 1) {
+                i = j;
+                Log.d(TAG, "addMarker:Name:" + model.getName() + ":getLongtitude:" + model.getLongtitude() + " getLattitude:" + model.getLattitude());
+                markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude()))
+                        .title(model.getName()).snippet(snippets).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
+            } else {
+                //Проверка что можно показывать маркер
+                if (model.getRights() == 1) {
+                    markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(),
+                            model.getLongtitude())).title(model.getName()).snippet(snippets)));
+                }
+            }
+        }
     }
 
     @Override
@@ -461,27 +552,33 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         for (int j = 0; j < smallModels.size(); j++) {
             SmallModel model = smallModels.get(j);
             String snippets = wordTimeOnMarker + dateformat.format(model.getTrack_date());
+            //Это ваша запись? = 1 => Означает вашу запись
             if (model.getId() == 1) {
                 i = j;
                 Log.d(TAG, "addMarker:Name:" + model.getName() + ":getLongtitude:" + model.getLongtitude() + " getLattitude:" + model.getLattitude());
                 markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(), model.getLongtitude()))
                         .title(model.getName()).snippet(snippets).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
             } else {
-                markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(),
-                        model.getLongtitude())).title(model.getName()).snippet(snippets)));
-            }
-            builder.include(markers.get(j).getPosition());
-            bounds = builder.build();
-            Map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                @Override
-                public void onMapLoaded() {
-                    int padding = 10; // offset from edges of the map in pixels
-                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-                    //Map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
-                    Map.moveCamera(cu);
+                //Проверка что можно показывать маркер
+                if (model.getRights() == 1) {
+                    markers.add(j, Map.addMarker(new MarkerOptions().position(new LatLng(model.getLattitude(),
+                            model.getLongtitude())).title(model.getName()).snippet(snippets)));
                 }
-            });
-        }
+            }
+            if (model.getId() == 1 || model.getRights() == 1) {
+                builder.include(markers.get(j).getPosition());
+                bounds = builder.build();
+                Map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                    @Override
+                    public void onMapLoaded() {
+                        int padding = 10; // offset from edges of the map in pixels
+                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                        //Map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
+                        Map.moveCamera(cu);
+                    }
+                });
+            }
+        } //
     }
 
 
@@ -670,14 +767,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onStop() {
         preferenceHelper.putBoolean(KEY_ACTIVITY_READY, false);
-        try {
-            this.unregisterReceiver(broadcastReceiverEdit);
-        } catch (IllegalArgumentException e) {
-        }
-        try {
-            this.unregisterReceiver(broadcastReceiver);
-        } catch (IllegalArgumentException e) {
-        }
+//        try {
+//            this.unregisterReceiver(broadcastReceiverEdit);
+//        } catch (IllegalArgumentException e) {
+//        }
+//        try {
+//            this.unregisterReceiver(broadcastReceiver);
+//        } catch (IllegalArgumentException e) {
+//        }
         super.onStop();
     }
 
@@ -738,9 +835,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) {return;}
-        boolean exit_flag = data.getBooleanExtra(Constants.EXIT_POOL,false);
-        if (resultCode==RESULT_OK && exit_flag) {
+        if (data == null) {
+            return;
+        }
+        boolean exit_flag = data.getBooleanExtra(Constants.EXIT_POOL, false);
+        if (resultCode == RESULT_OK && exit_flag) {
             finish();
         }
     }

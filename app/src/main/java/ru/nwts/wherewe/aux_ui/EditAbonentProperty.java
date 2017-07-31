@@ -1,8 +1,10 @@
 package ru.nwts.wherewe.aux_ui;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.menu.MenuBuilder;
@@ -11,17 +13,30 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import ru.nwts.wherewe.R;
 import ru.nwts.wherewe.TODOApplication;
 import ru.nwts.wherewe.database.DBHelper;
+import ru.nwts.wherewe.fragments.EditAbonentFragment;
+import ru.nwts.wherewe.model.SmallModel;
+import ru.nwts.wherewe.settings.Constants;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
-public class EditAbonentProperty extends AppCompatActivity {
+import static android.R.attr.id;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
+import static ru.nwts.wherewe.database.DBConstant.KEY_MODE;
+import static ru.nwts.wherewe.database.DBConstant.KEY_NAME;
+import static ru.nwts.wherewe.settings.Constants.ACTION_EDIT_ABONENT;
+
+public class EditAbonentProperty extends AppCompatActivity implements EditAbonentFragment.SaveListener{
 
     private Toolbar toolbar;
     public DBHelper dbHelper;
     PreferenceHelper preferenceHelper;
+    EditAbonentFragment mEditAbonentFragment;
+    private final int ACTION_EDIT_NAME = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +61,10 @@ public class EditAbonentProperty extends AppCompatActivity {
             toolbar.inflateMenu(R.menu.menu_option_rv);
         }
         dbHelper = TODOApplication.getInstance().dbHelper;
+        //
+        Intent intent = getIntent();
+        TODOApplication.getInstance().setEmail(intent.getStringExtra(Constants.ABONENT_ITEM));
+        showFragmentEditAbonent();
     }
 
     @Override
@@ -119,4 +138,41 @@ public class EditAbonentProperty extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void showFragmentEditAbonent(){
+        if (mEditAbonentFragment == null) {
+            mEditAbonentFragment = new EditAbonentFragment();
+        }
+        if (getFragmentManager().getBackStackEntryCount() != 0) {
+            getFragmentManager().popBackStack();
+        }
+        getFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                .replace(R.id.content_frame, mEditAbonentFragment, Constants.TAG_EDIT_ABONENT_FRAGMENT).commit();
+    }
+
+    @Override
+    public void onSaveAbonent(SmallModel updatedModel) {
+        if (updatedModel == null) {
+            return;
+        }
+        dbHelper.dbUpdateSmallModel(updatedModel);
+
+        if (dbHelper.dbUpdateSmallModel(updatedModel) == 1) {
+            Toast.makeText(this, R.string.update_done, Toast.LENGTH_SHORT).show();
+            sendBroadCastEditAbonent(id, updatedModel.getName(), ACTION_EDIT_NAME);
+        } else {
+            Toast.makeText(this, R.string.update_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendBroadCastEditAbonent(int id, String name, int action) {
+        Intent intent = new Intent();
+        intent.setAction(ACTION_EDIT_ABONENT);
+        intent.putExtra(KEY_ID, id);
+        intent.putExtra(KEY_NAME, name);
+        intent.putExtra(KEY_MODE, action);
+        //intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+        Log.d(Constants.TAG, "sendMessage:sendBroadCastEditAbonent:send from Recycler");
+        sendBroadcast(intent);
+    }
 }

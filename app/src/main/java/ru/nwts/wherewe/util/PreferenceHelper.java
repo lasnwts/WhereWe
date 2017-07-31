@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import ru.nwts.wherewe.settings.Constants;
+
+import static android.R.attr.value;
+
 /**
  * Created by Надя on 27.11.2016.
  */
@@ -91,5 +95,15 @@ public class PreferenceHelper {
 
     public boolean get_allowedSendLocation(){
         return preferences.getBoolean("allowedSendLocation",true);
+    }
+
+    public void setIteratorTrackCount(int value){
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(Constants.MAX_TRACK_COUNT,value);
+        editor.apply();
+    }
+
+    public int getIteratorTrackCount(){
+        return preferences.getInt(Constants.MAX_TRACK_COUNT,0);
     }
 }

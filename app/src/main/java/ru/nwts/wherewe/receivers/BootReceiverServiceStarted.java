@@ -13,6 +13,9 @@ import ru.nwts.wherewe.services.DeviceLocationService;
  */
 
 public class BootReceiverServiceStarted extends BroadcastReceiver {
+    public BootReceiverServiceStarted() {
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Context context1 = context.getApplicationContext();

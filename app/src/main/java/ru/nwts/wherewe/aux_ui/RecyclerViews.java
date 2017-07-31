@@ -46,12 +46,11 @@ import ru.nwts.wherewe.util.PreferenceHelper;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_MODE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_NAME;
+import static ru.nwts.wherewe.settings.Constants.ACTION_EDIT_ABONENT;
 
 public class RecyclerViews extends AppCompatActivity implements DialogFragmentOneItem.EditingTaskListener,
         DialogFragmentYesNo.DialogFragmentYesNoListener, DialogFragmentInputStr.DialogFragmentInputStrListener {
 
-    //LOG
-    public static final String TAG = "MyLogs";
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -59,7 +58,7 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
     private adapterSmallModel adapter;
 
     private List<SmallModel> smallModels;
-    private final String ACTION_EDIT_ABONENT = "ru.nwts.wherewe.edit";
+//    private final String ACTION_EDIT_ABONENT = "ru.nwts.wherewe.edit";
     private final int ACTION_DELETE = 0;
     private final int ACTION_EDIT_NAME = 1;
     public DBHelper dbHelper;
@@ -138,7 +137,7 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
                                         (selectedDrawerItem - 1)
                                 );
 
-                                Log.d(TAG, "Drwaer:selectedDrawerItem:" + selectedDrawerItem);
+                                Log.d(Constants.TAG, "Drwaer:selectedDrawerItem:" + selectedDrawerItem);
 
                                 switch (selectedDrawerItem) {
                                     case 1:
@@ -190,18 +189,19 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
     }
 
     private void loadRecyclerViewItem() {
-
+        if (adapter != null) {
+            adapter = null;
+        }
         adapter = new adapterSmallModel(smallModels, this, new adapterClickListener() {
             @Override
             public void adapterOnClickListener(int item) {
                 Intent intent = new Intent(RecyclerViews.this, EditAbonentProperty.class);
-                intent.putExtra(Constants.ABONENT_ITEM,item);
+                intent.putExtra(Constants.ABONENT_ITEM, smallModels.get(item).getEmail());
                 overridePendingTransition(R.anim.open_main, R.anim.close_next);
                 startActivity(intent);
             }
         });
         recyclerView.setAdapter(adapter);
-
     }
 
     private void sendBroadCastEditAbonent(int id, String name, int action) {
@@ -212,13 +212,13 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
         intent.putExtra(KEY_MODE, action);
         //intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-        Log.d(TAG, "sendMessage:sendBroadCastEditAbonent:send from Recycler");
+        Log.d(Constants.TAG, "sendMessage:sendBroadCastEditAbonent:send from Recycler");
         sendBroadcast(intent);
     }
 
     @Override
     public void onTaskEdited(SmallModel updatedTask, int position, int id) {
-        Log.d(TAG, "onDialogPositiveClick:onTaskEdited:getId()" + id + " position:" + position);
+        Log.d(Constants.TAG, "onDialogPositiveClick:onTaskEdited:getId()" + id + " position:" + position);
         if (dbHelper.dbUpdateName(id, updatedTask.getName()) == 1) {
             Toast.makeText(this, R.string.update_done, Toast.LENGTH_SHORT).show();
             adapter.setNotifyDataChange(updatedTask.getName(), position);
@@ -226,12 +226,12 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
         } else {
             Toast.makeText(this, R.string.update_error, Toast.LENGTH_SHORT).show();
         }
-        Log.v(TAG, "adapterSmallModel: email updated: =" + updatedTask.getEmail());
+        Log.v(Constants.TAG, "adapterSmallModel: email updated: =" + updatedTask.getEmail());
     }
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, int id, int position) {
-        Log.d(TAG, "onDialogPositiveClick:position=" + position + "; id=" + id + " ;item count=" + adapter.getItemCount());
+        Log.d(Constants.TAG, "onDialogPositiveClick:position=" + position + "; id=" + id + " ;item count=" + adapter.getItemCount());
         //Yes delete record
         if (id > 1) {
             if (dbHelper.dbDeleteUser(id) > 0) {
@@ -259,21 +259,21 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
         This test code begin
          */
 
-        Log.d(TAG, "showAbout:" + dbHelper.getEmailPartFBasePartFromMe());
+        Log.d(Constants.TAG, "showAbout:" + dbHelper.getEmailPartFBasePartFromMe());
         String s = dbHelper.getEmailPartFBasePartFromMe();
         byte[] bs = s.getBytes();
         String strEncoded = Base64.encodeToString(bs, Base64.DEFAULT);
-        Log.d(TAG, "showAbout:base64 encoded:" + strEncoded);
+        Log.d(Constants.TAG, "showAbout:base64 encoded:" + strEncoded);
         s = new String(Base64.decode(strEncoded.getBytes(), Base64.DEFAULT));
-        Log.d(TAG, "showAbout:base64 decoded:" + s);
+        Log.d(Constants.TAG, "showAbout:base64 decoded:" + s);
         email = s.substring(0, s.indexOf(";"));
-        Log.d(TAG, "showAbout:email:" + email);
+        Log.d(Constants.TAG, "showAbout:email:" + email);
         s = s.substring(s.indexOf(";") + 1, s.length());
-        Log.d(TAG, "showAbout:s:" + s);
+        Log.d(Constants.TAG, "showAbout:s:" + s);
         part_email = s.substring(0, s.indexOf(";"));
-        Log.d(TAG, "showAbout:part_email:" + part_email);
+        Log.d(Constants.TAG, "showAbout:part_email:" + part_email);
         fbase_part = s.substring(s.indexOf(";") + 1, s.length());
-        Log.d(TAG, "showAbout:Fbase_part:" + fbase_part);
+        Log.d(Constants.TAG, "showAbout:Fbase_part:" + fbase_part);
         if (!dbHelper.checkExistClient(email, part_email)) {
             dbHelper.dbInsertUser("", 0, 0, 0, 0, 0, preferenceHelper.getLong("Time"), Double.longBitsToDouble(preferenceHelper.getLong("Longtitude")),
                     Double.longBitsToDouble(preferenceHelper.getLong("Latitude")), fbase_part, null, 0, 999, "i123456789", "o123456789", email, part_email);
@@ -311,7 +311,7 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
             strDecoded = new String(Base64.decode(strEncoded.getBytes(), Base64.DEFAULT));
         } catch (IllegalArgumentException error) {
             strDecoded = "";
-            Log.e(TAG, error.toString());
+            Log.e(Constants.TAG, error.toString());
         }
         return strDecoded;
     }
@@ -343,7 +343,6 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
         } else {
             Toast.makeText(getApplicationContext(), "Привет, вы ничего не ввели!", Toast.LENGTH_SHORT).show();
         }
-
     }
 
 
@@ -354,23 +353,23 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
 
         if (isFireBasePathValidation(sendMessage)) {
             sendMessage = getEmailAndFireBasePathtoClient(sendMessage.substring(8, sendMessage.length()));
-            Log.d(TAG, "EmailAndFireBasePathtoClient: " + sendMessage);
+            Log.d(Constants.TAG, "EmailAndFireBasePathtoClient: " + sendMessage);
 
             if (isEmailValidation(getEmailFromDecoded(sendMessage))) {
                 email = getEmailFromDecoded(sendMessage).trim();
-                Log.d(TAG, "EmailAndFireBasePathtoClient:is email:mathes : " + email);
+                Log.d(Constants.TAG, "EmailAndFireBasePathtoClient:is email:mathes : " + email);
             } else {
                 return false;
             }
             if (isPartEmailValidation(getPartEmailFromDecoded(sendMessage))) {
                 part_email = getPartEmailFromDecoded(sendMessage).trim();
-                Log.d(TAG, "EmailAndFireBasePathtoClient:part_email:" + part_email);
+                Log.d(Constants.TAG, "EmailAndFireBasePathtoClient:part_email:" + part_email);
             } else {
                 return false;
             }
             if ((getFireBasePathFromDecoded(sendMessage).length() > 20)) {
                 fbase_part = getFireBasePathFromDecoded(sendMessage).trim();
-                Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:" + fbase_part);
+                Log.d(Constants.TAG, "EmailAndFireBasePathtoClient:fbase_path:" + fbase_part);
             } else {
                 return false;
             }
@@ -390,20 +389,20 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
             }
             return true;
         } else {
-            Log.d(TAG, "putInputStrNewSendInformation: error in str!");
+            Log.d(Constants.TAG, "putInputStrNewSendInformation: error in str!");
         }
         return false;
     }
 
     private boolean isFireBasePathValidation(String fbase_path) {
         if (fbase_path != null && !fbase_path.isEmpty() && fbase_path.length() > 20) {
-            Log.d(TAG, "putInputStrNewSendInformation:" + fbase_path);
-            Log.d(TAG, "putInputStrNewSendInformation:" + fbase_path.indexOf("99999"));
+            Log.d(Constants.TAG, "putInputStrNewSendInformation:" + fbase_path);
+            Log.d(Constants.TAG, "putInputStrNewSendInformation:" + fbase_path.indexOf("99999"));
             if (fbase_path.indexOf("99999") > 0) {
                 try {
                     new String(Base64.decode(fbase_path.substring(8, fbase_path.length()).getBytes(), Base64.DEFAULT));
                 } catch (IllegalArgumentException error) {
-                    Log.e(TAG, error.toString());
+                    Log.e(Constants.TAG, error.toString());
                     return false;
                 }
                 return true;
@@ -428,7 +427,7 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
     private String getFireBasePathFromDecoded(String strDecoded) {
         String s = strDecoded.substring(strDecoded.indexOf(";") + 1, strDecoded.length());
         String fbase_part = s.substring(s.indexOf(";") + 1, s.length());
-        Log.d(TAG, "EmailAndFireBasePathtoClient:fbase_path:22:" + fbase_part);
+        Log.d(Constants.TAG, "EmailAndFireBasePathtoClient:fbase_path:22:" + fbase_part);
         return fbase_part;
     }
 
@@ -468,5 +467,13 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (adapter != null) {
+            smallModels = dbHelper.getListSmallModel();
+            loadRecyclerViewItem();
+        }
+    }
 }
 

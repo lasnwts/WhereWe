@@ -68,4 +68,11 @@
 
     </FrameLayout>
 
+    <ImageView
+        android:id="@+id/imgMarker1"
+        android:visibility="gone"
+        android:scaleType="centerInside"
+        android:layout_width="32dp"
+        android:layout_height="32dp"/>
+
 </RelativeLayout>

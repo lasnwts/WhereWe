@@ -2,25 +2,33 @@ package ru.nwts.wherewe.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 
 import java.util.List;
 
 import ru.nwts.wherewe.R;
+import ru.nwts.wherewe.database.DataManager;
 import ru.nwts.wherewe.model.SmallModel;
 import ru.nwts.wherewe.fragments.dialog.DialogFragmentOneItem;
 import ru.nwts.wherewe.fragments.dialog.DialogFragmentYesNo;
+import ru.nwts.wherewe.settings.Constants;
 
 /**
  * Created by пользователь on 16.02.2017.
@@ -38,7 +46,8 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
     private adapterClickListener mAdapterClickListener;
     private Activity activity;
 
-    public adapterSmallModel(List<SmallModel> smallModels, Context context, adapterClickListener mAdapterClickListener) {
+    public adapterSmallModel(List<SmallModel> smallModels, Context context,
+                             adapterClickListener mAdapterClickListener) {
         this.smallModels = smallModels;
         this.context = context;
         this.mAdapterClickListener = mAdapterClickListener;
@@ -57,7 +66,9 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
         final SmallModel smallModel = smallModels.get(position);
         holder.textViewHead.setText(smallModel.getName());
         holder.textViewDesc.setText(smallModel.getEmail());
-
+        if (smallModel.getImgView() != null && !TextUtils.isEmpty(smallModel.getImgView())) {
+            picassoGetImages(holder, Uri.parse(smallModel.getImgView()));
+        }
         //View One element
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,8 +77,8 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
                 FragmentManager fm = activity.getSupportFragmentManager();
                 Log.v(TAG, "adapterSmallModel:item:"+"One setOnClickListener:"+ holder.textViewHead.getText().toString());
                 holder.mAdapterClickListener.adapterOnClickListener(position);
-                DialogFragment dialogFragmentOneItem = DialogFragmentOneItem.newInstance(smallModels.get(position),position);
-                dialogFragmentOneItem.show(fm,"NewW");
+//                DialogFragment dialogFragmentOneItem = DialogFragmentOneItem.newInstance(smallModels.get(position),position);
+//                dialogFragmentOneItem.show(fm,"NewW");
             }
         });
 
@@ -170,6 +181,7 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
         public TextView textViewDesc;
         public TextView textViewOption;
         public RelativeLayout relativeLayout;
+        public ImageView mImageView;
         adapterClickListener mAdapterClickListener;
       //  public Lay
 
@@ -179,7 +191,49 @@ public class adapterSmallModel extends RecyclerView.Adapter<adapterSmallModel.Vi
             textViewDesc = (TextView) itemView.findViewById(R.id.textViewDesc);
             textViewOption = (TextView) itemView.findViewById(R.id.textViewOptions);
             relativeLayout = (RelativeLayout) itemView.findViewById(R.id.recyclerViewLayout);
+            mImageView = (ImageView) itemView.findViewById(R.id.imgRecyclerViewAbonent);
             mAdapterClickListener = madapterClickListener;
         }
+    }
+
+    /**
+     * Picasso
+     */
+    private void picassoGetImages(final ViewHolder holder, final Uri imageUri) {
+        DataManager.getInstance().getPicasso()
+                .load(imageUri)
+                .centerInside()
+                .resize(200, 150)
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .error(R.drawable.error_load_image)
+                .placeholder(R.drawable.error_load_image)
+                .into(holder.mImageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(Constants.TAG, "load from cache");
+                    }
+
+                    @Override
+                    public void onError() {
+                        DataManager.getInstance().getPicasso()
+                                .load(imageUri)
+                                //  .fit()
+                                .centerCrop()
+                                .resize(200, 150)
+                                .error(R.drawable.error_load_image)
+                                .placeholder(R.drawable.error_load_image)
+                                .into(holder.mImageView, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.d(Constants.TAG, "Save from network - fetch image");
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Log.d(Constants.TAG, "Could not fetch image");
+                                    }
+                                });
+                    }
+                });
     }
 }

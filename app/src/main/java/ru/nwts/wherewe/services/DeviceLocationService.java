@@ -31,19 +31,28 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.greenrobot.greendao.query.Query;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
 import ru.nwts.wherewe.TODOApplication;
 import ru.nwts.wherewe.database.DBHelper;
+import ru.nwts.wherewe.database.DataManager;
+import ru.nwts.wherewe.model.DaoSession;
 import ru.nwts.wherewe.model.FbaseModel;
 import ru.nwts.wherewe.model.ListFireBasePath;
 import ru.nwts.wherewe.model.ModelCheck;
+import ru.nwts.wherewe.model.TrackModel;
+import ru.nwts.wherewe.model.TrackModelDao;
 import ru.nwts.wherewe.receivers.BoardReceiverBattery;
+import ru.nwts.wherewe.settings.Constants;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static android.R.attr.id;
+import static android.R.attr.mode;
+import static ru.nwts.wherewe.TODOApplication.getDaoSession;
 import static ru.nwts.wherewe.database.DBConstant.KEY_DATE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_LATTITUDE;
@@ -73,6 +82,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     private final int WAKEUP_MIN_10 = 10;
     private int wakeup_min = 5; //default time alarm
     //
+    private int MAX_COUNT_TRACK_RECORD = 9999;
+    //
     private long myTimeUpdate;
     private double myLatitudeUpdate;
     private double myLongtitudeUpdate;
@@ -92,6 +103,10 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     ModelCheck modelCheck;
     FbaseModel fbaseModel;
     List<ListFireBasePath> listFireBasePaths;
+    //track
+    private TrackModel mTrackModel;
+    private TrackModelDao mTrackModelDao;
+    private DaoSession mDaoSession;
 
     //firebase auth object
     private FirebaseAuth firebaseAuth;
@@ -211,6 +226,30 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         //get new object
         fbaseModel = new FbaseModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
                 databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(), myTime);
+
+        /**
+         * Put track
+         */
+        if (mTrackModel == null) {
+            mTrackModel = new TrackModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
+                    modelCheck.getEmail(), dbHelper.getName(modelCheck.getEmail()), myTime, 0);
+        } else {
+
+            /*
+            mTrackModel.setLattitude(myLatitude);
+            mTrackModel.setLongtitude(myLongitude);
+            mTrackModel.setSpeed(mySpeed);
+            mTrackModel.setEmail(modelCheck.getEmail());
+            mTrackModel.setName(dbHelper.getName(modelCheck.getEmail()));
+            mTrackModel.setTrack_date(myTime);
+            */
+            mTrackModel = null;
+            mTrackModel = new TrackModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
+                    modelCheck.getEmail(), dbHelper.getName(modelCheck.getEmail()), myTime, 0);
+        }
+        putTrack(mTrackModel);
+
+
         //put myTime
 //        preferenceHelper.putLong("Time", System.currentTimeMillis());
         //Пишем в SQLite о себеreplaceALL
@@ -236,6 +275,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                 return;
             }
         }
+        //Пишем в Track (трасировка)
+
         //Пишем в FB
         for (jCount = 0; jCount < (listFireBasePaths.size()); jCount++) {
             //Запись в FireBase 03/02/2017
@@ -458,6 +499,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     @Override
     public void onCreate() {
         super.onCreate();
+
         Log.d(TAG, "LOcatio Service Started");
         myAccuracy = 0;
         timeWork = System.currentTimeMillis();
@@ -465,12 +507,27 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         if (preferenceHelper == null) {
             initPreferences();
         }
-        preferenceHelper.putInt(LOCATION_MODE, 0);
+        if (preferenceHelper != null) {
+            preferenceHelper.putInt(LOCATION_MODE, 0);
+            if (TODOApplication.getInstance().getMaxRecordCoutTrackTable() == 0) {
+                TODOApplication.getInstance().setMaxRecordCoutTrackTable(preferenceHelper.getInt(Constants.MAX_TRACK_COUNT));
+            }
+        } else {
+            Log.d(TAG, this.getClass().getName().toString() + " preferenceHelper == null!, destroy service...:(");
+            onDestroy();
+        }
         //init SQlite
         dbHelper = TODOApplication.getInstance().dbHelper;
         if (dbHelper == null) {
             Log.e(TAG, "SQLite error! Service Application destroyed.");
             onDestroy();
+        }
+
+        mDaoSession = DataManager.getInstance().getDaoSession();
+        if (mDaoSession == null) {
+            //
+        } else {
+            mTrackModelDao = mDaoSession.getTrackModelDao();
         }
 
         firebaseAuth = TODOApplication.getFireBaseAuth();
@@ -528,6 +585,24 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                                 }
                             }
                         }
+                        /**
+                         * Put track
+                         */
+                        if (dbHelper != null) {
+                            if (mTrackModel == null) {
+                                mTrackModel = new TrackModel(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
+                                        fbaseModel.getSpeed(), 0, 0, 0, 0,
+                                        fbaseModel.getEmail(),
+                                        dbHelper.getName(fbaseModel.getEmail()),
+                                        fbaseModel.getDateTime(), 0);
+                            } else {
+                                mTrackModel = null;
+                                mTrackModel = new TrackModel(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
+                                        fbaseModel.getSpeed(), 0, 0, 0, 0,
+                                        fbaseModel.getEmail(), dbHelper.getName(fbaseModel.getEmail()), fbaseModel.getDateTime(), 0);
+                            }
+                            putTrack(mTrackModel);
+                        }
                     }
                 }
             }
@@ -558,6 +633,20 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
                                 }
                             }
                         }
+                        /**
+                         * Put track
+                         */
+                        if (mTrackModel == null) {
+                            mTrackModel = new TrackModel(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
+                                    fbaseModel.getSpeed(), 0, 0, 0, 0,
+                                    fbaseModel.getEmail(), dbHelper.getName(modelCheck.getEmail()), fbaseModel.getDateTime(), 0);
+                        } else {
+                            mTrackModel = null;
+                            mTrackModel = new TrackModel(fbaseModel.getLattitude(), fbaseModel.getLongtitude(),
+                                    fbaseModel.getSpeed(), 0, 0, 0, 0,
+                                    fbaseModel.getEmail(), dbHelper.getName(fbaseModel.getEmail()), fbaseModel.getDateTime(), 0);
+                        }
+                        putTrack(mTrackModel);
                     }
                 }
             }
@@ -590,6 +679,49 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
 
+    /**
+     * Получаем количество Track
+     */
+    private int getTrackCount() {
+        Query<TrackModel> trackModelQuery = mDaoSession.queryBuilder(TrackModel.class).build();
+        List<TrackModel> trackModelList = trackModelQuery.list();
+        return trackModelList.size();
+    }
+
+    /**
+     * Записываем track
+     *
+     * @param trackModel
+     */
+    private void putTrack(TrackModel trackModel) {
+        if (getTrackCount() < MAX_COUNT_TRACK_RECORD) {
+            mTrackModelDao.insert(trackModel);
+            preferenceHelper.setIteratorTrackCount(getTrackCount());
+        } else {
+            if (preferenceHelper.getIteratorTrackCount() > MAX_COUNT_TRACK_RECORD) {
+                preferenceHelper.setIteratorTrackCount(0);
+            } else {
+                preferenceHelper.setIteratorTrackCount(preferenceHelper.getIteratorTrackCount() + 1);
+            }
+            Query<TrackModel> trackModelQuery = mDaoSession.queryBuilder(TrackModel.class)
+                    .where(TrackModelDao.Properties.Id.eq(preferenceHelper.getIteratorTrackCount())).build();
+            TrackModel localTrackModel = trackModelQuery.unique();
+            if (localTrackModel == null) {
+                mTrackModelDao.insert(trackModel);
+                preferenceHelper.setIteratorTrackCount(preferenceHelper.getIteratorTrackCount());
+            } else {
+                localTrackModel.setLattitude(trackModel.getLattitude());
+                localTrackModel.setLongtitude(trackModel.getLongtitude());
+                localTrackModel.setSpeed(trackModel.getSpeed());
+                localTrackModel.setEmail(trackModel.getEmail());
+                localTrackModel.setName(trackModel.getName());
+                localTrackModel.setTrack_date(trackModel.getTrack_date());
+                localTrackModel.update();
+            }
+        }
+
+    }
+
     @Override
     public void onDestroy() {
         //last record save..
@@ -609,6 +741,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             Log.d(TAG, ":DeviceServiceLocation:onDestroy() :" + br.GetBatteryInfo());
         }
         onWakeUpInstallation();
+        //in shared preference count of track table
+        preferenceHelper.putInt(Constants.MAX_TRACK_COUNT, TODOApplication.getInstance().getMaxRecordCoutTrackTable());
         Log.d(TAG, "onDestroy end");
         super.onDestroy();
     }

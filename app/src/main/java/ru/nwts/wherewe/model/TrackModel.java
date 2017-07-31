@@ -6,45 +6,33 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
 
 /**
- * Created by пользователь on 19.06.2017.
+ * Created by пользователь on 21.06.2017.
  */
 @Entity(active = true)
-public class GNodel {
-
+public class TrackModel {
     @Id
     private Long id;
     private String name;
     private int state;
     private int mode;
     private int rights;
-    private long speed;
+    private double speed;
     private int moved;
     private long track_date;
-    private long longtitude;
-    private long lattitude;
-    private String fbase_path;
-    private String fbase_old;
-    private int track_count;
-    private int track_count_allowed;
-    private String key;
-    private String key_old;
+    private double longtitude;
+    private double lattitude;
     private int contact_id;
     private String email;
-    private String part_email;
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
     /** Used for active entity operations. */
-    @Generated(hash = 1313362356)
-    private transient GNodelDao myDao;
+    @Generated(hash = 1457393434)
+    private transient TrackModelDao myDao;
 
-    public GNodel() {
-    }
+    public TrackModel( double lattitude, double longtitude, double speed, int moved, int state,
+                       int mode, int rights, String email, String name, long track_date,  int contact_id) {
 
-
-    public GNodel(String name, int state, int mode, int rights, long speed, int moved,
-                  long track_date, long longtitude, long lattitude, String fbase_path, String fbase_old, int track_count,
-                  int track_count_allowed, String key, String key_old, int contact_id, String email, String part_email) {
         this.name = name;
         this.state = state;
         this.mode = mode;
@@ -54,22 +42,13 @@ public class GNodel {
         this.track_date = track_date;
         this.longtitude = longtitude;
         this.lattitude = lattitude;
-        this.fbase_path = fbase_path;
-        this.fbase_old = fbase_old;
-        this.track_count = track_count;
-        this.track_count_allowed = track_count_allowed;
-        this.key = key;
-        this.key_old = key_old;
         this.contact_id = contact_id;
         this.email = email;
-        this.part_email = part_email;
     }
 
-
-    @Generated(hash = 1860545194)
-    public GNodel(Long id, String name, int state, int mode, int rights, long speed, int moved, long track_date,
-            long longtitude, long lattitude, String fbase_path, String fbase_old, int track_count, int track_count_allowed,
-            String key, String key_old, int contact_id, String email, String part_email) {
+    @Generated(hash = 942854375)
+    public TrackModel(Long id, String name, int state, int mode, int rights, double speed, int moved, long track_date,
+            double longtitude, double lattitude, int contact_id, String email) {
         this.id = id;
         this.name = name;
         this.state = state;
@@ -80,207 +59,109 @@ public class GNodel {
         this.track_date = track_date;
         this.longtitude = longtitude;
         this.lattitude = lattitude;
-        this.fbase_path = fbase_path;
-        this.fbase_old = fbase_old;
-        this.track_count = track_count;
-        this.track_count_allowed = track_count_allowed;
-        this.key = key;
-        this.key_old = key_old;
         this.contact_id = contact_id;
         this.email = email;
-        this.part_email = part_email;
     }
 
+    @Generated(hash = 1083798577)
+    public TrackModel() {
+    }
 
     public Long getId() {
-        return this.id;
+        return id;
     }
-
 
     public void setId(Long id) {
         this.id = id;
     }
 
-
     public String getName() {
-        return this.name;
+        return name;
     }
-
 
     public void setName(String name) {
         this.name = name;
     }
 
-
     public int getState() {
-        return this.state;
+        return state;
     }
-
 
     public void setState(int state) {
         this.state = state;
     }
 
-
     public int getMode() {
-        return this.mode;
+        return mode;
     }
-
 
     public void setMode(int mode) {
         this.mode = mode;
     }
 
-
     public int getRights() {
-        return this.rights;
+        return rights;
     }
-
 
     public void setRights(int rights) {
         this.rights = rights;
     }
 
-
-    public long getSpeed() {
-        return this.speed;
+    public double getSpeed() {
+        return speed;
     }
-
 
     public void setSpeed(long speed) {
         this.speed = speed;
     }
 
-
     public int getMoved() {
-        return this.moved;
+        return moved;
     }
-
 
     public void setMoved(int moved) {
         this.moved = moved;
     }
 
-
     public long getTrack_date() {
-        return this.track_date;
+        return track_date;
     }
-
 
     public void setTrack_date(long track_date) {
         this.track_date = track_date;
     }
 
-
-    public long getLongtitude() {
-        return this.longtitude;
+    public double getLongtitude() {
+        return longtitude;
     }
 
-
-    public void setLongtitude(long longtitude) {
+    public void setLongtitude(double longtitude) {
         this.longtitude = longtitude;
     }
 
-
-    public long getLattitude() {
-        return this.lattitude;
+    public double getLattitude() {
+        return lattitude;
     }
 
-
-    public void setLattitude(long lattitude) {
+    public void setLattitude(double lattitude) {
         this.lattitude = lattitude;
     }
 
-
-    public String getFbase_path() {
-        return this.fbase_path;
-    }
-
-
-    public void setFbase_path(String fbase_path) {
-        this.fbase_path = fbase_path;
-    }
-
-
-    public String getFbase_old() {
-        return this.fbase_old;
-    }
-
-
-    public void setFbase_old(String fbase_old) {
-        this.fbase_old = fbase_old;
-    }
-
-
-    public int getTrack_count() {
-        return this.track_count;
-    }
-
-
-    public void setTrack_count(int track_count) {
-        this.track_count = track_count;
-    }
-
-
-    public int getTrack_count_allowed() {
-        return this.track_count_allowed;
-    }
-
-
-    public void setTrack_count_allowed(int track_count_allowed) {
-        this.track_count_allowed = track_count_allowed;
-    }
-
-
-    public String getKey() {
-        return this.key;
-    }
-
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public String getKey_old() {
-        return this.key_old;
-    }
-
-
-    public void setKey_old(String key_old) {
-        this.key_old = key_old;
-    }
-
-
     public int getContact_id() {
-        return this.contact_id;
+        return contact_id;
     }
-
 
     public void setContact_id(int contact_id) {
         this.contact_id = contact_id;
     }
 
-
     public String getEmail() {
-        return this.email;
+        return email;
     }
-
 
     public void setEmail(String email) {
         this.email = email;
     }
-
-
-    public String getPart_email() {
-        return this.part_email;
-    }
-
-
-    public void setPart_email(String part_email) {
-        this.part_email = part_email;
-    }
-
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
@@ -294,7 +175,6 @@ public class GNodel {
         myDao.delete(this);
     }
 
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
      * Entity must attached to an entity context.
@@ -306,7 +186,6 @@ public class GNodel {
         }
         myDao.refresh(this);
     }
-
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
@@ -320,11 +199,14 @@ public class GNodel {
         myDao.update(this);
     }
 
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
 
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 125219950)
+    @Generated(hash = 1905747753)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
-        myDao = daoSession != null ? daoSession.getGNodelDao() : null;
+        myDao = daoSession != null ? daoSession.getTrackModelDao() : null;
     }
 }

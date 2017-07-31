@@ -45,8 +45,8 @@ public class DataManager {
         return mContext;
     }
 
-//    public DaoSession getDaoSession() {
-//        return mDaoSession;
-//    }
+    public DaoSession getDaoSession() {
+        return mDaoSession;
+    }
 
 }

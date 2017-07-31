@@ -23,10 +23,24 @@ public class TODOApplication extends Application {
 
     public final String TEST_STRING = "Test Application";
 
+    /**
+     * Variable count record in track table     *
+     */
+    private int maxRecordCoutTrackTable;
+
+    public int getMaxRecordCoutTrackTable() {
+        return maxRecordCoutTrackTable;
+    }
+
+    public void setMaxRecordCoutTrackTable(int maxRecordCoutTrackTable) {
+        this.maxRecordCoutTrackTable = maxRecordCoutTrackTable;
+    }
+
     private static TODOApplication instance;
     private static DaoSession sDaoSession;
 
     public DBHelper dbHelper;
+    private String mEmail;
 
     //firebase auth object
     private FirebaseAuth firebaseAuth;
@@ -47,7 +61,7 @@ public class TODOApplication extends Application {
         dbHelper = new DBHelper(this);
         Fabric.with(this, new Crashlytics());
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "whw_db");
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "whwdb");
         Database db = helper.getWritableDb();
         sDaoSession = new DaoMaster(db).newSession();
         //**************************************************************************
@@ -99,4 +113,11 @@ public class TODOApplication extends Application {
         return sDaoSession;
     }
 
+    public String getEmail() {
+        return mEmail;
+    }
+
+    public void setEmail(String email) {
+        mEmail = email;
+    }
 }
