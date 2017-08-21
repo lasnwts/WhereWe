@@ -26,5 +26,16 @@ public interface Constants {
      */
     public final static String MAX_TRACK_COUNT = "max_track_count";
 
+    /**
+     * Константы для сохрание состояния редактировния
+     * абонента при поовроте экрана
+     */
+    public final static String KEY_EDIT_NAME_ABONENT = "key_name_abonent";
+    public final static String KEY_EDIT_EMAIL_ABONENT = "key_email_abonent";
+    public final static String KEY_EDIT_FOTO_ABONENT = "key_foto_abonent";
+    public final static String KEY_EDIT_SHOW_ABONENT = "key_show_abonent";
+
+
+
 
 }

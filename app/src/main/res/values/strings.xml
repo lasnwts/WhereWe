@@ -97,6 +97,9 @@
     <string name="ed_name_abonent">Наименование абонента</string>
     <string name="btn_save">Сохранить</string>
     <string name="choice_image_abonent">Выберите изображение</string>
+    <string name="service_notification_remind">Напоминание</string>
+    <string name="service_notification_remind_desc">Пора покормить кота</string>
+    <string name="service_notification_run">Последнее китайское предупреждение!</string>
 
 
 </resources>

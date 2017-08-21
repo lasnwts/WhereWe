@@ -162,6 +162,15 @@ public class EditAbonentProperty extends AppCompatActivity implements EditAbonen
         } else {
             Toast.makeText(this, R.string.update_error, Toast.LENGTH_SHORT).show();
         }
+        /**
+         * Очищаем шлак от карточки абоенента
+         */
+        if (preferenceHelper != null){
+            preferenceHelper.putString(Constants.KEY_EDIT_EMAIL_ABONENT,"");
+            preferenceHelper.putString(Constants.KEY_EDIT_NAME_ABONENT,"");
+            preferenceHelper.putString(Constants.KEY_EDIT_FOTO_ABONENT,"");
+
+        }
     }
 
     private void sendBroadCastEditAbonent(int id, String name, int action) {

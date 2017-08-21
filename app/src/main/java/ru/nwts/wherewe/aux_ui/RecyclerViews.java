@@ -58,7 +58,7 @@ public class RecyclerViews extends AppCompatActivity implements DialogFragmentOn
     private adapterSmallModel adapter;
 
     private List<SmallModel> smallModels;
-//    private final String ACTION_EDIT_ABONENT = "ru.nwts.wherewe.edit";
+    //    private final String ACTION_EDIT_ABONENT = "ru.nwts.wherewe.edit";
     private final int ACTION_DELETE = 0;
     private final int ACTION_EDIT_NAME = 1;
     public DBHelper dbHelper;

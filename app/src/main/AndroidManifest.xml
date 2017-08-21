@@ -48,7 +48,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
 
-        <receiver android:name=".receivers.BootReceiverServiceStarted">
+        <receiver android:name=".receivers.BootReceiverServiceStarted"
+                  android:enabled="true"
+                  android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />

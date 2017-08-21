@@ -243,6 +243,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                 }
 
                             } else if (selectedDrawerItem == -1) {
+                                /**
+                                 * Очищаем шлак от карточки абоенента
+                                 */
+                                if (preferenceHelper != null){
+                                    preferenceHelper.putString(Constants.KEY_EDIT_EMAIL_ABONENT,"");
+                                    preferenceHelper.putString(Constants.KEY_EDIT_NAME_ABONENT,"");
+                                    preferenceHelper.putString(Constants.KEY_EDIT_FOTO_ABONENT,"");
+
+                                }
                                 overridePendingTransition(R.anim.open_next, R.anim.close_main);
                                 finish();
                             }
@@ -271,6 +280,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
         locationService = new Intent(ProfileActivity.this, DeviceLocationService.class);
+        startService(locationService);
         //Preference
         initPreferences();
 /*
@@ -761,6 +771,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onDestroy() {
+        startService(locationService);
         super.onDestroy();
     }
 
@@ -775,6 +786,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 //            this.unregisterReceiver(broadcastReceiver);
 //        } catch (IllegalArgumentException e) {
 //        }
+        startService(locationService);
         super.onStop();
     }
 

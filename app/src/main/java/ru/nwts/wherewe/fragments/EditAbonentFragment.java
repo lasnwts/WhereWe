@@ -66,7 +66,6 @@ public class EditAbonentFragment extends Fragment {
     private Uri imgViewUri;
     private String imgViewUriString;
 
-
     private static final String TAG = Constants.TAG_EDIT_ABONENT_FRAGMENT;
 
     @Override
@@ -82,6 +81,11 @@ public class EditAbonentFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(TAG, true);
+        //Сохранаяем состояние карточки абонента
+        preferenceHelper.putString(Constants.KEY_EDIT_NAME_ABONENT, edTextName.getText().toString());
+        preferenceHelper.putString(Constants.KEY_EDIT_EMAIL_ABONENT, edTextEmail.getText().toString());
+        preferenceHelper.putString(Constants.KEY_EDIT_FOTO_ABONENT, imgViewUri.toString());
+        preferenceHelper.putBoolean(Constants.KEY_EDIT_SHOW_ABONENT, mCheckBoxShowOnMap.isChecked());
         super.onSaveInstanceState(outState);
     }
 
@@ -120,6 +124,7 @@ public class EditAbonentFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+
 //        EventBus.getDefault().unregister(this);
     }
 
@@ -171,6 +176,18 @@ public class EditAbonentFragment extends Fragment {
             }
         });
         showAbonent();
+        /**
+         * Восстановление состояние
+         */
+        if (TextUtils.isEmpty(edTextName.getText().toString())){
+            edTextName.setText(preferenceHelper.getString(Constants.KEY_EDIT_NAME_ABONENT));
+        }
+        if (TextUtils.isEmpty(edTextEmail.getText().toString())){
+            edTextEmail.setText(preferenceHelper.getString(Constants.KEY_EDIT_EMAIL_ABONENT));
+        }
+        if (TextUtils.isEmpty(imgViewUriString)){
+            imgViewUriString = preferenceHelper.getString(Constants.KEY_EDIT_FOTO_ABONENT);
+        }
         return view;
     }
 

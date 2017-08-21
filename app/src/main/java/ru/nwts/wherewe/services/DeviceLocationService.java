@@ -2,15 +2,22 @@ package ru.nwts.wherewe.services;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -37,6 +44,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
+import ru.nwts.wherewe.BaseActivity;
+import ru.nwts.wherewe.R;
 import ru.nwts.wherewe.TODOApplication;
 import ru.nwts.wherewe.database.DBHelper;
 import ru.nwts.wherewe.database.DataManager;
@@ -66,6 +75,8 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     //VARIABBLES MONITORING
+    // Идентификатор уведомления
+    private final int NOTIFY_ID = 101;
     private long timeAccpetWait = 15 * 60 * 1000; //Время (15 мин) через которое необходимо обязательно записать в FB информацию
     private double acceptDistance = 10; //meters from transfer
     private String accprtDistanceString = "meter";
@@ -75,6 +86,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     "N" -   Nautical Miles
     "meter" -   meters
  */
+    PowerManager pm;
     private final String ACTION_MAPRECEIVER = "ru.nwts.wherewe.map";
     private final int WAKEUP_MIN_1 = 1;
     private final int WAKEUP_MIN_2 = 2;
@@ -146,6 +158,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "Service onBind");
         return null;
     }
 
@@ -166,6 +179,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private void sendMessage(double Latitude, double Longtitude, int id, Long myTime) {
+        Log.d(TAG, "Servive sendMessage");
         Intent intent = new Intent();
         intent.setAction(ACTION_MAPRECEIVER);
         intent.putExtra(KEY_ID, id);
@@ -180,6 +194,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(TAG, "Service onLocationChanged");
         myLatitude = location.getLatitude();
         myLongitude = location.getLongitude();
         preferenceHelper.putLong("Latitude", Double.doubleToRawLongBits(myLatitude));
@@ -223,6 +238,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private void putWriteMyDataToFireBase(Double myLatitude, Double myLongitude, long myTime, double mySpeed) {
+        Log.d(TAG, "Servive putWriteMyDataToFireBase");
         //get new object
         fbaseModel = new FbaseModel(myLatitude, myLongitude, mySpeed, 0, 0, 0, 0,
                 databaseReference.child(user.getUid()).getKey().toString(), modelCheck.getEmail(), modelCheck.getPart_email(), myTime);
@@ -315,6 +331,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private boolean getCheckWriteOrNotInFirerBase(Double myLatitude, Double myLongitude, long myTime) {
+        Log.d(TAG, "Servive getCheckWriteOrNotInFirerBase");
         //Здесь необходимо из SharedPreferency получить Разрешенную дистанцию
         //Также время записи в FB
         modelCheck = dbHelper.getLatLongTimeFromMe();
@@ -344,12 +361,14 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private String getNormalizeString(String s) {
+        Log.d(TAG, "Servive getNormalizeString");
         //        return  (s.replaceAll("[^A-Za-z0-9+]","_")).replaceAll("[@]+","_");
         return s.replaceAll("[^A-Za-z0-9]+", "_");
     }
 
 
     private double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
+        Log.d(TAG, "Servive distance");
         double theta = lon1 - lon2;
         double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
         dist = Math.acos(dist);
@@ -367,10 +386,12 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private double deg2rad(double deg) {
+        Log.d(TAG, "Servive deg2rad");
         return (deg * Math.PI / 180.0);
     }
 
     private double rad2deg(double rad) {
+        Log.d(TAG, "Servive rad2deg");
         return (rad * 180 / Math.PI);
     }
 
@@ -397,6 +418,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private boolean checkPlayServices() {
+        Log.d(TAG, "Servive checkPlayServices");
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(this);
         if (result != ConnectionResult.SUCCESS) {
@@ -406,6 +428,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     protected synchronized void buildGoogleApiClient() {
+        Log.d(TAG, "Service buildGoogleApiClient");
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -423,6 +446,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
 
     private void initPreferences() {
+        Log.d(TAG, "Servive initPreferences");
         PreferenceHelper.getInstance().init(getApplicationContext());
         preferenceHelper = PreferenceHelper.getInstance();
     }
@@ -471,6 +495,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private void initService() {
+        Log.d(TAG, "Servive initService");
         //
         if (preferenceHelper == null) {
             initPreferences();
@@ -501,11 +526,27 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         super.onCreate();
 
         Log.d(TAG, "LOcatio Service Started");
+        onWakeUpInstallation();
         myAccuracy = 0;
         timeWork = System.currentTimeMillis();
         //
         if (preferenceHelper == null) {
             initPreferences();
+        }
+        //get PowerManager
+        pm = (PowerManager) getSystemService(getApplicationContext().POWER_SERVICE);
+        //notification
+        //Проверка что экран включен
+        if (pm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                if (pm.isInteractive()) {
+                    setNotification(1); //Show notification
+                }
+            } else {
+                if (pm.isScreenOn()) {
+                    setNotification(1); //Show notification
+                }
+            }
         }
         if (preferenceHelper != null) {
             preferenceHelper.putInt(LOCATION_MODE, 0);
@@ -516,6 +557,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
             Log.d(TAG, this.getClass().getName().toString() + " preferenceHelper == null!, destroy service...:(");
             onDestroy();
         }
+
         //init SQlite
         dbHelper = TODOApplication.getInstance().dbHelper;
         if (dbHelper == null) {
@@ -683,6 +725,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
      * Получаем количество Track
      */
     private int getTrackCount() {
+        Log.d(TAG, "Servive getTrackCount");
         Query<TrackModel> trackModelQuery = mDaoSession.queryBuilder(TrackModel.class).build();
         List<TrackModel> trackModelList = trackModelQuery.list();
         return trackModelList.size();
@@ -694,6 +737,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
      * @param trackModel
      */
     private void putTrack(TrackModel trackModel) {
+        Log.d(TAG, "Servive putTrack");
         if (getTrackCount() < MAX_COUNT_TRACK_RECORD) {
             mTrackModelDao.insert(trackModel);
             preferenceHelper.setIteratorTrackCount(getTrackCount());
@@ -724,10 +768,27 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy begining 1");
+        //Проверка что экран включен
+        if (pm != null) {
+            Log.d(TAG, "Service onDestroy pn != null");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                if (pm.isInteractive()) {
+                    Log.d(TAG, "Service onDestroy:isInteractive setNotification.cancel");
+                    setNotification(7); //Show notification
+                }
+            } else {
+                if (pm.isScreenOn()) {
+                    Log.d(TAG, "Service onDestroy:isScreenOn setNotification.cancel");
+                    setNotification(7); //Show notification
+                }
+            }
+        }
+
         //last record save..
         dbHelper.dbUpdateMe(1, 0, 0, 0, mySpeedUpdate, 0, myTimeUpdate, myLongtitudeUpdate, myLatitudeUpdate, databaseReference.child(user.getUid()).getKey().toString());
         preferenceHelper.putBoolean(KEY_LOCATION_SERVICE_STARTED, false);
-        Log.d(TAG, "onDestroy begining");
+        Log.d(TAG, "onDestroy begining 2");
         if (googleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
             googleApiClient.disconnect();
@@ -748,6 +809,7 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
     }
 
     private void onWakeUpInstallation() {
+        Log.d(TAG, "Servive onWakeUpInstallation");
         Intent intent = new Intent(this, DeviceLocationService.class);
         pendingIntent = PendingIntent.getService(this, 0, intent, 0);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -757,4 +819,49 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         Log.d(TAG, "alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);");
     }
+
+    /**
+     * Установка уведомления
+     * для гарантированног7о запуска
+     */
+    private void setNotification(int actions) {
+        Log.d(TAG, "Servive setNotification");
+        Context context = getApplicationContext();
+
+        Intent notificationIntent = new Intent(context, BaseActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(context,
+                0, notificationIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Resources res = context.getResources();
+        Notification.Builder builder = new Notification.Builder(context);
+
+        Notification.Builder builder1 = builder.setContentIntent(contentIntent)
+                .setSmallIcon(R.drawable.ic_service_map)
+                // большая картинка
+                .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.ic_app))
+                //.setTicker(res.getString(R.string.warning)) // текст в строке состояния
+                .setTicker(getString(R.string.service_notification_run))
+                .setWhen(System.currentTimeMillis())
+                .setAutoCancel(true)
+                //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
+                .setContentTitle(getString(R.string.service_notification_remind))
+                //.setContentText(res.getString(R.string.notifytext))
+                .setContentText(getString(R.string.service_notification_remind_desc));// Текст уведомления
+
+        // Notification notification = builder.getNotification(); // до API 16
+        Notification notification = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            notification = builder.build();
+        }
+
+        NotificationManager notificationManager = (NotificationManager) context
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFY_ID, notification);
+        if (actions == 7) {
+            Log.d(TAG, "Servive setNotification.cancel");
+            notificationManager.cancel(NOTIFY_ID);
+        }
+    }
+
 }
