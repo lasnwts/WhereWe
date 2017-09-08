@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.provider.SyncStateContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.menu.MenuBuilder;
@@ -13,6 +15,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import ru.nwts.wherewe.R;
@@ -24,6 +27,7 @@ import ru.nwts.wherewe.settings.Constants;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static android.R.attr.id;
+import static android.R.attr.thickness;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_MODE;
@@ -37,6 +41,7 @@ public class EditAbonentProperty extends AppCompatActivity implements EditAbonen
     PreferenceHelper preferenceHelper;
     EditAbonentFragment mEditAbonentFragment;
     private final int ACTION_EDIT_NAME = 1;
+    BottomNavigationView bnv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +69,37 @@ public class EditAbonentProperty extends AppCompatActivity implements EditAbonen
         //
         Intent intent = getIntent();
         TODOApplication.getInstance().setEmail(intent.getStringExtra(Constants.ABONENT_ITEM));
+        bnv = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        bnv.setOnNavigationItemSelectedListener(getBottomNavigationListener());
         showFragmentEditAbonent();
+    }
+
+    @NonNull
+    private BottomNavigationView.OnNavigationItemSelectedListener getBottomNavigationListener() {
+        return new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_abonent:
+                        //код
+                        break;
+
+                    case R.id.action_stats:
+                       //code
+                        Toast.makeText(getApplication().getApplicationContext(),"Будет реализовано позже, мм если будет нужно.. :))",Toast.LENGTH_SHORT).show();
+                        bnv.getMenu().getItem(0).setChecked(true);
+                        break;
+
+                    case R.id.action_map:
+                        //todo
+                        Toast.makeText(getApplication().getApplicationContext(),"Будет реализовано позже, мм если будет нужно.. :))",Toast.LENGTH_SHORT).show();
+                        bnv.getMenu().getItem(0).setChecked(true);
+                        break;
+
+                }
+                return true;
+            }
+        };
     }
 
     @Override

@@ -97,6 +97,10 @@ public class PreferenceHelper {
         return preferences.getBoolean("allowedSendLocation",true);
     }
 
+    public boolean get_allowedViewServiceLocation(){
+        return preferences.getBoolean("allowedViewServiceLocation",false);
+    }
+
     public void setIteratorTrackCount(int value){
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(Constants.MAX_TRACK_COUNT,value);

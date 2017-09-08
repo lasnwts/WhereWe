@@ -30,4 +30,9 @@
         <!--android:entries="@array/text_style"-->
         <!--android:entryValues="@array/text_style"-->
         <!--android:dialogTitle="Input type work sensor, please" />-->
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="allowedViewServiceLocation"
+        android:summary="@string/hintAllowedViewServiceLocation"
+        android:title="@string/allowedViewLocation"/>
 </PreferenceScreen>

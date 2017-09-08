@@ -826,6 +826,12 @@ public class DeviceLocationService extends Service implements GoogleApiClient.Co
      */
     private void setNotification(int actions) {
         Log.d(TAG, "Servive setNotification");
+
+        if (!preferenceHelper.get_allowedViewServiceLocation()){
+            Log.d(TAG, "Servive setNotification not allowed!");
+            return;
+        }
+
         Context context = getApplicationContext();
 
         Intent notificationIntent = new Intent(context, BaseActivity.class);
