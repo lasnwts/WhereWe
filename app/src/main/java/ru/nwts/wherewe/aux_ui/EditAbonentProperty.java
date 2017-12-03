@@ -4,7 +4,6 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.provider.SyncStateContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import ru.nwts.wherewe.R;
@@ -27,8 +25,6 @@ import ru.nwts.wherewe.settings.Constants;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
 import static android.R.attr.id;
-import static android.R.attr.thickness;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 import static ru.nwts.wherewe.database.DBConstant.KEY_ID;
 import static ru.nwts.wherewe.database.DBConstant.KEY_MODE;
 import static ru.nwts.wherewe.database.DBConstant.KEY_NAME;
@@ -219,4 +215,6 @@ public class EditAbonentProperty extends AppCompatActivity implements EditAbonen
         Log.d(Constants.TAG, "sendMessage:sendBroadCastEditAbonent:send from Recycler");
         sendBroadcast(intent);
     }
+
+
 }

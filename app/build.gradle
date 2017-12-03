@@ -4,7 +4,7 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "ru.nwts.wherewe"
         minSdkVersion 15
@@ -22,6 +22,7 @@ android {
 }
 
 repositories {
+    buildDir = "C:/temp/${rootProject.name}/${project.name}"
     jcenter()
     maven {
         url "https://jitpack.io"

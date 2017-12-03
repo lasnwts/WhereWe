@@ -2,13 +2,11 @@ package ru.nwts.wherewe.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,16 +17,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +32,6 @@ import ru.nwts.wherewe.model.SmallModel;
 import ru.nwts.wherewe.settings.Constants;
 import ru.nwts.wherewe.util.PreferenceHelper;
 
-import static android.R.attr.x;
-import static android.R.attr.y;
 import static android.app.Activity.RESULT_OK;
 import static ru.nwts.wherewe.settings.Constants.GALLERY_REQUEST;
 
@@ -67,6 +57,8 @@ public class EditAbonentFragment extends Fragment {
     private String imgViewUriString;
 
     private static final String TAG = Constants.TAG_EDIT_ABONENT_FRAGMENT;
+    private OnSelectedActionGalleryListener mOnSelectedActionGalleryListener;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,10 +120,20 @@ public class EditAbonentFragment extends Fragment {
 //        EventBus.getDefault().unregister(this);
     }
 
+    /**
+     * Выбор галереи
+     * 0 - отказ
+     * 1 - Фото
+     * 2 - встроенная галерея
+     */
+    public interface OnSelectedActionGalleryListener {
+        void onSelectedActionGallery(int buttonIndex);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_edit_abonent, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_abonent, container,false);
         view.setTag(TAG);
         edTextEmail = (EditText) view.findViewById(R.id.edTxtEmailAbonent);
         edTextName = (EditText) view.findViewById(R.id.edTxNameAbonent);
@@ -232,6 +234,10 @@ public class EditAbonentFragment extends Fragment {
             isExistSmallModel = getSmallModel(TODOApplication.getInstance().getEmail());
         }
     }
+
+
+
+
 
 //    @Subscribe(threadMode = ThreadMode.MAIN)
 //    public void onEvent
